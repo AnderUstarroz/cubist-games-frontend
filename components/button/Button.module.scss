@@ -1,0 +1,47 @@
+.default {
+  cursor: pointer;
+  padding: 10px 20px;
+  background: var(--colorBtn1);
+  font-size: var(--fontSize1);
+  font-weight: bold;
+  border: 0;
+  color: var(--colorFont3);
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  &:hover {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.15) 0 0);
+  }
+}
+.default:global {
+  &.active {
+  }
+}
+.default:global {
+  &.inactive,
+  &.disabled {
+    background-color: transparent;
+    border: 1px solid #cccccc;
+    color: #cccccc;
+    &:hover {
+      background-image: none;
+    }
+  }
+  &.inactive {
+    &:hover {
+      background: var(--colorBtn1);
+      color: var(--colorFont3);
+      border-color: var(--colorBtn1);
+    }
+  }
+  &.disabled {
+    cursor: no-drop;
+  }
+}
+
+@media (max-width: 768px) {
+  .default {
+    font-size: var(--mFontSize1);
+  }
+}

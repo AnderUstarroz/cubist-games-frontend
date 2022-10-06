@@ -1,0 +1,23 @@
+.wn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-weight: normal;
+  padding: 12px 15px;
+  border-radius: 5px;
+}
+.success {
+  background: rgba(33, 229, 111, 0.7);
+  color: white;
+}
+
+.info {
+  background: rgba(78, 68, 206, 0.7);
+  color: white;
+}
+
+.error {
+  background: rgba(235, 55, 66, 0.7);
+  color: white;
+}

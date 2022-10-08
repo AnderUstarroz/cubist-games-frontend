@@ -6,14 +6,14 @@ import {
 import { Connection } from "@solana/web3.js";
 import type { Adapter } from "@solana/wallet-adapter-base";
 import dynamic from "next/dynamic";
-import toast from "react-hot-toast";
+import { flashMsg } from "./helpers";
 
 const Notification = dynamic(() => import("../notification"));
 
 export async function BundlrWrapper(
   connection: Connection,
   adapter: Adapter
-): Promise<Bundlr | undefined> {
+): Promise<Bundlr> {
   try {
     return new Proxy(
       await new Bundlr(
@@ -30,12 +30,7 @@ export async function BundlrWrapper(
                 .catch((e: any) => {
                   if (e instanceof BundlrError) {
                     console.log("entra!");
-                    toast.custom(
-                      <Notification message={e.message} variant="error" />,
-                      {
-                        duration: 10000,
-                      }
-                    );
+                    flashMsg(e.message, "error", 10000);
                   } else {
                     throw e;
                   }
@@ -54,11 +49,8 @@ export async function BundlrWrapper(
     );
   } catch (e: any) {
     if (e instanceof BundlrError) {
-      toast.custom(<Notification message={e.message} variant="error" />, {
-        duration: 10000,
-      });
-    } else {
-      throw e;
+      flashMsg(e.message, "error", 10000);
     }
+    throw e;
   }
 }

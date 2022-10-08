@@ -42,7 +42,7 @@ export default function HomeMenu({ toggle }: HomeMenuType) {
         <Link href="/admin">Admin</Link>
       </MenuItem>
       <MenuItem>
-        <Link href="/admin/settings">
+        <Link href="/admin/games-settings">
           <a title="Settings" onClick={toggle}>
             <Icon cType="gear" />
           </a>

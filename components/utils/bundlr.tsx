@@ -29,7 +29,6 @@ export async function BundlrWrapper(
                 .apply(target, args)
                 .catch((e: any) => {
                   if (e instanceof BundlrError) {
-                    console.log("entra!");
                     flashMsg(e.message, "error", 10000);
                   } else {
                     throw e;

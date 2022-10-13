@@ -18,3 +18,16 @@ export function human_number(n: number, decimals: number) {
     maximumFractionDigits: decimals,
   });
 }
+
+const en_ordinal_rules = new Intl.PluralRules("en", { type: "ordinal" });
+const suffixes: any = {
+  one: "st",
+  two: "nd",
+  few: "rd",
+  other: "th",
+};
+export function ordinal(number: number): string {
+  const category = en_ordinal_rules.select(number);
+  const suffix = suffixes[category];
+  return number + suffix;
+}

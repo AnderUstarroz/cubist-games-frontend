@@ -6,6 +6,7 @@ const Menus: MenuTypes = {
   "/": dynamic(() => import("./home")),
   "/admin": dynamic(() => import("./home")),
   "/admin/games-settings": dynamic(() => import("./home")),
+  "/admin/game": dynamic(() => import("./home")),
   "/unauthorized": dynamic(() => import("./home")),
   "/404": dynamic(() => import("./home")),
 };

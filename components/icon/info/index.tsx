@@ -1,6 +1,6 @@
-import * as React from "react"
-import styles from "./Icon.module.scss"
-import { IconType } from "../types"
+import * as React from "react";
+import styles from "./Icon.module.scss";
+import { IconType } from "../types";
 function Info(props: IconType) {
   return (
     <svg
@@ -13,6 +13,7 @@ function Info(props: IconType) {
       width={props.width ? props.width : 20}
       height={props.height ? props.height : 20}
       className={props.className ? props.className : styles.icon}
+      onClick={props.onClick ? props.onClick : undefined}
     >
       <g>
         <g>
@@ -58,7 +59,7 @@ function Info(props: IconType) {
       <g></g>
       <g></g>
     </svg>
-  )
+  );
 }
 
-export default Info
+export default Info;

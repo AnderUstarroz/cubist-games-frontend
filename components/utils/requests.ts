@@ -12,11 +12,12 @@ export const multi_request = async (
   requests: MultiRequestType[]
 ): Promise<any[]> => {
   const data = await Promise.allSettled(
-    requests.map((request: MultiRequestType) => request[0](...request[1]))
+    requests.map((params: MultiRequestType) => params[0](...params[1]))
   );
   if (data.find(isRejected)) {
     const errorMsg = `Failed to fetch all requests`;
     flashMsg(errorMsg, "error");
+    console.error(errorMsg, data);
     throw new Error(errorMsg);
   }
   return data.map((result: any) => result.value);

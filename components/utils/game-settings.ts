@@ -1,7 +1,20 @@
-import { ProfitShareType } from "@cubist-collective/cubist-games-lib";
+import {
+  isRejected,
+  OptionType,
+  ProfitShareType,
+  SolanaProgramType,
+  SystemConfigType,
+} from "@cubist-collective/cubist-games-lib";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { ProfitShareInputType } from "../../pages/types/game-settings";
+import GameSettings from "../../pages/admin/games-settings";
+import {
+  ConfigInputType,
+  GameStateType,
+  OptionInputType,
+  ProfitShareInputType,
+} from "../../pages/types/game-settings";
+import { multi_request } from "./requests";
 
 export function addProfitShare(
   profitSharing: ProfitShareInputType[],
@@ -32,7 +45,8 @@ export function feeTrans(
 ) {
   return toRust ? value * 100 : value / 100;
 }
-export function fireThresholdTrans(
+
+export function transform_num_with_decimals(
   value: number | BN,
   decimals: number,
   toRust: boolean = true
@@ -40,6 +54,17 @@ export function fireThresholdTrans(
   return toRust
     ? new BN(Math.pow(10, decimals) * (value as number))
     : (value as BN).toNumber() / Math.pow(10, decimals);
+}
+
+export function transform_num(value: number | BN, toRust: boolean = true) {
+  return toRust ? new BN(value as number) : (value as BN).toNumber();
+}
+export function fireThresholdTrans(
+  value: number | BN,
+  decimals: number,
+  toRust: boolean = true
+) {
+  return transform_num_with_decimals(value, decimals, toRust);
 }
 
 export function minStakeTrans(
@@ -47,9 +72,7 @@ export function minStakeTrans(
   decimals: number,
   toRust: boolean = true
 ) {
-  return toRust
-    ? new BN(Math.pow(10, decimals) * (value as number))
-    : (value as BN).toNumber() / Math.pow(10, decimals);
+  return transform_num_with_decimals(value, decimals, toRust);
 }
 
 export function minStepTrans(
@@ -57,9 +80,7 @@ export function minStepTrans(
   decimals: number,
   toRust: boolean = true
 ) {
-  return toRust
-    ? new BN(Math.pow(10, decimals) * (value as number))
-    : (value as BN).toNumber() / Math.pow(10, decimals);
+  return transform_num_with_decimals(value, decimals, toRust);
 }
 
 export function stakeButtonsTrans(
@@ -88,6 +109,109 @@ export function profitSharingTrans(
       });
 }
 
+export function gameIdTrans(
+  value: number | BN,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_num(value, toRust);
+}
+
+export function transform_date(value: number | Date | null, toRust: boolean) {
+  if (!value) return null;
+  return toRust
+    ? new BN(Math.floor((value as Date).getTime() / 1000))
+    : new Date((value as number) * 1000);
+}
+
+export function openTimeTrans(
+  value: Date | number,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+
+export function closeTimeTrans(
+  value: Date | number,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+export function settleTimeTrans(
+  value: Date | number,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+export function createdAtTrans(
+  value: Date | number | null,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+export function updatedAtTrans(
+  value: Date | number | null,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+
+export function cashedAtTrans(
+  value: Date | number | null,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+export function settledAtTrans(
+  value: Date | number | null,
+  _decimals: number,
+  toRust: boolean = true
+) {
+  return transform_date(value, toRust);
+}
+
+export function solProfitsTrans(
+  value: number | BN,
+  decimals: number,
+  toRust: boolean = true
+) {
+  return transform_num_with_decimals(value, decimals, toRust);
+}
+
+export function tokenProfitsTrans(
+  value: number | BN,
+  decimals: number,
+  toRust: boolean = true
+) {
+  return transform_num_with_decimals(value, decimals, toRust);
+}
+
+export function optionsTrans(
+  values: OptionInputType[] | OptionType[],
+  decimals: number,
+  toRust: boolean = true
+) {
+  return toRust
+    ? (values as OptionInputType[]).map((k: OptionInputType) => {
+        return {
+          ...k,
+          totalStake: new BN(Math.pow(10, decimals) * k.totalStake),
+        };
+      })
+    : (values as OptionType[]).map((k: OptionType) => {
+        return {
+          ...k,
+          totalStake: k.totalStake.toNumber() / Math.pow(10, decimals),
+        };
+      });
+}
+
 export const TRANSFORM_SETTINGS: { [key: string]: Function } = {
   feeTrans,
   fireThresholdTrans,
@@ -95,6 +219,17 @@ export const TRANSFORM_SETTINGS: { [key: string]: Function } = {
   minStepTrans,
   stakeButtonsTrans,
   profitSharingTrans,
+  gameIdTrans,
+  openTimeTrans,
+  closeTimeTrans,
+  settleTimeTrans,
+  createdAtTrans,
+  updatedAtTrans,
+  settledAtTrans,
+  cashedAtTrans,
+  solProfitsTrans,
+  tokenProfitsTrans,
+  optionsTrans,
 };
 
 export function inputsToRustSettings(
@@ -122,4 +257,54 @@ export function rustToInputsSettings(rustSettings: any, decimals: number): any {
         : value;
   }
   return inputsSettings;
+}
+
+export function default_profit_sharing(
+  fee: number,
+  systemConfig: SystemConfigType
+) {
+  let systemFee = {
+    treasury: systemConfig.treasury.toBase58(),
+    share: Math.ceil((systemConfig.profitFee / fee) * 100) / 100,
+  };
+  return [
+    {
+      treasury: process.env.NEXT_PUBLIC_AUTHORITY as string,
+      share: 100 - systemFee.share,
+    },
+    systemFee,
+  ];
+}
+
+export async function fetch_configs(
+  config: ConfigInputType,
+  solanaProgram: SolanaProgramType,
+  pdas: any,
+  setSystemConfig: Function,
+  setConfig: Function,
+  setStats: Function,
+  maxDecimals: number
+): Promise<boolean> {
+  const result = await Promise.allSettled([
+    solanaProgram.account.systemConfig.fetch(pdas[0][0]),
+    solanaProgram.account.config.fetch(pdas[1][0]),
+    solanaProgram.account.stats.fetch(pdas[2][0]),
+  ]);
+  const [systemConfigData, configData, statsData] = result.map((k: any) =>
+    k.status === "fulfilled" ? k.value : null
+  );
+  if (!configData) {
+    // Define the default profit sharing
+    if (config.profitSharing.length <= 1 && systemConfigData.profitFee) {
+      setConfig({
+        ...config,
+        profitSharing: default_profit_sharing(config.fee, systemConfigData),
+      });
+      return false;
+    }
+  }
+  setSystemConfig(systemConfigData);
+  setConfig(rustToInputsSettings(configData, maxDecimals));
+  setStats(statsData);
+  return true;
 }

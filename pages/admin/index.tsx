@@ -26,6 +26,12 @@ const AdminHome: NextPage = () => {
               <p>Default configuration for games.</p>
             </a>
           </div>
+          <div className={styles.grid}>
+            <a href="admin/game" className={styles.card}>
+              <h2>New Game</h2>
+              <p>Create a new game.</p>
+            </a>
+          </div>
         </main>
       )}
     </div>

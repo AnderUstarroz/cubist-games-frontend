@@ -1,8 +1,8 @@
-import React, { FC } from "react";
+import React, { FC, ReactNode } from "react";
 import styles from "./Notification.module.scss";
 
 export interface NotificationProps {
-  message: string;
+  message: string | ReactNode;
   variant: "error" | "info" | "success";
 }
 

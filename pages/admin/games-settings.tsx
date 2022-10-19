@@ -121,16 +121,15 @@ const GameSettings: NextPage = () => {
   const [settings, setSettings] = useState<ConfigInputType>({
     https: true, // Populated on page load using window.location.protocol
     domain: "", // Populated on page load using window.location.host
-    fee: 10,
+    fee: 7,
     showPot: true,
     useCategories: false,
-    useToken: false,
     allowReferral: true,
     fireThreshold: 100,
     minStake: 0.1,
     minStep: 0.1,
     customStakeButton: true,
-    stakeButtons: [0.1, 0.25, 0.5, 1],
+    stakeButtons: [0.1, 0.2, 0.5, 1],
     designTemplatesHash: null,
     categoriesHash: null,
     profitSharing: [],
@@ -261,7 +260,7 @@ const GameSettings: NextPage = () => {
     ]);
     // Reacharge Arweave when there is not enough balance
     if (price.gte(balance)) {
-      const requiredLamports = balance.toNumber() - price.toNumber();
+      const requiredLamports = price.toNumber() - balance.toNumber();
       setRechargeArweave({
         ...rechargeArweave,
         display: true,
@@ -281,6 +280,7 @@ const GameSettings: NextPage = () => {
     }
     const arweaveHash = await bundlr?.uploadJSON(termsJSONString);
     setTerms({ ...terms, loading: true });
+    flashMsg("Uploading Terms & Conditions to Arweave...", "success");
     // Check if Terms PDA already exists
     let termsPDAExists = true;
     try {
@@ -315,7 +315,12 @@ const GameSettings: NextPage = () => {
         });
       }
       setModals({ ...modals, terms: false });
-      flashMsg("Terms uploaded to Arweave", "success");
+      flashMsg(
+        `${
+          termsPDAExists ? "Updated" : "Created new"
+        } Terms & Conditions successfully`,
+        "success"
+      );
     } catch (error) {
       if (!(error instanceof AnchorError)) {
         throw error;
@@ -339,6 +344,7 @@ const GameSettings: NextPage = () => {
         display: false,
       });
     } catch (error) {
+      console.error(error);
       setRechargeArweave({ ...rechargeArweave, loading: false });
     }
   };

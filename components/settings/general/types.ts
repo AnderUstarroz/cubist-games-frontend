@@ -6,6 +6,7 @@ export interface GeneralSettingsType {
     showPot: boolean;
     allowReferral: boolean;
     fireThreshold: number;
+    openTime?: Date;
     [key: string]: any;
   };
   errors: { [key: string]: string };

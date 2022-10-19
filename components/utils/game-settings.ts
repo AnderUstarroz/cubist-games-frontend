@@ -26,6 +26,7 @@ export function addProfitShare(
     profitSharing.push({
       treasury: "",
       share: parseFloat(remaining.toFixed(2)),
+      cashed: false,
     });
     func("profitSharing", profitSharing);
   }
@@ -102,10 +103,18 @@ export function profitSharingTrans(
 ) {
   return toRust
     ? (values as ProfitShareInputType[]).map((p: ProfitShareInputType) => {
-        return { treasury: new PublicKey(p.treasury), share: p.share * 100 };
+        return {
+          treasury: new PublicKey(p.treasury),
+          share: p.share * 100,
+          cashed: p.cashed,
+        };
       })
     : (values as ProfitShareType[]).map((p: ProfitShareType) => {
-        return { treasury: p.treasury.toBase58(), share: p.share / 100 };
+        return {
+          treasury: p.treasury.toBase58(),
+          share: p.share / 100,
+          cashed: p.cashed,
+        };
       });
 }
 
@@ -262,17 +271,19 @@ export function rustToInputsSettings(rustSettings: any, decimals: number): any {
 export function default_profit_sharing(
   fee: number,
   systemConfig: SystemConfigType
-) {
-  let systemFee = {
-    treasury: systemConfig.treasury.toBase58(),
-    share: Math.ceil((systemConfig.profitFee / fee) * 100) / 100,
-  };
+): ProfitShareInputType[] {
+  let treasuryShare = Math.ceil((systemConfig.profitFee / fee) * 100) / 100;
   return [
     {
       treasury: process.env.NEXT_PUBLIC_AUTHORITY as string,
-      share: 100 - systemFee.share,
+      share: 100 - treasuryShare,
+      cashed: false,
     },
-    systemFee,
+    {
+      treasury: systemConfig.treasury.toBase58(),
+      share: treasuryShare,
+      cashed: false,
+    },
   ];
 }
 
@@ -293,17 +304,21 @@ export async function fetch_configs(
   const [systemConfigData, configData, statsData] = result.map((k: any) =>
     k.status === "fulfilled" ? k.value : null
   );
+  // console.log("SystemConfig:", systemConfigData);
+  // console.log("configData:", configData);
+  // console.log("config:", config);
+  // console.log("startsData:", statsData);
+  setSystemConfig(systemConfigData);
   if (!configData) {
     // Define the default profit sharing
-    if (config.profitSharing.length <= 1 && systemConfigData.profitFee) {
+    if (config?.profitSharing.length <= 1 && systemConfigData.profitFee) {
       setConfig({
         ...config,
         profitSharing: default_profit_sharing(config.fee, systemConfigData),
       });
-      return false;
     }
+    return false;
   }
-  setSystemConfig(systemConfigData);
   setConfig(rustToInputsSettings(configData, maxDecimals));
   setStats(statsData);
   return true;

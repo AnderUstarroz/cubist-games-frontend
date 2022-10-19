@@ -1,0 +1,9 @@
+.imageInput {
+  position: relative;
+  > img {
+    width: 100px;
+  }
+  input {
+    display: none;
+  }
+}

@@ -107,7 +107,9 @@ export function ProfitSharingValidator(
   if (totalShares != 100) {
     throw new SettingsError(
       "profitSharing",
-      "The sum of all shares must be exactly 100%"
+      `The sum of all shares must be exactly 100%, but currently is ${parseFloat(
+        totalShares.toFixed(2)
+      )}%`
     );
   }
 
@@ -252,13 +254,34 @@ export function validateStakes(allSettings: AllSettingsType) {
   );
 }
 export function validateTermsId(allSettings: AllSettingsType) {
+  const termsId = (allSettings.Settings as GameSettingsInputType).termsId;
+  if (!termsId) {
+    throw new SettingsError(
+      "termsId",
+      `Cannot create a game without Terms & Conditions`
+    );
+  }
+  // Check if the selected Terms exists on Config PDA
   if (
-    !allSettings.Config?.terms.filter(
-      (k: TermsType) =>
-        k.id === (allSettings.Settings as GameSettingsInputType).termsId
-    ).length
+    !allSettings.Config?.terms.filter((k: TermsType) => k.id === termsId).length
   ) {
     throw new SettingsError("termsId", `Invalid Terms & Conditions`);
+  }
+}
+
+export function validateDates(allSettings: AllSettingsType) {
+  const gameSettings = allSettings.Settings as GameSettingsInputType;
+  if (gameSettings.openTime >= gameSettings.closeTime) {
+    throw new SettingsError(
+      "closeTime",
+      "Close time must be greater than open time"
+    );
+  }
+  if (gameSettings.closeTime >= gameSettings.settleTime) {
+    throw new SettingsError(
+      "settleTime",
+      "Settle time must be greater than close time"
+    );
   }
 }
 
@@ -277,12 +300,18 @@ export const COMBINED_VALIDATORS: { [key: string]: any } = {
   minStep: validateStakes,
   stakeButtons: validateStakes,
   termsId: validateTermsId,
+  openTime: validateDates,
+  closeTime: validateDates,
+  settleTime: validateDates,
 };
 
-// Combined fields is used to know which fields are related at the time of cleaning up form errors.
+// Used as a map to know which fields are related at the time of cleaning up form errors.
 export const COMBINED_INPUTS: { [key: string]: string[] } = {
   fee: ["profitSharing"],
   profitSharing: ["fee"],
+  openTime: ["closeTime", "settleTime"],
+  closeTime: ["openTime", "settleTime"],
+  settleTime: ["openTime", "closeTime"],
 };
 
 export function validateInput(key: string, value: any, nameSpace: string = "") {

@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
+import { ReactNode } from "react";
 
 const Notification = dynamic(() => import("../notification"));
 
@@ -15,7 +16,7 @@ export const flashError = async (
 };
 
 export function flashMsg(
-  msg: string,
+  msg: string | ReactNode,
   variant: "error" | "info" | "success" = "error",
   duration: number = 5000
 ) {

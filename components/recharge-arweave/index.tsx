@@ -32,14 +32,14 @@ export default function RechargeArweave({
         .
       </p>
       <ul>
-        <li>Current balance: {human_number(solBalance, decimals)} SOL</li>
+        <li>Arweave balance: {human_number(solBalance, decimals)} SOL</li>
         <li>Required balance: {human_number(requiredSol, decimals)} SOL</li>
       </ul>
       <p>
         You need to top up at least{" "}
         <strong>{human_number(requiredSol, decimals)} SOL</strong> (
         {human_number(requiredUsd, decimals)} USD) into your Arweave account to
-        be able to upload your data, but we recommend you to top up{" "}
+        be able to upload your data, but we recommend you to top up at least{" "}
         <strong>{human_number(recommendedSol, decimals)}</strong> (1 USD), so
         you don&apos;t need to repeat this step every single time you change
         some data.
@@ -56,7 +56,7 @@ export default function RechargeArweave({
           min={solBalance - requiredSol}
           max={100}
         />{" "}
-        SOL
+        SOL ({human_number(value * (requiredUsd / requiredSol), 2)} USD)
         {loading ? (
           <div>Loading..</div>
         ) : (

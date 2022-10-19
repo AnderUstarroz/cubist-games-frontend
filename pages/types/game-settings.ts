@@ -2,7 +2,6 @@ export interface GeneralInputType {
   fee: number;
   showPot: boolean;
   useCategories: boolean;
-  useToken: boolean;
   allowReferral: boolean;
   fireThreshold: number;
 }
@@ -19,6 +18,7 @@ export interface StakeButtonsInputType {
 export interface ProfitShareInputType {
   treasury: string;
   share: number;
+  cashed: boolean;
 }
 export interface TermsType {
   id: string;

@@ -22,7 +22,7 @@ export default function Checkbox(props: CheckboxType) {
 
   return (
     <motion.svg
-      initial={false}
+      initial={props.value}
       animate={props.value ? "checked" : "unchecked"}
       whileHover="hover"
       whileTap="pressed"

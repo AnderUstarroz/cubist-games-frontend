@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import useSWR from "swr";
-import Image from "next/image";
+import NextImage from "next/image";
 import styles from "../../styles/GamesSettings.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
@@ -15,8 +15,6 @@ import {
   ConfigInputType,
   GameSettingsInputType,
   GameStateType,
-  ProfitShareInputType,
-  TermsInputsType,
 } from "../types/game-settings";
 import { BN } from "@project-serum/anchor";
 import { addHours } from "date-fns";
@@ -32,9 +30,6 @@ import {
   stats_pda,
   MAX_TERMS,
   solana_usd_price,
-  terms_pda,
-  lamports_to_sol,
-  solana_to_usd,
   TermsType,
   arweave_json,
   system_config_pda,
@@ -42,12 +37,10 @@ import {
   SystemConfigType,
   game_pda,
   StatsType,
+  lamports_to_sol,
+  solana_to_usd,
 } from "@cubist-collective/cubist-games-lib";
-import {
-  parse_float_input,
-  human_number,
-  DEFAULT_DECIMALS,
-} from "../../components/utils/number";
+import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
   COMBINED_INPUTS,
   validateCombinedInput,
@@ -55,22 +48,18 @@ import {
 } from "../../components/validation/settings";
 import { SettingsError } from "../../components/validation/errors";
 import {
-  addProfitShare,
   rustToInputsSettings,
-  profitSharingCompleted,
-  inputsToRustSettings,
-  default_profit_sharing,
   fetch_configs,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
-import { fetcher } from "../../components/utils/requests";
+import { fetcher, multi_request } from "../../components/utils/requests";
 import { flashError, flashMsg } from "../../components/utils/helpers";
 import { RechargeArweaveType } from "../../components/recharge-arweave/types";
-import { AnimatePresence, motion } from "framer-motion";
-import { AnchorError } from "@project-serum/anchor";
 import Link from "next/link";
+import { process_image } from "../../components/utils/image";
 
 const Input = dynamic(() => import("../../components/input"));
+const ImageInput = dynamic(() => import("../../components/image-input"));
 const Checkbox = dynamic(() => import("../../components/checkbox"));
 const Icon = dynamic(() => import("../../components/icon"));
 const Modal = dynamic(() => import("../../components/modal"));
@@ -133,11 +122,10 @@ const Game: NextPage = () => {
     tokenProfits: null,
     openTime: addHours(new Date(), 3),
     closeTime: addHours(new Date(), 27),
-    settleTime: addHours(new Date(), 27),
-    fee: 10,
+    settleTime: addHours(new Date(), 30),
+    fee: 7,
     showPot: true,
     useCategories: false,
-    useToken: false,
     allowReferral: true,
     fireThreshold: 100,
     minStake: 0.1,
@@ -159,6 +147,7 @@ const Game: NextPage = () => {
   const [modals, setModals] = useState({
     main: false,
     terms: false,
+    rechargeArweave: false,
   });
   const [mainModalContent, setMainModalContent] = useState<ReactNode>(null);
 
@@ -211,10 +200,10 @@ const Game: NextPage = () => {
   };
 
   const handleSave = () => {
-    // let config = gameSettings;
-    // for (const [key, value] of Object.entries(config)) {
-    //   if (!validateSettingsField(key, value)) return;
-    // }
+    let config = gameSettings;
+    for (const [key, value] of Object.entries(config)) {
+      if (!validateSettingsField(key, value)) return;
+    }
     // (async () => {
     //   try {
     //     configExists
@@ -285,7 +274,6 @@ const Game: NextPage = () => {
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
     if (!publicKey || !wallet || !data || solanaProgram) return;
-    // debugger;
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -357,34 +345,52 @@ const Game: NextPage = () => {
     })();
   }, [stats]);
 
-  const handleUpload = async (file: FileType) => {
+  const displayRechargeArweave = (price: BN, balance: BN) => {
+    // Reacharge Arweave when there is not enough balance
+    if (price.gte(balance)) {
+      const requiredLamports = price.toNumber() - balance.toNumber();
+      setRechargeArweave({
+        ...rechargeArweave,
+        display: true,
+        value: Math.max(
+          ...[1 / (solUsdPrice as number), lamports_to_sol(requiredLamports)]
+        ),
+        requiredSol: lamports_to_sol(requiredLamports),
+        solBalance: lamports_to_sol(balance.toNumber()),
+        requiredUsd: solana_to_usd(
+          lamports_to_sol(requiredLamports),
+          solUsdPrice as number
+        ),
+        recommendedSol: 1 / (solUsdPrice as number),
+        decimals: maxDecimals,
+      });
+      return true;
+    }
+    return false;
+  };
+
+  const handleUploadImage = async (name: string, file: FileType) => {
     if (!bundlr || !publicKey) {
+      throw new Error("Bundlr or wallet not initialized");
+    }
+
+    const [balance, price] = await multi_request([
+      [bundlr.balance, []],
+      [bundlr.getPrice, [file.size]],
+    ]);
+    if (displayRechargeArweave(price, balance)) {
+      setModals({ ...modals, rechargeArweave: true });
       return;
     }
-    console.log("Wallet:", bundlr.address);
-    const price = await bundlr.getPrice(file.size);
-    console.log("Price works!", price);
-    // const price = await bundlrMethod(bundlr, "getPrice", [file.size]);
-    // const balance_wallet = await connection.getBalance(publicKey);
-    // const balance_bundlr = await bundlrMethod(bundlr, "balance", [
-    //   publicKey as PublicKey,
-    // ]);
-    // console.log(
-    //   `Upload cost: ${bundlr.lamportsToSol(price).toString()} ${bundlr.ticker}`
-    // );
-    // console.log(
-    //   "Bundler balance:",
-    //   `${bundlr.lamportsToSol(balance_bundlr).toString()} ${bundlr.ticker}`
-    // );
-    // console.log(
-    //   `Wallet balance: ${bundlr.lamportsToSol(balance_wallet).toString()} ${
-    //     bundlr.ticker
-    //   }`
-    // );
-
-    // await fund(bundler, 0.01);
-
-    // bundler.utils.unitConverter(balance).toFixed(7, 2).toString()
+    file.arweave_hash = await bundlr?.uploadFile(file);
+    if (file.arweave_hash) {
+      setFiles({ ...files, [name]: file });
+      setGameSettings({ ...gameSettings, [`${name}Hash`]: file.arweave_hash });
+      flashMsg(
+        "Image was successfully uploaded, but you still need to save the game.",
+        "info"
+      );
+    }
   };
 
   return (
@@ -412,6 +418,7 @@ const Game: NextPage = () => {
                   <label>
                     <span>Terms & Conditions</span>
                     <Select
+                      placeholder="Select one option..."
                       name="termsId"
                       options={config?.terms.map((t: TermsType) => {
                         return { value: t.id, label: t.id };
@@ -438,6 +445,17 @@ const Game: NextPage = () => {
                         handleUpdateGameSettings("termsId", option?.value);
                       }}
                     />
+                    {!gameSettings.termsId ? (
+                      <p>
+                        You need to{" "}
+                        <Link href="/admin/games-settings">
+                          <a title="Settings">create Terms & Conditions</a>
+                        </Link>{" "}
+                        first
+                      </p>
+                    ) : (
+                      ""
+                    )}
                   </label>
                 </fieldset>
               </div>
@@ -465,7 +483,19 @@ const Game: NextPage = () => {
                   setModals={setModals}
                 />
               )}
-
+              <div>
+                <ImageInput
+                  name="image1"
+                  file={files.image ? files.image : null}
+                  onChange={async (e: any) =>
+                    process_image(
+                      e.target.name,
+                      e.target.files,
+                      handleUploadImage
+                    )
+                  }
+                />
+              </div>
               <div>
                 <Button
                   onClick={() => handleSave()}
@@ -479,6 +509,17 @@ const Game: NextPage = () => {
               </div>
             </>
           )}
+          <Modal
+            modalId={"rechargeArweave"}
+            modals={modals}
+            setIsOpen={setModals}
+          >
+            <RechargeArweave
+              {...rechargeArweave}
+              handleUpdate={(value: string) => handleUpdateArweaveInput(value)}
+              handleRechargeArweave={() => handleRechargeArweave()}
+            />
+          </Modal>
           <Modal modalId={"main"} modals={modals} setIsOpen={setModals}>
             {mainModalContent}
           </Modal>

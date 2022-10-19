@@ -1,6 +1,7 @@
 import { parse_float_input } from "../../utils/number";
 import dynamic from "next/dynamic";
 import { GeneralSettingsType } from "./types";
+import { format } from "date-fns";
 
 const Input = dynamic(() => import("../../input"));
 const Checkbox = dynamic(() => import("../../checkbox"));
@@ -12,10 +13,122 @@ export default function GeneralSettings({
   handleUpdateSettings,
   showModal,
 }: GeneralSettingsType) {
+  const TZ = `Time zone: ${
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  } (${format(new Date(), "OOOO")})`;
   return (
     <div>
       <h2>General</h2>
       <fieldset>
+        {settings.openTime ? (
+          <label>
+            <span>
+              Open time{" "}
+              <Icon
+                cType="info"
+                onClick={() =>
+                  showModal(
+                    <div>
+                      <h3>Open time</h3>
+                      <p>
+                        Defines the time at which the game will start being
+                        displayed and accepting bets.
+                      </p>
+                    </div>
+                  )
+                }
+              />
+            </span>
+            <Input
+              type="datetime-local"
+              name="openTime"
+              className={errors.hasOwnProperty("openTime") ? "error" : null}
+              value={settings.openTime.toISOString().slice(0, 16)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleUpdateSettings(
+                  "openTime",
+                  new Date(e.target.valueAsNumber)
+                )
+              }
+            />
+            <div>{TZ}</div>
+          </label>
+        ) : (
+          ""
+        )}{" "}
+        {settings.closeTime ? (
+          <label>
+            <span>
+              Close time{" "}
+              <Icon
+                cType="info"
+                onClick={() =>
+                  showModal(
+                    <div>
+                      <h3>Close time</h3>
+                      <p>
+                        Defines the time at which the game will stop accepting
+                        bets.
+                      </p>
+                    </div>
+                  )
+                }
+              />
+            </span>
+            <Input
+              type="datetime-local"
+              name="closeTime"
+              className={errors.hasOwnProperty("closeTime") ? "error" : null}
+              value={settings.closeTime.toISOString().slice(0, 16)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleUpdateSettings(
+                  "closeTime",
+                  new Date(e.target.valueAsNumber)
+                )
+              }
+            />
+            <div>{TZ}</div>
+          </label>
+        ) : (
+          ""
+        )}
+        {settings.settleTime ? (
+          <label>
+            <span>
+              Settle time{" "}
+              <Icon
+                cType="info"
+                onClick={() =>
+                  showModal(
+                    <div>
+                      <h3>Settle time</h3>
+                      <p>
+                        Defines the approximated time at which the game should
+                        be settled. Note that you must settle the game manually
+                        by selecting the result/outcome of the game.
+                      </p>
+                    </div>
+                  )
+                }
+              />
+            </span>
+            <Input
+              type="datetime-local"
+              name="settleTime"
+              className={errors.hasOwnProperty("settleTime") ? "error" : null}
+              value={settings.settleTime.toISOString().slice(0, 16)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleUpdateSettings(
+                  "settleTime",
+                  new Date(e.target.valueAsNumber)
+                )
+              }
+            />
+            <div>{TZ}</div>
+          </label>
+        ) : (
+          ""
+        )}{" "}
         <label>
           <span>
             Fee{" "}
@@ -27,6 +140,7 @@ export default function GeneralSettings({
                     <h3>Fee</h3>
                     <p>
                       Defines the percentage of benefits collected on each game.
+                      This fee is taken from all placed bets (pot).
                     </p>
                   </div>
                 )
@@ -55,7 +169,7 @@ export default function GeneralSettings({
                 showModal(
                   <div>
                     <h3>Show pot</h3>
-                    <p>Displays the sum of all stakes on the game page.</p>
+                    <p>Displays the sum of all stakes within the game page.</p>
                   </div>
                 )
               }
@@ -108,8 +222,8 @@ export default function GeneralSettings({
                     <p>
                       The fire threshold is just a flame animation which is
                       displayed when the pot (sum of all bet stakes) has reached
-                      certain amount. Just a visual way to tell that a game is
-                      getting &quot;hot&quot;.
+                      certain amount. It is just a visual way to tell which game
+                      is getting most attention.
                     </p>
                   </div>
                 )

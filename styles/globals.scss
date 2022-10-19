@@ -23,7 +23,7 @@ a {
 .aligned {
   display: flex;
   gap: 15px;
-  align-content: center;
+  align-items: center;
 }
 @media (prefers-color-scheme: dark) {
   html {

@@ -10,7 +10,7 @@ ReactModal.setAppElement("#__next");
 const Modal = (props: any) => {
   return (
     <ReactModal
-      className={props.nftInfoModal ? styles.nftInfo : styles.modal}
+      className={props.className ? props.className : styles.modal}
       isOpen={props.modals[props.modalId]}
       style={{
         overlay: {

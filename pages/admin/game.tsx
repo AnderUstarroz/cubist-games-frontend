@@ -2,19 +2,25 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import useSWR from "swr";
 import NextImage from "next/image";
-import styles from "../../styles/GamesSettings.module.scss";
+import styles from "../../styles/Game.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { AnchorError } from "@project-serum/anchor";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import Button from "../../components/button";
-import { BundlrWrapper } from "../../components/utils/bundlr";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import {
+  BundlrWrapper,
+  displayRechargeArweave,
+} from "../../components/utils/bundlr";
+import { PublicKey } from "@solana/web3.js";
 import Router, { useRouter } from "next/router";
 import Select from "react-select";
 import {
   ConfigInputType,
   GameSettingsInputType,
   GameStateType,
+  OptionInputType,
+  PDAType,
 } from "../types/game-settings";
 import { BN } from "@project-serum/anchor";
 import { addHours } from "date-fns";
@@ -39,6 +45,7 @@ import {
   StatsType,
   lamports_to_sol,
   solana_to_usd,
+  terms_pda,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
@@ -50,13 +57,37 @@ import { SettingsError } from "../../components/validation/errors";
 import {
   rustToInputsSettings,
   fetch_configs,
+  inputsToRustSettings,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
 import { fetcher, multi_request } from "../../components/utils/requests";
-import { flashError, flashMsg } from "../../components/utils/helpers";
+import {
+  flashError,
+  flashMsg,
+  is_authorized,
+} from "../../components/utils/helpers";
 import { RechargeArweaveType } from "../../components/recharge-arweave/types";
 import Link from "next/link";
 import { process_image } from "../../components/utils/image";
+import { DefinitionInputsType, OptionType } from "../types/game";
+import { MDEditorProps } from "@uiw/react-md-editor";
+import { MarkdownPreviewProps } from "@uiw/react-markdown-preview";
+import {
+  bold,
+  italic,
+  strikethrough,
+  hr,
+  title,
+  link,
+  quote,
+  unorderedListCommand,
+  orderedListCommand,
+  checkedListCommand,
+  divider,
+  fullscreen,
+} from "@uiw/react-md-editor/lib/commands";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 
 const Input = dynamic(() => import("../../components/input"));
 const ImageInput = dynamic(() => import("../../components/image-input"));
@@ -76,7 +107,35 @@ const ProfitSharing = dynamic(
 const RechargeArweave = dynamic(
   () => import("../../components/recharge-arweave")
 );
+const MDEditor = dynamic<MDEditorProps>(() => import("@uiw/react-md-editor"), {
+  ssr: false,
+});
 
+const MarkdownPreview = dynamic<MarkdownPreviewProps>(
+  () => import("@uiw/react-markdown-preview"),
+  {
+    ssr: false,
+  }
+);
+
+const mkEditorDefaults: any = {
+  preview: "edit",
+  commands: [
+    bold,
+    italic,
+    strikethrough,
+    title,
+    hr,
+    divider,
+    link,
+    quote,
+    divider,
+    unorderedListCommand,
+    orderedListCommand,
+    checkedListCommand,
+  ],
+  extraCommands: [],
+};
 const Game: NextPage = () => {
   const router = useRouter();
   const { connection } = useConnection();
@@ -86,7 +145,7 @@ const Game: NextPage = () => {
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
   const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
-  const [pdas, setPdas] = useState<any>(null);
+  const [pdas, setPdas] = useState<PDAType[] | null>(null);
   const [rechargeArweave, setRechargeArweave] = useState<RechargeArweaveType>({
     display: false,
     value: 1,
@@ -97,6 +156,7 @@ const Game: NextPage = () => {
     error: false,
     loading: false,
     decimals: 9,
+    closeModals: { rechargeArweave: false },
   });
   const [files, setFiles] = useState<FilesType>({});
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
@@ -144,9 +204,23 @@ const Game: NextPage = () => {
     options: [],
     result: null,
   });
+  const [definition, setDefinition] = useState<DefinitionInputsType>({
+    loading: false,
+    title: "",
+    description: "",
+    warning: "",
+    options: [
+      { title: "TypeOption1", description: "", color: "#53BC46" },
+      { title: "TypeOption2", description: "", color: "#CF4E4E" },
+    ],
+  });
+  const [definitionErrors, setDefinitionErrors] = useState<{
+    [key: string]: string;
+  }>({});
   const [modals, setModals] = useState({
     main: false,
     terms: false,
+    definition: false,
     rechargeArweave: false,
   });
   const [mainModalContent, setMainModalContent] = useState<ReactNode>(null);
@@ -175,6 +249,12 @@ const Game: NextPage = () => {
     } catch (error) {
       if (error instanceof SettingsError) {
         switch (nameSpace) {
+          case "Definition":
+            setDefinitionErrors({
+              ...definitionErrors,
+              [error.code]: error.message,
+            });
+            break;
           default:
             setErrors({ ...errors, [error.code]: error.message });
         }
@@ -200,41 +280,119 @@ const Game: NextPage = () => {
   };
 
   const handleSave = () => {
-    let config = gameSettings;
-    for (const [key, value] of Object.entries(config)) {
+    for (const [key, value] of Object.entries(gameSettings)) {
       if (!validateSettingsField(key, value)) return;
     }
-    // (async () => {
-    //   try {
-    //     configExists
-    //       ? // Update existing config
-    //         await solanaProgram?.methods
-    //           .updateConfig(inputsToRustSettings(config, maxDecimals))
-    //           .accounts({
-    //             authority: authority,
-    //             systemConfig: pdas[0][0],
-    //             config: pdas[1][0],
-    //           })
-    //           .rpc()
-    //       : // Create new Config
-    //         await solanaProgram?.methods
-    //           .initializeConfig(inputsToRustSettings(config, maxDecimals))
-    //           .accounts({
-    //             authority: authority,
-    //             systemConfig: pdas[0][0],
-    //             config: pdas[1][0],
-    //             stats: pdas[2][0],
-    //           })
-    //           .rpc();
-    //     flashMsg("Configuration saved!", "success");
-    //     Router.push("/admin");
-    //   } catch (error) {
-    //     if (!(error instanceof AnchorError)) {
-    //       throw error;
-    //     }
-    //     flashMsg(`${error.error.errorMessage}`);
-    //   }
-    // })();
+    for (const [key, value] of Object.entries(definition)) {
+      if (!validateSettingsField(key, value, "Definition")) return;
+    }
+    (async () => {
+      if (!pdas) return;
+      // Add game options:
+      let params = { ...gameSettings };
+      const [termsPda, _] = await terms_pda(authority, params.termsId);
+      try {
+        let terms = await solanaProgram?.account.terms.fetch(termsPda);
+        params.termsHash = terms?.arweaveHash as string;
+      } catch (error) {
+        return flashMsg(`Terms & Conditions "${params.termsId}" not found!`);
+      }
+      try {
+        !gameSettings.createdAt
+          ? // Create new Game
+            await solanaProgram?.methods
+              .createGame(inputsToRustSettings(params, maxDecimals))
+              .accounts({
+                authority: authority,
+                systemConfig: pdas[0][0],
+                config: pdas[1][0],
+                stats: pdas[2][0],
+                game: pdas[3][0],
+              })
+              .rpc()
+          : // Update existing Game
+            await solanaProgram?.methods
+              .updateGame(inputsToRustSettings(params, maxDecimals))
+              .accounts({
+                authority: authority,
+                systemConfig: pdas[0][0],
+                config: pdas[1][0],
+                game: pdas[3][0],
+              })
+              .rpc();
+
+        flashMsg("Game saved!", "success");
+        Router.push("/admin");
+      } catch (error) {
+        if (!(error instanceof AnchorError)) {
+          throw error;
+        }
+        flashMsg(`${error.error.errorMessage}`);
+      }
+    })();
+  };
+  const handleUpdateDefinition = (key: string, value: any) => {
+    delete definitionErrors[key];
+    setDefinitionErrors(definitionErrors);
+    const updatedDescription = { ...definition, [key]: value };
+    validateSettingsField(key, value, "Definition", {
+      Description: updatedDescription,
+    });
+    setDefinition(updatedDescription);
+  };
+
+  const handleUpdateOption = (field: string, index: number, value: string) => {
+    handleUpdateDefinition(
+      "options",
+      definition.options.reduce(
+        (acc: OptionType[], curr: OptionType, optIndex: number) =>
+          acc.concat(index === optIndex ? { ...curr, [field]: value } : curr),
+        [] as OptionType[]
+      )
+    );
+  };
+
+  const handleSaveDefinition = async () => {
+    for (const [key, value] of Object.entries(definition)) {
+      if (!validateSettingsField(key, value, "Definition")) return;
+    }
+    if (!bundlr || !solanaProgram) return;
+    const jsonContent = JSON.stringify((({ loading, ...t }) => t)(definition));
+    const [balance, price] = await multi_request([
+      [bundlr.balance, []],
+      [bundlr.getPrice, [Buffer.byteLength(jsonContent, "utf8")]],
+    ]);
+    // Reacharge Arweave when there is not enough balance
+    if (
+      displayRechargeArweave(
+        price,
+        balance,
+        {
+          ...rechargeArweave,
+          closeModals: { rechargeArweave: false, definition: true },
+        },
+        setRechargeArweave,
+        solUsdPrice as number,
+        maxDecimals
+      )
+    ) {
+      setModals({ ...modals, rechargeArweave: true });
+      return;
+    }
+    setDefinition({ ...definition, loading: true });
+    const arweaveHash = await bundlr?.uploadJSON(jsonContent);
+    if (arweaveHash) {
+      setDefinition({ ...definition, loading: false });
+      setGameSettings({
+        ...gameSettings,
+        definitionHash: arweaveHash,
+        options: definition.options.map((o: OptionType, k: number) => {
+          return { id: k, totalStake: 0, totalBets: 0 };
+        }),
+      });
+      flashMsg("Uploaded game definition to Arweave", "success");
+      setModals({ ...modals, definition: false });
+    }
   };
 
   const handleUpdateArweaveInput = (value: string) => {
@@ -249,6 +407,7 @@ const Game: NextPage = () => {
         loading: false,
         display: false,
       });
+      setModals({ ...modals, ...rechargeArweave.closeModals });
     } catch (error) {
       setRechargeArweave({ ...rechargeArweave, loading: false });
     }
@@ -273,7 +432,7 @@ const Game: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!publicKey || !wallet || !data || solanaProgram) return;
+    if (!publicKey || !wallet || !data || solanaProgram || pdas) return;
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -290,7 +449,7 @@ const Game: NextPage = () => {
 
   // STEP 2 - Fetch Configs
   useEffect(() => {
-    if (!solanaProgram || !pdas) return;
+    if (!solanaProgram || !pdas || systemConfig) return;
     (async () => {
       if (
         !(await fetch_configs(
@@ -311,14 +470,15 @@ const Game: NextPage = () => {
 
   // STEP 3 - Fetch Game
   useEffect(() => {
-    if (!stats || !solanaProgram || !config) return;
+    if (!stats || !solanaProgram || !config || !pdas) return;
     (async () => {
       const gameId = new BN(
         router.query.id
           ? (router.query.id as string)
           : stats.totalGames.toNumber() + 1
       );
-      const [gamePda, _bump] = await game_pda(authority, new BN(gameId));
+      const [gamePda, bump] = await game_pda(authority, new BN(gameId));
+      setPdas(pdas.concat([[gamePda, bump]])); // Add Game to the existing PDAs
       try {
         // Populate Settings using fetched Game
         setGameSettings(
@@ -345,40 +505,24 @@ const Game: NextPage = () => {
     })();
   }, [stats]);
 
-  const displayRechargeArweave = (price: BN, balance: BN) => {
-    // Reacharge Arweave when there is not enough balance
-    if (price.gte(balance)) {
-      const requiredLamports = price.toNumber() - balance.toNumber();
-      setRechargeArweave({
-        ...rechargeArweave,
-        display: true,
-        value: Math.max(
-          ...[1 / (solUsdPrice as number), lamports_to_sol(requiredLamports)]
-        ),
-        requiredSol: lamports_to_sol(requiredLamports),
-        solBalance: lamports_to_sol(balance.toNumber()),
-        requiredUsd: solana_to_usd(
-          lamports_to_sol(requiredLamports),
-          solUsdPrice as number
-        ),
-        recommendedSol: 1 / (solUsdPrice as number),
-        decimals: maxDecimals,
-      });
-      return true;
-    }
-    return false;
-  };
-
   const handleUploadImage = async (name: string, file: FileType) => {
     if (!bundlr || !publicKey) {
       throw new Error("Bundlr or wallet not initialized");
     }
-
     const [balance, price] = await multi_request([
       [bundlr.balance, []],
       [bundlr.getPrice, [file.size]],
     ]);
-    if (displayRechargeArweave(price, balance)) {
+    if (
+      displayRechargeArweave(
+        price,
+        balance,
+        { ...rechargeArweave, closeModals: { rechargeArweave: false } },
+        setRechargeArweave,
+        solUsdPrice as number,
+        maxDecimals
+      )
+    ) {
       setModals({ ...modals, rechargeArweave: true });
       return;
     }
@@ -400,7 +544,7 @@ const Game: NextPage = () => {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {!publicKey ? (
+      {!is_authorized(publicKey) ? (
         <main className={styles.main}>Not registered</main>
       ) : (
         <main className={styles.main}>
@@ -497,9 +641,35 @@ const Game: NextPage = () => {
                 />
               </div>
               <div>
+                <h3>
+                  Definition{" "}
+                  <Button
+                    onClick={() => setModals({ ...modals, definition: true })}
+                  >
+                    Edit
+                  </Button>
+                </h3>
+                <h4>Title</h4>
+                <MarkdownPreview source={definition.title} />
+                <h4>Description</h4>
+                <MarkdownPreview source={definition.description} />
+                <h4>Options</h4>
+                <ul>
+                  {definition.options.map((o: OptionType, k: number) => (
+                    <li key={`descOpt-${k}`}>
+                      <MarkdownPreview source={o.title} />
+                      <MarkdownPreview source={o.description} />
+                    </li>
+                  ))}
+                </ul>{" "}
+              </div>
+              <div>
                 <Button
                   onClick={() => handleSave()}
-                  disabled={Boolean(Object.keys(errors).length)}
+                  disabled={
+                    Boolean(Object.keys(errors).length) ||
+                    Boolean(Object.keys(definitionErrors).length)
+                  }
                 >
                   Save
                 </Button>
@@ -509,6 +679,111 @@ const Game: NextPage = () => {
               </div>
             </>
           )}
+          <Modal modalId={"definition"} modals={modals} setIsOpen={setModals}>
+            <div>
+              <h3>Warning message</h3>
+              <div>
+                <p>Used to inform users about unexpected events or delays.</p>
+                <MDEditor
+                  value={definition.warning}
+                  onChange={(text: any) =>
+                    setDefinition({ ...definition, warning: text })
+                  }
+                  {...mkEditorDefaults}
+                />
+              </div>
+              <label>
+                <span>Game title</span>
+                <Input
+                  name="title"
+                  type="text"
+                  maxLength={64}
+                  placeholder="Game title"
+                  className={
+                    definitionErrors.hasOwnProperty("title") ? "error" : null
+                  }
+                  value={definition.title}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleUpdateDefinition("title", e.target.value)
+                  }
+                />
+              </label>
+              <label>
+                <span>Description</span>
+                <MDEditor
+                  value={definition.description}
+                  className={
+                    definitionErrors.hasOwnProperty("description")
+                      ? styles.MDEditorError
+                      : null
+                  }
+                  onChange={(text: any) =>
+                    handleUpdateDefinition("description", text.slice(0, 1000))
+                  }
+                  {...mkEditorDefaults}
+                />
+              </label>
+              <h3>Options</h3>
+              {definitionErrors.hasOwnProperty("options") ? (
+                <p>{definitionErrors.options}</p>
+              ) : (
+                ""
+              )}
+              <ul>
+                {definition.options.map((o: OptionType, k: number) => (
+                  <li key={`descOpt-${k}`}>
+                    <label>
+                      <span>Option</span>
+                      <Input
+                        name="title"
+                        type="text"
+                        maxLength={32}
+                        placeholder="Option name"
+                        value={o.title}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          handleUpdateOption("title", k, e.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
+                      <span>color</span>
+                      <Input
+                        type="color"
+                        value={o.color}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          handleUpdateOption("color", k, e.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
+                      <span>Description</span>
+                      <MDEditor
+                        value={o.description}
+                        height={85}
+                        onChange={(text: any) =>
+                          handleUpdateOption(
+                            "description",
+                            k,
+                            text.slice(0, 64)
+                          )
+                        }
+                        {...mkEditorDefaults}
+                      />
+                    </label>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="aligned">
+                <Button onClick={() => handleSaveDefinition()}>Save</Button>{" "}
+                <Button
+                  onClick={() => setModals({ ...modals, definition: false })}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </Modal>
           <Modal
             modalId={"rechargeArweave"}
             modals={modals}

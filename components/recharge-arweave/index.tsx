@@ -19,6 +19,7 @@ export default function RechargeArweave({
   loading,
   decimals,
   handleRechargeArweave,
+  closeModals,
   ...props
 }: RechargeArweavePropsType) {
   return (

@@ -12,12 +12,13 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { is_ascii_alphanumeric } from "./string";
 import { ordinal } from "../utils/number";
-import { ProfitSharingType } from "../settings/profit-sharing/types";
+import { DefinitionInputsType, OptionType } from "../../pages/types/game";
 
 export interface AllSettingsType {
   SystemConfig: SystemConfigType;
   Settings: ConfigInputType | GameSettingsInputType;
   Terms?: TermsInputsType;
+  Definition?: DefinitionInputsType;
   Config?: ConfigInputType;
 }
 
@@ -183,6 +184,45 @@ export function descriptionTermsValidator(value: string) {
   }
 }
 
+export function titleDefinitionValidator(value: string) {
+  const maxChar = 64;
+  if (!value || value.length > maxChar) {
+    let error = !value ? "empty" : `longer than ${maxChar} characters`;
+    throw new SettingsError("title", `Game title cannot be ${error}`);
+  }
+}
+export function descriptionDefinitionValidator(value: string) {
+  const maxChar = 1000;
+  if (!value || value.length > maxChar) {
+    let error = !value ? "empty" : `longer than ${maxChar} characters`;
+    throw new SettingsError(
+      "description",
+      `Game description cannot be ${error}`
+    );
+  }
+}
+
+export function optionsDefinitionValidator(options: OptionType[]) {
+  if (options.length < 2) {
+    throw new SettingsError("options", "There should be at least 2 options");
+  }
+  options.map((o: OptionType, k: number) => {
+    if (!o.title) {
+      throw new SettingsError(
+        "options",
+        `The title of the ${ordinal(k + 1)} option cannot be empty`
+      );
+    }
+    if (!/^#[\da-f]{6}$/i.test(o.color)) {
+      throw new SettingsError(
+        "options",
+        `Invalid color on ${ordinal(k + 1)} option`
+      );
+    }
+  });
+  const maxChar = 1000;
+}
+
 export function feeAndProfitSharing(allSettings: AllSettingsType) {
   feeValidator(allSettings.Settings.fee);
   ProfitSharingValidator(
@@ -290,6 +330,9 @@ export const VALIDATORS: { [key: string]: any } = {
   idTermsValidator,
   titleTermsValidator,
   descriptionTermsValidator,
+  titleDefinitionValidator,
+  descriptionDefinitionValidator,
+  optionsDefinitionValidator,
 };
 
 export const COMBINED_VALIDATORS: { [key: string]: any } = {

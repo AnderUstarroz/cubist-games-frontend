@@ -323,3 +323,9 @@ export async function fetch_configs(
   setStats(statsData);
   return true;
 }
+
+export const is_authorized = (publicKey: PublicKey | null): boolean => {
+  return (
+    publicKey?.toBase58() === (process.env.NEXT_PUBLIC_AUTHORITY as string)
+  );
+};

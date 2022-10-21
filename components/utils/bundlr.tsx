@@ -2,13 +2,14 @@ import {
   Bundlr,
   BundlrError,
   ENVIRONMENT,
+  lamports_to_sol,
+  solana_to_usd,
 } from "@cubist-collective/cubist-games-lib";
 import { Connection } from "@solana/web3.js";
 import type { Adapter } from "@solana/wallet-adapter-base";
-import dynamic from "next/dynamic";
 import { flashMsg } from "./helpers";
-
-const Notification = dynamic(() => import("../notification"));
+import { BN } from "@project-serum/anchor";
+import { RechargeArweaveType } from "../recharge-arweave/types";
 
 export async function BundlrWrapper(
   connection: Connection,
@@ -53,3 +54,34 @@ export async function BundlrWrapper(
     throw e;
   }
 }
+
+export const displayRechargeArweave = (
+  price: BN,
+  balance: BN,
+  rechargeArweave: RechargeArweaveType,
+  setRechargeArweave: Function,
+  solUsdPrice: number,
+  maxDecimals: number
+) => {
+  // Reacharge Arweave when there is not enough balance
+  if (price.gte(balance)) {
+    const requiredLamports = price.toNumber() - balance.toNumber();
+    setRechargeArweave({
+      ...rechargeArweave,
+      display: true,
+      value: Math.max(
+        ...[1 / (solUsdPrice as number), lamports_to_sol(requiredLamports)]
+      ),
+      requiredSol: lamports_to_sol(requiredLamports),
+      solBalance: lamports_to_sol(balance.toNumber()),
+      requiredUsd: solana_to_usd(
+        lamports_to_sol(requiredLamports),
+        solUsdPrice as number
+      ),
+      recommendedSol: 1 / (solUsdPrice as number),
+      decimals: maxDecimals,
+    });
+    return true;
+  }
+  return false;
+};

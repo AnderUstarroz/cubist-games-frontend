@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "@cubist-collective/cubist-games-lib": "link:../cubist-games-lib",
+    "@uiw/react-markdown-preview": "^4.1.2",
+    "@uiw/react-md-editor": "^3.19.0",
     "date-fns": "^2.29.3",
     "framer-motion": "^7.3.2",
     "next": "12.2.5",
+    "next-remove-imports": "^1.0.7",
     "next-themes": "^0.2.1",
     "next-transpile-modules": "^9.0.0",
     "react": "18.2.0",

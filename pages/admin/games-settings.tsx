@@ -7,10 +7,17 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import Button from "../../components/button";
-import { BundlrWrapper } from "../../components/utils/bundlr";
+import {
+  BundlrWrapper,
+  displayRechargeArweave,
+} from "../../components/utils/bundlr";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import Router from "next/router";
-import { ConfigInputType, TermsInputsType } from "../types/game-settings";
+import {
+  ConfigInputType,
+  PDAType,
+  TermsInputsType,
+} from "../types/game-settings";
 
 import {
   Bundlr,
@@ -41,9 +48,7 @@ import {
 } from "../../components/validation/settings";
 import { SettingsError } from "../../components/validation/errors";
 import {
-  rustToInputsSettings,
   inputsToRustSettings,
-  default_profit_sharing,
   fetch_configs,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
@@ -52,7 +57,11 @@ import {
   multi_request,
   new_domain,
 } from "../../components/utils/requests";
-import { flashError, flashMsg } from "../../components/utils/helpers";
+import {
+  flashError,
+  flashMsg,
+  is_authorized,
+} from "../../components/utils/helpers";
 import { RechargeArweaveType } from "../../components/recharge-arweave/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { AnchorError } from "@project-serum/anchor";
@@ -92,7 +101,7 @@ const GameSettings: NextPage = () => {
   );
   const [configExists, setConfigExists] = useState<boolean>(false);
   const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
-  const [pdas, setPdas] = useState<any>(null);
+  const [pdas, setPdas] = useState<PDAType[] | null>(null);
   const [rechargeArweave, setRechargeArweave] = useState<RechargeArweaveType>({
     display: false,
     value: 1,
@@ -103,6 +112,7 @@ const GameSettings: NextPage = () => {
     error: false,
     loading: false,
     decimals: 9,
+    closeModals: {},
   });
   const [files, setFiles] = useState<FilesType>({});
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
@@ -156,7 +166,6 @@ const GameSettings: NextPage = () => {
       const allSettings = {
         SystemConfig: systemConfig as SystemConfigType,
         Settings: settings,
-        Terms: terms,
         ...updatedSettings,
       };
       validateInput(key, value, nameSpace);
@@ -213,18 +222,12 @@ const GameSettings: NextPage = () => {
       if (!validateSettingsField(key, value)) return;
     }
     (async () => {
+      if (!pdas) {
+        return;
+      }
       try {
-        configExists
-          ? // Update existing config
-            await solanaProgram?.methods
-              .updateConfig(inputsToRustSettings(config, maxDecimals))
-              .accounts({
-                authority: authority,
-                systemConfig: pdas[0][0],
-                config: pdas[1][0],
-              })
-              .rpc()
-          : // Create new Config
+        !configExists
+          ? // Create new Config
             await solanaProgram?.methods
               .initializeConfig(inputsToRustSettings(config, maxDecimals))
               .accounts({
@@ -233,7 +236,17 @@ const GameSettings: NextPage = () => {
                 config: pdas[1][0],
                 stats: pdas[2][0],
               })
+              .rpc()
+          : // Update existing config
+            await solanaProgram?.methods
+              .updateConfig(inputsToRustSettings(config, maxDecimals))
+              .accounts({
+                authority: authority,
+                systemConfig: pdas[0][0],
+                config: pdas[1][0],
+              })
               .rpc();
+
         flashMsg("Configuration saved!", "success");
         Router.push("/admin");
       } catch (error) {
@@ -249,7 +262,7 @@ const GameSettings: NextPage = () => {
     for (const [key, value] of Object.entries(terms)) {
       if (!validateSettingsField(key, value, "Terms")) return;
     }
-    if (!bundlr || !solanaProgram) return;
+    if (!bundlr || !solanaProgram || !pdas) return;
     const termsJSONString = JSON.stringify(
       (({ bump, loading, ...t }) => t)(terms)
     );
@@ -259,23 +272,16 @@ const GameSettings: NextPage = () => {
       [bundlr.getPrice, [Buffer.byteLength(termsJSONString, "utf8")]],
     ]);
     // Reacharge Arweave when there is not enough balance
-    if (price.gte(balance)) {
-      const requiredLamports = price.toNumber() - balance.toNumber();
-      setRechargeArweave({
-        ...rechargeArweave,
-        display: true,
-        value: Math.max(
-          ...[1 / (solUsdPrice as number), lamports_to_sol(requiredLamports)]
-        ),
-        requiredSol: lamports_to_sol(requiredLamports),
-        solBalance: lamports_to_sol(balance.toNumber()),
-        requiredUsd: solana_to_usd(
-          lamports_to_sol(requiredLamports),
-          solUsdPrice as number
-        ),
-        recommendedSol: 1 / (solUsdPrice as number),
-        decimals: maxDecimals,
-      });
+    if (
+      displayRechargeArweave(
+        price,
+        balance,
+        rechargeArweave,
+        setRechargeArweave,
+        solUsdPrice as number,
+        maxDecimals
+      )
+    ) {
       return;
     }
     const arweaveHash = await bundlr?.uploadJSON(termsJSONString);
@@ -421,7 +427,7 @@ const GameSettings: NextPage = () => {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {!publicKey ? (
+      {!is_authorized(publicKey) ? (
         <main className={styles.main}>Not registered</main>
       ) : (
         <main className={styles.main}>

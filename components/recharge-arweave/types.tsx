@@ -10,6 +10,7 @@ export interface RechargeArweaveType {
   error: boolean;
   loading: boolean;
   decimals: number;
+  closeModals: { [key: string]: boolean };
 }
 export interface RechargeArweavePropsType {
   display: boolean;
@@ -23,4 +24,5 @@ export interface RechargeArweavePropsType {
   error: boolean;
   loading: boolean;
   decimals: number;
+  closeModals: { [key: string]: boolean };
 }

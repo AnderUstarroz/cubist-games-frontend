@@ -2,10 +2,51 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../../styles/Home.module.css";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { flashError, is_authorized } from "../../components/utils/helpers";
+import { useEffect, useState } from "react";
+import { PublicKey } from "@solana/web3.js";
+import {
+  config_pda,
+  fetch_pdas,
+  initSolanaProgram,
+  SolanaProgramType,
+  stats_pda,
+  SYSTEM_AUTHORITY,
+  system_config_pda,
+} from "@cubist-collective/cubist-games-lib";
+import { PDAType } from "../types/game-settings";
+import useSWR from "swr";
+import { fetcher } from "../../components/utils/requests";
 
 const AdminHome: NextPage = () => {
+  const { data } = useSWR("/api/idl", fetcher);
+  const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
+  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [authority, _setAuthority] = useState<PublicKey>(
+    new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
+  );
+  const [solanaProgram, setSolanaProgram] = useState<SolanaProgramType | null>(
+    null
+  );
+
+  // STEP 1 - Init Program and PDAs
+  useEffect(() => {
+    if (!publicKey || !wallet || solanaProgram || !data || pdas) return;
+    (async () => {
+      setPdas(
+        await flashError(fetch_pdas, [
+          [system_config_pda, SYSTEM_AUTHORITY],
+          [config_pda, authority],
+          [stats_pda, authority],
+        ])
+      );
+      setSolanaProgram(
+        await initSolanaProgram(JSON.parse(data), connection, wallet.adapter)
+      );
+    })();
+  }, [publicKey, wallet, connection, data, solanaProgram, authority, pdas]);
 
   return (
     <div className={styles.container}>
@@ -15,7 +56,7 @@ const AdminHome: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {!publicKey ? (
+      {!is_authorized(publicKey) ? (
         <main className={styles.main}>Not registered</main>
       ) : (
         <main className={styles.main}>
@@ -30,6 +71,12 @@ const AdminHome: NextPage = () => {
             <a href="admin/game" className={styles.card}>
               <h2>New Game</h2>
               <p>Create a new game.</p>
+            </a>
+          </div>
+          <div className={styles.grid}>
+            <a href="admin/games" className={styles.card}>
+              <h2>Manage Games</h2>
+              <p>Edit existing games.</p>
             </a>
           </div>
         </main>

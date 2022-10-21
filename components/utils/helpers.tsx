@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { ReactNode } from "react";
+import { PublicKey } from "@solana/web3.js";
 
 const Notification = dynamic(() => import("../notification"));
 
@@ -24,3 +25,9 @@ export function flashMsg(
     duration: duration,
   });
 }
+
+export const is_authorized = (publicKey: PublicKey | null): boolean => {
+  return (
+    publicKey?.toBase58() === (process.env.NEXT_PUBLIC_AUTHORITY as string)
+  );
+};

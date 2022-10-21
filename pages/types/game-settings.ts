@@ -1,3 +1,5 @@
+import { PublicKey } from "@solana/web3.js";
+
 export interface GeneralInputType {
   fee: number;
   showPot: boolean;
@@ -81,3 +83,5 @@ export interface GameSettingsInputType
   options: OptionInputType[];
   result: number | null;
 }
+
+export type PDAType = [PublicKey, number];

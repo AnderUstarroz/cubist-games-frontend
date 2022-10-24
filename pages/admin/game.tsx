@@ -46,6 +46,8 @@ import {
   lamports_to_sol,
   solana_to_usd,
   terms_pda,
+  arweave_image,
+  blob_to_base64,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
@@ -480,13 +482,31 @@ const Game: NextPage = () => {
       const [gamePda, bump] = await game_pda(authority, new BN(gameId));
       setPdas(pdas.concat([[gamePda, bump]])); // Add Game to the existing PDAs
       try {
-        // Populate Settings using fetched Game
-        setGameSettings(
-          rustToInputsSettings(
-            await solanaProgram.account.game.fetch(gamePda),
-            maxDecimals
-          )
+        const existingGame = rustToInputsSettings(
+          await solanaProgram.account.game.fetch(gamePda),
+          maxDecimals
         );
+        // Populate Settings using existing Game
+        setGameSettings(existingGame);
+        // Populate Game definition
+        setDefinition({
+          ...definition,
+          ...(await arweave_json(existingGame.definitionHash)),
+        });
+        // Populate image
+        if (existingGame.image1Hash) {
+          const imageBlob = await arweave_image(existingGame.image1Hash);
+          setFiles({
+            ...files,
+            image1: {
+              mimeType: imageBlob.type,
+              size: imageBlob.size,
+              stream: null,
+              base64: await blob_to_base64(imageBlob as Blob),
+              arweaveHash: existingGame.image1Hash,
+            },
+          });
+        }
       } catch (error) {
         // If game doesn't exist, populate settings using fetched config settings
         setGameSettings({
@@ -526,10 +546,10 @@ const Game: NextPage = () => {
       setModals({ ...modals, rechargeArweave: true });
       return;
     }
-    file.arweave_hash = await bundlr?.uploadFile(file);
-    if (file.arweave_hash) {
+    file.arweaveHash = await bundlr?.uploadFile(file);
+    if (file.arweaveHash) {
       setFiles({ ...files, [name]: file });
-      setGameSettings({ ...gameSettings, [`${name}Hash`]: file.arweave_hash });
+      setGameSettings({ ...gameSettings, [`${name}Hash`]: file.arweaveHash });
       flashMsg(
         "Image was successfully uploaded, but you still need to save the game.",
         "info"
@@ -630,7 +650,7 @@ const Game: NextPage = () => {
               <div>
                 <ImageInput
                   name="image1"
-                  file={files.image ? files.image : null}
+                  file={files.image1 ? files.image1 : null}
                   onChange={async (e: any) =>
                     process_image(
                       e.target.name,

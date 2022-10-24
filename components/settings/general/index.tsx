@@ -104,8 +104,13 @@ export default function GeneralSettings({
                       <h3>Settle time</h3>
                       <p>
                         Defines the approximated time at which the game should
-                        be settled. Note that you must settle the game manually
-                        by selecting the result/outcome of the game.
+                        be settled.{" "}
+                      </p>
+                      <p>
+                        <strong>
+                          Remember that you must settle the game manually by
+                          selecting the result/outcome of the game.
+                        </strong>
                       </p>
                     </div>
                   )

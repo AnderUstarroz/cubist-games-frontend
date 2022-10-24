@@ -13,7 +13,7 @@ export default function ImageInput({
       {file?.base64 ? <motion.img src={file?.base64} /> : ""}
       <label className="aligned">
         <span>{file === null ? "Upload" : "Change"} Image</span>
-        <motion.input type={"file"} name="image" accept="*" {...props} />
+        <motion.input type={"file"} name={name} accept="*" {...props} />
       </label>
     </div>
   );

@@ -52,6 +52,9 @@ export function transform_num_with_decimals(
   decimals: number,
   toRust: boolean = true
 ) {
+  if (value == null) {
+    return null;
+  }
   return toRust
     ? new BN(Math.pow(10, decimals) * (value as number))
     : (value as BN).toNumber() / Math.pow(10, decimals);
@@ -323,9 +326,3 @@ export async function fetch_configs(
   setStats(statsData);
   return true;
 }
-
-export const is_authorized = (publicKey: PublicKey | null): boolean => {
-  return (
-    publicKey?.toBase58() === (process.env.NEXT_PUBLIC_AUTHORITY as string)
-  );
-};

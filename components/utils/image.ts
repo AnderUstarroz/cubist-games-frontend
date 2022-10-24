@@ -44,7 +44,7 @@ export function process_image(
         size: inputFiles[0]?.size ?? 0,
         stream: fileReaderStream(newFile),
         base64: await blob_to_base64(compressed as Blob),
-        arweave_hash: null,
+        arweaveHash: null,
       });
     })();
   };

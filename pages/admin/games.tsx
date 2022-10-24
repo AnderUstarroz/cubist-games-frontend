@@ -14,7 +14,6 @@ import {
   arweave_json,
   config_pda,
   fetch_pdas,
-  game_pda,
   initSolanaProgram,
   SolanaProgramType,
   StatsType,
@@ -25,10 +24,9 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { ConfigInputType, PDAType } from "../types/game-settings";
 import useSWR from "swr";
-import { fetcher } from "../../components/utils/requests";
+import { fetcher, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
-import { BN } from "@project-serum/anchor";
 
 const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
@@ -85,33 +83,6 @@ const Games: NextPage = () => {
     })();
   }, [solanaProgram, pdas]);
 
-  const load_next_games = async (
-    solanaProgram: SolanaProgramType,
-    authority: PublicKey,
-    gameIds: number[],
-    fetchDefinition: boolean = true
-  ) => {
-    let pdas = await fetch_pdas(
-      gameIds.map((id: number) => [game_pda, authority, new BN(id)])
-    );
-    let games: any = await Promise.allSettled(
-      pdas.map((pda: PDAType) => solanaProgram.account.game.fetch(pda[0]))
-    );
-    games = games
-      .filter((g: any) => g.status === "fulfilled")
-      .map((g: any) => g.value);
-    if (games && fetchDefinition) {
-      let definitions = await Promise.allSettled(
-        games.map((game: any) => arweave_json(game.definitionHash))
-      );
-      definitions.map((r: any, k: number) => {
-        if (r.status === "fulfilled") {
-          games[k].definition = r.value;
-        }
-      });
-    }
-    return games;
-  };
   const game_batch = (maxGameId: number, max = 10): number[] => {
     // Returns a list with the Game ids in descendent order
     let batch: number[] = [];
@@ -123,11 +94,12 @@ const Games: NextPage = () => {
     }
     return batch;
   };
+
   // STEP 3 - Fetch Game
   useEffect(() => {
     if (!stats || !solanaProgram || !config || !pdas) return;
     (async () => {
-      let games = await load_next_games(
+      let games = await fetch_games(
         solanaProgram,
         authority,
         game_batch(stats.totalGames.toNumber())
@@ -135,6 +107,7 @@ const Games: NextPage = () => {
       debugger;
     })();
   }, [stats]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -160,7 +133,7 @@ const Games: NextPage = () => {
             </a>
           </div>
           <div className={styles.grid}>
-            <a href="admin/manage-games" className={styles.card}>
+            <a href="admin/games" className={styles.card}>
               <h2>Manage Games</h2>
               <p>Edit existing games.</p>
             </a>

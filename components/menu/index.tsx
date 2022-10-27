@@ -5,9 +5,10 @@ import dynamic from "next/dynamic";
 const Menus: MenuTypes = {
   "/": dynamic(() => import("./home")),
   "/admin": dynamic(() => import("./home")),
-  "/admin/games-settings": dynamic(() => import("./home")),
+  "/admin/global-settings": dynamic(() => import("./home")),
   "/admin/game": dynamic(() => import("./home")),
   "/unauthorized": dynamic(() => import("./home")),
+  "/game/[title]": dynamic(() => import("./home")),
   "/404": dynamic(() => import("./home")),
 };
 const DefaultMenu = ({ toggle }: MenuType) => {

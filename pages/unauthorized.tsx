@@ -33,7 +33,7 @@ const Unauthorized: NextPage = () => {
             <p>You are not allowed to access this content.</p>
 
             <div className="aligned">
-              <Link href={`${process.env.NEXT_PUBLIC_HOST}`} passHref>
+              <Link href="/" passHref>
                 <Button>Back to games</Button>
               </Link>
             </div>

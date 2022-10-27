@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import styles from "../../styles/Home.module.css";
+import styles from "../../styles/Admin.module.scss";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { flashError, is_authorized } from "../../components/utils/helpers";
 import { useEffect, useState } from "react";
@@ -33,7 +33,8 @@ const AdminHome: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!publicKey || !wallet || solanaProgram || !data || pdas) return;
+    if (!is_authorized(publicKey) || !wallet || solanaProgram || !data || pdas)
+      return;
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -62,7 +63,7 @@ const AdminHome: NextPage = () => {
         <main className={styles.main}>
           <h1 className={styles.title}>Admin site</h1>
           <div className={styles.grid}>
-            <a href="admin/games-settings" className={styles.card}>
+            <a href="admin/global-settings" className={styles.card}>
               <h2>Settings &rarr;</h2>
               <p>Default configuration for games.</p>
             </a>

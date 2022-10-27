@@ -6,7 +6,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import "../styles/globals.scss";
 import "../styles/variables.scss";
 
-function MyApp({ Component, pageProps }: AppProps) {
+function CubistGames({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider defaultTheme={"light"} themes={["light", "dark"]}>
       <ContextProvider>
@@ -18,4 +18,4 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default MyApp;
+export default CubistGames;

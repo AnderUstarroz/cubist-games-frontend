@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import styles from "../../styles/Home.module.css";
+import styles from "../../styles/AdminGames.module.scss";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import {
   flashError,
@@ -11,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import {
-  arweave_json,
   config_pda,
   fetch_pdas,
   initSolanaProgram,
@@ -27,6 +25,8 @@ import useSWR from "swr";
 import { fetcher, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
+import { GameType } from "../types/game";
+import { game_batch } from "../../components/utils/game";
 
 const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
@@ -44,10 +44,12 @@ const Games: NextPage = () => {
   );
   const [config, setConfig] = useState<ConfigInputType | null>(null);
   const [stats, setStats] = useState<StatsType | null>(null);
+  const [games, setGames] = useState<GameType[]>([]);
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!publicKey || !wallet || solanaProgram || !data || pdas) return;
+    if (!is_authorized(publicKey) || !wallet || solanaProgram || !data || pdas)
+      return;
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -83,28 +85,17 @@ const Games: NextPage = () => {
     })();
   }, [solanaProgram, pdas]);
 
-  const game_batch = (maxGameId: number, max = 10): number[] => {
-    // Returns a list with the Game ids in descendent order
-    let batch: number[] = [];
-    for (let i = 0; i < max; i++) {
-      if (maxGameId - i <= 0) {
-        break;
-      }
-      batch.push(maxGameId - i);
-    }
-    return batch;
-  };
-
   // STEP 3 - Fetch Game
   useEffect(() => {
     if (!stats || !solanaProgram || !config || !pdas) return;
     (async () => {
-      let games = await fetch_games(
-        solanaProgram,
-        authority,
-        game_batch(stats.totalGames.toNumber())
+      setGames(
+        await fetch_games(
+          solanaProgram,
+          authority,
+          game_batch(stats.totalGames.toNumber())
+        )
       );
-      debugger;
     })();
   }, [stats]);
 
@@ -120,24 +111,15 @@ const Games: NextPage = () => {
       ) : (
         <main className={styles.main}>
           <h1 className={styles.title}>Manage games</h1>
-          <div className={styles.grid}>
-            <a href="admin/games-settings" className={styles.card}>
-              <h2>Settings &rarr;</h2>
-              <p>Default configuration for games.</p>
-            </a>
-          </div>
-          <div className={styles.grid}>
-            <a href="admin/game" className={styles.card}>
-              <h2>New Game</h2>
-              <p>Create a new game.</p>
-            </a>
-          </div>
-          <div className={styles.grid}>
-            <a href="admin/games" className={styles.card}>
-              <h2>Manage Games</h2>
-              <p>Edit existing games.</p>
-            </a>
-          </div>
+          <ul>
+            {games.map((g: GameType, k: number) => (
+              <li key={`game-${k}`}>
+                <a href={`/admin/game?id=${g.data.gameId}`}>
+                  Game {g.data.gameId} - {g.cached.definition?.title}
+                </a>
+              </li>
+            ))}
+          </ul>
         </main>
       )}
     </div>

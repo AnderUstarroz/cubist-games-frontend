@@ -13,7 +13,7 @@ function defaultButton(props: ButtonType) {
     <motion.button
       {...props}
       className={
-        styles.default + (props.className ? " " + props.className : "")
+        styles.default + (props.className ? ` ${props.className}` : "")
       }
     >
       {props.children}

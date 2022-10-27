@@ -8,6 +8,9 @@
   align-items: center;
 }
 
-.options {
-  margin: 0;
+.grid {
+  max-width: 800px;
+  > div {
+    margin-bottom: 25px;
+  }
 }

@@ -7,7 +7,7 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
-import GameSettings from "../../pages/admin/games-settings";
+import GameSettings from "../../pages/admin/global-settings";
 import {
   ConfigInputType,
   GameStateType,

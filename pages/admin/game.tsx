@@ -2,12 +2,11 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import useSWR from "swr";
 import NextImage from "next/image";
-import styles from "../../styles/Game.module.scss";
+import styles from "../../styles/AdminGame.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { AnchorError } from "@project-serum/anchor";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import Button from "../../components/button";
 import {
   BundlrWrapper,
   displayRechargeArweave,
@@ -49,7 +48,7 @@ import {
   arweave_image,
   blob_to_base64,
 } from "@cubist-collective/cubist-games-lib";
-import { DEFAULT_DECIMALS } from "../../components/utils/number";
+import { DEFAULT_DECIMALS, ordinal } from "../../components/utils/number";
 import {
   COMBINED_INPUTS,
   validateCombinedInput,
@@ -73,7 +72,6 @@ import Link from "next/link";
 import { process_image } from "../../components/utils/image";
 import { DefinitionInputsType, OptionType } from "../types/game";
 import { MDEditorProps } from "@uiw/react-md-editor";
-import { MarkdownPreviewProps } from "@uiw/react-markdown-preview";
 import {
   bold,
   italic,
@@ -93,10 +91,13 @@ import "@uiw/react-markdown-preview/markdown.css";
 
 const Input = dynamic(() => import("../../components/input"));
 const ImageInput = dynamic(() => import("../../components/image-input"));
-const Checkbox = dynamic(() => import("../../components/checkbox"));
+const Switch = dynamic(() => import("../../components/switch"));
 const Icon = dynamic(() => import("../../components/icon"));
 const Modal = dynamic(() => import("../../components/modal"));
 const Info = dynamic(() => import("../../components/settings/info"));
+const Button = dynamic(() => import("../../components/button"));
+const Markdown = dynamic(() => import("../../components/markdown"));
+
 const GeneralSettings = dynamic(
   () => import("../../components/settings/general")
 );
@@ -112,13 +113,6 @@ const RechargeArweave = dynamic(
 const MDEditor = dynamic<MDEditorProps>(() => import("@uiw/react-md-editor"), {
   ssr: false,
 });
-
-const MarkdownPreview = dynamic<MarkdownPreviewProps>(
-  () => import("@uiw/react-markdown-preview"),
-  {
-    ssr: false,
-  }
-);
 
 const mkEditorDefaults: any = {
   preview: "edit",
@@ -415,15 +409,6 @@ const Game: NextPage = () => {
     }
   };
 
-  // Init
-  useEffect(() => {
-    if (solUsdPrice) return;
-    (async () => {
-      setSolUsdPrice(await solana_usd_price());
-      setMaxDecimals(DEFAULT_DECIMALS);
-    })();
-  }, []);
-
   // Init Bundlr
   useEffect(() => {
     if (!publicKey || !wallet || bundlr) return;
@@ -434,8 +419,11 @@ const Game: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!publicKey || !wallet || !data || solanaProgram || pdas) return;
+    if (!is_authorized(publicKey) || !wallet || !data || solanaProgram || pdas)
+      return;
     (async () => {
+      setSolUsdPrice(await solana_usd_price());
+      setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
           [system_config_pda, SYSTEM_AUTHORITY],
@@ -557,6 +545,50 @@ const Game: NextPage = () => {
     }
   };
 
+  const handleToggleGame = async (value: boolean) => {
+    if (!pdas) return;
+    console.log("GAME STATE", value);
+    await solanaProgram?.methods
+      .toggleGame(value)
+      .accounts({
+        authority: authority,
+        game: pdas[3][0],
+      })
+      .rpc();
+    setGameSettings({ ...gameSettings, isActive: value });
+  };
+
+  const handleSetOutcome = async (optionId: number) => {
+    if (!solanaProgram || !pdas) return;
+    try {
+      // VOID GAME
+      if (optionId >= gameSettings.options.length) {
+        await solanaProgram.methods
+          .voidGame()
+          .accounts({
+            authority: authority,
+            game: pdas[3][0],
+          })
+          .rpc();
+        flashMsg("Game voided", "success");
+      } else {
+        // SETTLE GAME
+        await solanaProgram.methods
+          .settleGame(optionId)
+          .accounts({
+            authority: authority,
+            game: pdas[3][0],
+          })
+          .rpc();
+        flashMsg("Game settled", "success");
+      }
+      Router.push("/admin");
+    } catch (error) {
+      flashMsg(`${error}`);
+    }
+    setModals({ ...modals, main: false });
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -575,6 +607,31 @@ const Game: NextPage = () => {
               <h1 className={styles.title}>Game</h1>
               <p>New games will be created with this settings by default</p>
               {!!gameSettings.createdAt && <Info gameSettings={gameSettings} />}
+              {!gameSettings.settledAt ? (
+                <div className="aligned">
+                  <Switch
+                    onChange={handleToggleGame}
+                    value={gameSettings.isActive}
+                  />
+                  {gameSettings.isActive ? "Active" : "Disabled"}{" "}
+                  <Icon
+                    cType="info"
+                    onClick={() =>
+                      showModal(
+                        <div>
+                          <h3>Activate/Deactivate games</h3>
+                          <p>
+                            Only active games can accept bets. Disabled games
+                            won&apos;t be displayed in the games list.
+                          </p>
+                        </div>
+                      )
+                    }
+                  />
+                </div>
+              ) : (
+                ""
+              )}
               <div>
                 <h2>Dates</h2>
 
@@ -612,7 +669,7 @@ const Game: NextPage = () => {
                     {!gameSettings.termsId ? (
                       <p>
                         You need to{" "}
-                        <Link href="/admin/games-settings">
+                        <Link href="/admin/global-settings">
                           <a title="Settings">create Terms & Conditions</a>
                         </Link>{" "}
                         first
@@ -670,32 +727,112 @@ const Game: NextPage = () => {
                   </Button>
                 </h3>
                 <h4>Title</h4>
-                <MarkdownPreview source={definition.title} />
+                <Markdown>{definition.title}</Markdown>
                 <h4>Description</h4>
-                <MarkdownPreview source={definition.description} />
-                <h4>Options</h4>
+                <Markdown>{definition.description}</Markdown>
+                <h4>Options </h4>
                 <ul>
                   {definition.options.map((o: OptionType, k: number) => (
                     <li key={`descOpt-${k}`}>
-                      <MarkdownPreview source={o.title} />
-                      <MarkdownPreview source={o.description} />
+                      <Markdown>{o.title}</Markdown>
+                      <Markdown>{o.description}</Markdown>
                     </li>
                   ))}
                 </ul>{" "}
               </div>
+              {gameSettings.isActive && !gameSettings.totalBetsPaid ? (
+                <div>
+                  Game result:
+                  <Select
+                    placeholder="Select game outcome..."
+                    name="result"
+                    options={[
+                      ...definition.options.map((o: OptionType, k: number) => {
+                        return {
+                          value: k,
+                          label: o.title,
+                        };
+                      }),
+                      { value: definition.options.length, label: "Void game" },
+                    ]}
+                    value={
+                      gameSettings.result !== null
+                        ? {
+                            value: gameSettings.result,
+                            label:
+                              definition.options[gameSettings.result].title,
+                          }
+                        : null
+                    }
+                    onChange={(option, _actionMeta) => {
+                      if (!option) return;
+                      showModal(
+                        <div>
+                          <h3>Game outcome</h3>
+                          <p>You have selected the following outcome:</p>
+                          <ul>
+                            <li>
+                              <strong
+                                style={{
+                                  color:
+                                    option.value < definition.options.length
+                                      ? definition.options[option.value].color
+                                      : "black",
+                                }}
+                              >
+                                {option.label}
+                              </strong>
+                            </li>
+                          </ul>
+                          <p>
+                            <strong>
+                              Note that the outcome cannot be changed if some
+                              participant has claimed a prize already
+                            </strong>
+                            . Are you completly sure you want to select this
+                            option as the outcome of the game?
+                          </p>
+                          <div className="aligned">
+                            <Button
+                              onClick={() => handleSetOutcome(option.value)}
+                            >
+                              Set outcome
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                setModals({ ...modals, main: false })
+                              }
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
               <div>
-                <Button
-                  onClick={() => handleSave()}
-                  disabled={
-                    Boolean(Object.keys(errors).length) ||
-                    Boolean(Object.keys(definitionErrors).length)
-                  }
-                >
-                  Save
+                {!gameSettings.hasBets ? (
+                  <Button
+                    onClick={() => handleSave()}
+                    disabled={
+                      Boolean(Object.keys(errors).length) ||
+                      Boolean(Object.keys(definitionErrors).length)
+                    }
+                  >
+                    Save
+                  </Button>
+                ) : (
+                  ""
+                )}
+                <Button>
+                  <Link href={`/admin`}>
+                    <a>Go Back</a>
+                  </Link>
                 </Button>
-                <Link href={`${process.env.NEXT_PUBLIC_HOST}/admin`}>
-                  <a>Cancel</a>
-                </Link>
               </div>
             </>
           )}
@@ -753,7 +890,28 @@ const Game: NextPage = () => {
                 {definition.options.map((o: OptionType, k: number) => (
                   <li key={`descOpt-${k}`}>
                     <label>
-                      <span>Option</span>
+                      <span>
+                        Option{" "}
+                        <Button
+                          onClick={() =>
+                            setDefinition({
+                              ...definition,
+                              options: [
+                                ...definition.options,
+                                {
+                                  title: `TypeOption${
+                                    definition.options.length + 1
+                                  }`,
+                                  description: "",
+                                  color: "#000000",
+                                },
+                              ],
+                            })
+                          }
+                        >
+                          +
+                        </Button>
+                      </span>
                       <Input
                         name="title"
                         type="text"
@@ -790,10 +948,21 @@ const Game: NextPage = () => {
                         {...mkEditorDefaults}
                       />
                     </label>
+                    <Button
+                      onClick={() =>
+                        setDefinition({
+                          ...definition,
+                          options: definition.options.filter(
+                            (_: OptionType, index: number) => index !== k
+                          ),
+                        })
+                      }
+                    >
+                      -
+                    </Button>
                   </li>
                 ))}
               </ul>
-
               <div className="aligned">
                 <Button onClick={() => handleSaveDefinition()}>Save</Button>{" "}
                 <Button

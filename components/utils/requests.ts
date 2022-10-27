@@ -1,16 +1,17 @@
 import {
+  compress_image,
   fetch_pdas,
   isRejected,
   SolanaProgramType,
-  var_to_str,
 } from "@cubist-collective/cubist-games-lib";
 import { flashMsg } from "./helpers";
 import { BN } from "@project-serum/anchor";
-import { get_cached_game } from "../../components/utils/db";
-import { GamesType } from "../../pages/types/game";
+import { get_cached_game, put_cached_game } from "../../components/utils/db";
+import { GamesType, GameType } from "../../pages/types/game";
 import { PublicKey } from "@solana/web3.js";
 import { game_pda } from "@cubist-collective/cubist-games-lib";
 import { PDAType } from "../../pages/types/game-settings";
+import { rustToInputsSettings } from "./game-settings";
 export type MultiRequestType = [Function, any[]];
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -37,7 +38,7 @@ export const fetch_games = async (
   solanaProgram: SolanaProgramType,
   authority: PublicKey,
   gameIds: number[]
-) => {
+): Promise<GameType[]> => {
   let pdas = await fetch_pdas(
     gameIds.map((id: number) => [game_pda, authority, new BN(id)])
   );
@@ -49,24 +50,24 @@ export const fetch_games = async (
   gamesData = gamesData
     .filter((g: any) => g.status === "fulfilled")
     .map((g: any) => {
-      games[g.value.gameId.toNumber()] = {
-        data: g.value,
+      const data = rustToInputsSettings(g.value, 9);
+      games[data.gameId] = {
+        data: data,
         cached: {
-          gameId: g.value.gameId.toNumber(),
+          gameId: data.gameId,
           definitionHash: null,
           image1Hash: null,
           definition: null,
           image1: null,
           thumb1: null,
-          mimeType1: null,
         },
       };
-      return g.value;
+      return data;
     });
 
-  // Fetch already existing cached games:
+  // Fetch cached games:
   let cachedGames = await Promise.allSettled(
-    gamesData.map((game: any) => get_cached_game(game.gameId.toNumber()))
+    gamesData.map((game: any) => get_cached_game(game.gameId))
   );
 
   // Populates games from cache or fetch missing assets:
@@ -78,33 +79,54 @@ export const fetch_games = async (
       g.value.definitionHash == games[g.value.gameId].data.definitionHash &&
       g.value.image1Hash == games[g.value.gameId].data.image1Hash
     ) {
-      games[k].cached = g.value;
+      games[gamesData[k].gameId].cached = g.value;
       return;
     }
     // Fetch assets when cached game doesn't exist or is outdated
     missingAssets.push([gamesData[k].gameId, gamesData[k].definitionHash]);
-    debugger;
     if (gamesData[k].image1Hash) {
       missingAssets.push([gamesData[k].gameId, gamesData[k].image1Hash]);
     }
   });
   // Fetch missing assets
   if (missingAssets.length) {
-    let fetchedAssets = (
-      await Promise.allSettled(
-        missingAssets.map((requests: [number, string]) =>
-          fetch(`https://arweave.net/${requests[1]}`)
+    let fetchedGames: number | null[] = await Promise.all(
+      (
+        await Promise.allSettled(
+          missingAssets.map((requests: [number, string]) =>
+            fetch(`https://arweave.net/${requests[1]}`)
+          )
         )
-      )
-    ).map((r: any, k: number) => {
-      console.log(r);
-      const contentType = r.value.headers.get("Content-Type");
-      if (/application\/json/.test(contentType)) {
-      } else if (/imageMODIFYME/.test(contentType)) {
+      ).map(async (r: any, k: number) => {
+        if (r.status !== "fulfilled") return null;
+        const gameId = missingAssets[k][0];
+        if (/application\/json/.test(r.value.headers.get("Content-Type"))) {
+          games[gameId].cached.definition = await r.value.json();
+          games[gameId].cached.definitionHash = missingAssets[k][1];
+          return gameId;
+        }
+        const imageBlob = await r.value.blob();
+        games[gameId].cached.image1Hash = missingAssets[k][1];
+        games[gameId].cached.image1 = imageBlob;
+        games[gameId].cached.thumb1 = await compress_image(
+          imageBlob,
+          100,
+          imageBlob.type
+        );
+        return gameId;
+      })
+    );
+    // Remove duplicates, and cache result
+    for (const gameId of new Set(fetchedGames)) {
+      if (gameId !== null) {
+        put_cached_game(games[gameId].cached);
       }
-      debugger;
-    });
+    }
   }
-
-  return games;
+  // Sort by Newest -> Oldest
+  return Object.keys(games)
+    .map((gameId: string) => parseInt(gameId))
+    .sort()
+    .reverse()
+    .map((gameId: number) => games[gameId]);
 };

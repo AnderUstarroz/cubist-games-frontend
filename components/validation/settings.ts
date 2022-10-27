@@ -134,7 +134,7 @@ export function ProfitSharingValidator(
     throw new SettingsError(
       "profitSharing",
       `Program treasury "${systemConfig.treasury.toBase58()} -> ${
-        (profitFee * 100) / fee
+        Math.ceil(((profitFee * 100) / fee) * 100) / 100
       }%" must be within the list of profit shares`
     );
   }

@@ -2,6 +2,7 @@ import { parse_float_input } from "../../utils/number";
 import dynamic from "next/dynamic";
 import { InfoType } from "./types";
 import { formatRelative } from "date-fns";
+import { game_state } from "../../utils/game";
 
 export default function Info({ gameSettings }: InfoType) {
   return (
@@ -10,7 +11,7 @@ export default function Info({ gameSettings }: InfoType) {
       <fieldset>
         <div>
           <label>State</label>
-          <span>{Object.keys(gameSettings.state)[0]}</span>
+          <span>{game_state(gameSettings)}</span>
         </div>
         <div>
           <label>Created at</label>

@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import useSWR from "swr";
 import Image from "next/image";
-import styles from "../../styles/GamesSettings.module.scss";
+import styles from "../../styles/GlobalSettings.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
@@ -215,7 +215,7 @@ const GameSettings: NextPage = () => {
       ? {
           ...settings,
           https: window.location.protocol === "https:",
-          domain: window.location.host,
+          domain: window.location.host.slice(0, 32), // Cannot be longer than 32 char
         }
       : settings;
     for (const [key, value] of Object.entries(config)) {
@@ -369,14 +369,6 @@ const GameSettings: NextPage = () => {
     });
   };
 
-  // Init
-  useEffect(() => {
-    (async () => {
-      setSolUsdPrice(await solana_usd_price());
-      setMaxDecimals(DEFAULT_DECIMALS);
-    })();
-  }, []);
-
   // Init Bundlr
   useEffect(() => {
     if (!publicKey || !wallet || bundlr) return;
@@ -385,10 +377,12 @@ const GameSettings: NextPage = () => {
     })();
   }, [publicKey, wallet, connection, bundlr]);
 
-  // Init Program and PDAs
+  // Step 1 - Init Program and PDAs
   useEffect(() => {
     if (!publicKey || !wallet || !data || solanaProgram) return;
     (async () => {
+      setSolUsdPrice(await solana_usd_price());
+      setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
           [system_config_pda, SYSTEM_AUTHORITY],
@@ -622,7 +616,7 @@ const GameSettings: NextPage = () => {
             >
               Save
             </Button>
-            <Link href={`${process.env.NEXT_PUBLIC_HOST}/admin`}>
+            <Link href={`/admin`}>
               <a>Cancel</a>
             </Link>
           </div>

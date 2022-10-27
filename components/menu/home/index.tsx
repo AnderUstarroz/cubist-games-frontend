@@ -32,17 +32,14 @@ export default function HomeMenu({ toggle }: HomeMenuType) {
         <SocialLinks />
       </MenuItem>
       <MenuItem>
-        <Link href={`${process.env.NEXT_PUBLIC_HOST}/`} passHref>
+        <Link href="/" passHref>
           <Button cType="transparent" onClick={toggle}>
             Home
           </Button>
         </Link>
       </MenuItem>
       <MenuItem>
-        <Link href="/admin">Admin</Link>
-      </MenuItem>
-      <MenuItem>
-        <Link href="/admin/games-settings">
+        <Link href="/admin">
           <a title="Settings" onClick={toggle}>
             <Icon cType="gear" />
           </a>

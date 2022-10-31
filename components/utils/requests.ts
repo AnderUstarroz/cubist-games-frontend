@@ -1,13 +1,20 @@
 import {
+  arweave_json,
   compress_image,
   fetch_pdas,
   isRejected,
   SolanaProgramType,
+  terms_pda,
 } from "@cubist-collective/cubist-games-lib";
 import { flashMsg } from "./helpers";
 import { BN } from "@project-serum/anchor";
-import { get_cached_game, put_cached_game } from "../../components/utils/db";
-import { GamesType, GameType } from "../../pages/types/game";
+import {
+  get_cached_game,
+  get_cached_terms,
+  put_cached_game,
+  put_cached_terms,
+} from "../../components/utils/db";
+import { GamesType, GameTermsType, GameType } from "../../pages/types/game";
 import { PublicKey } from "@solana/web3.js";
 import { game_pda } from "@cubist-collective/cubist-games-lib";
 import { PDAType } from "../../pages/types/game-settings";
@@ -129,4 +136,35 @@ export const fetch_games = async (
     .sort()
     .reverse()
     .map((gameId: number) => games[gameId]);
+};
+
+export const fetch_terms = async (
+  solanaProgram: SolanaProgramType,
+  termsId: string,
+  termsHash: string
+): Promise<GameTermsType> => {
+  let terms = await get_cached_terms(termsId);
+  if (!terms || terms.hash != termsHash) {
+    console.log("entra a buscar terms");
+    try {
+      const [termsPda, _] = await terms_pda(
+        new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string),
+        termsId
+      );
+      terms = {
+        agreed: false,
+        hash: termsHash,
+        ...(await arweave_json(
+          (
+            await solanaProgram.account.terms.fetch(termsPda)
+          ).arweaveHash
+        )),
+      };
+      put_cached_terms(terms);
+    } catch (error) {
+      flashMsg("Failed to fetch Terms & Conditions");
+      console.log(error);
+    }
+  }
+  return terms;
 };

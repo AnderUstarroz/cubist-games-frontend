@@ -41,3 +41,25 @@ export interface GamesType {
 export interface GamesByStateType {
   [key: string]: GameType[];
 }
+
+export interface PrevGameType {
+  pot: number;
+  [key: string]: number;
+}
+
+export interface CustomStakeType {
+  id: number;
+  title: string;
+  description: string;
+  color: string;
+  stake: string;
+  error: boolean;
+}
+
+export interface GameTermsType {
+  agreed: boolean;
+  id: string;
+  hash: string;
+  title: string;
+  description: string;
+}

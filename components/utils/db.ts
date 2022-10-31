@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { CachedGameType } from "../../pages/types/game";
+import { CachedGameType, GameTermsType } from "../../pages/types/game";
 
 const DB_NAME = `CubistGamesDB_${(
   process.env.NEXT_PUBLIC_AUTHORITY as string
@@ -29,8 +29,10 @@ const getDB = async () => {
           keyPath: "id",
         });
         termsStore.createIndex("id", "id", { unique: true });
-        termsStore.createIndex("termsHash", "termsHash", { unique: true });
-        termsStore.createIndex("terms", "terms", { unique: false });
+        termsStore.createIndex("hash", "hash", { unique: true });
+        termsStore.createIndex("title", "title", { unique: false });
+        termsStore.createIndex("description", "description", { unique: false });
+        termsStore.createIndex("agreed", "agreed", { unique: false });
       },
     }
   );
@@ -47,6 +49,16 @@ export const del_cached_game = async (gameId: number) => {
 export const put_cached_game = async (game: CachedGameType) => {
   const db = await getDB();
   await db.put(GAME_STORE, game);
+};
+
+export const get_cached_terms = async (termsId: string) => {
+  const db = await getDB();
+  return await db.get(TERMS_STORE, termsId);
+};
+
+export const put_cached_terms = async (terms: GameTermsType) => {
+  const db = await getDB();
+  await db.put(TERMS_STORE, terms);
 };
 
 export default getDB;

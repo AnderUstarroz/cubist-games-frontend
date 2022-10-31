@@ -1,9 +1,8 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../../styles/Game.module.scss";
-import Link from "next/link";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { AnchorProvider, Program, setProvider } from "@project-serum/anchor";
 import {
   arweave_json,
@@ -16,44 +15,83 @@ import {
   PROGRAM_ID,
   SolanaProgramType,
   solana_usd_price,
+  SystemConfigType,
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import fs from "fs";
-import { GameType, OptionType } from "../types/game";
-import { OptionInputType, PDAType } from "../types/game-settings";
+import {
+  GameType,
+  OptionType,
+  PrevGameType,
+  CustomStakeType,
+  GameTermsType,
+} from "../types/game";
+import { PDAType } from "../types/game-settings";
 import { flashError } from "../../components/utils/helpers";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
-import { fetch_games } from "../../components/utils/requests";
+import { fetch_games, fetch_terms } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import { DEFAULT_ANIMATION } from "../../components/utils/animation";
-import { format_time } from "../../components/utils/date";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { update_prev_game } from "../../components/utils/game";
 
-const Button = dynamic(() => import("../../components/button"));
-const Markdown = dynamic(() => import("../../components/markdown"));
+const Game = dynamic(() => import("../../components/game"));
+const Modal = dynamic(() => import("../../components/modal"));
 
-const Game: NextPage = ({ data, path }: any) => {
+const GamePage: NextPage = ({ data, path }: any) => {
   const { publicKey, wallet } = useWallet();
+  const { setVisible: setWalletVisible } = useWalletModal();
   const { connection } = useConnection();
   const [pdas, setPdas] = useState<PDAType[] | null>(null);
   const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
+  const [terms, setTerms] = useState<GameTermsType>({
+    agreed: false,
+    id: "",
+    hash: "",
+    title: "",
+    description: "",
+  });
   const [game, setGame] = useState<GameType | null>(null);
+  const [systemConfig, setSystemConfig] = useState<SystemConfigType | null>(
+    null
+  );
+  const [customStake, setCustomStake] = useState<CustomStakeType>({
+    id: 0,
+    title: "",
+    description: "",
+    color: "",
+    stake: "1",
+    error: false,
+  });
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
   const [refreshGame, setRefreshGame] = useState<boolean>(false);
+  const [prevGame, setPrevGame] = useState<PrevGameType | null>(null);
+  const [modals, setModals] = useState({
+    main: false,
+    customStake: false,
+  });
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
   const [solanaProgram, setSolanaProgram] = useState<SolanaProgramType | null>(
     null
   );
+  const [mainModalContent, setMainModalContent] = useState<ReactNode>(null);
+
+  const setMainModal = (content: any, show = true) => {
+    if (show) {
+      setMainModalContent(content);
+    }
+    setModals({ ...modals, main: show });
+  };
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!wallet || !data || solanaProgram || pdas) return;
+    if (!data || solanaProgram || pdas) return;
     (async () => {
       // Init
       setSolUsdPrice(await solana_usd_price());
@@ -66,33 +104,52 @@ const Game: NextPage = ({ data, path }: any) => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(data.idl, connection, wallet.adapter)
+        await initSolanaProgram(
+          data.idl,
+          connection,
+          wallet ? wallet.adapter : new PhantomWalletAdapter()
+        )
       );
     })();
   }, [wallet, connection, data, solanaProgram, authority]);
 
   // STEP 2 - Fetch Game
   useEffect(() => {
-    if (!connection || !solanaProgram || !pdas || game) return;
+    if (!connection || !solanaProgram || !pdas || game || terms.id) return;
     let websocket: null | number = null;
     (async () => {
       // Populate Settings using existing Game
-      setGame((await fetch_games(solanaProgram, authority, [data.gameId]))[0]);
+      const fetchedGame = (
+        await fetch_games(solanaProgram, authority, [data.gameId])
+      )[0];
+      setPrevGame(update_prev_game(fetchedGame.data, true));
+      setGame(fetchedGame);
+      setSystemConfig(
+        await solanaProgram.account.systemConfig.fetch(pdas[0][0])
+      );
+      setTerms({
+        ...terms,
+        ...(await fetch_terms(
+          solanaProgram,
+          fetchedGame.data.termsId,
+          fetchedGame.data.termsHash
+        )),
+      });
     })();
     // Create Websocket connection to apply Game updates.
     websocket = connection.onAccountChange(
       pdas[2][0],
       (updatedAccountInfo: any, context: any) => {
-        setRefreshGame(true);
-        console.log("UPDATED ACCOUNT", updatedAccountInfo);
-        console.log("ACCOUNT CONTEXT", context);
+        if (!refreshGame) setRefreshGame(true);
+        // console.log("Updated game account:", updatedAccountInfo);
+        // console.log("game account context:", context);
       },
       "confirmed"
     );
-    // Refresh game every 20 seconds (if needed)
+    // Refresh game every 15 seconds (if needed)
     const refreshGameInterval = setInterval(
       () => handleRefreshGame(),
-      20 * 1000
+      15 * 1000
     );
     return () => {
       if (websocket) connection.removeAccountChangeListener(websocket);
@@ -100,10 +157,22 @@ const Game: NextPage = ({ data, path }: any) => {
     };
   }, [solanaProgram, pdas]);
 
+  // Wallet connected
+  useEffect(() => {
+    if (!wallet || !publicKey || !connection || !data.idl) return;
+    (async () => {
+      setSolanaProgram(
+        await initSolanaProgram(data.idl, connection, wallet.adapter)
+      );
+    })();
+  }, [publicKey, wallet, connection, data.idl]);
+
   const handleRefreshGame = async () => {
     if (!refreshGame || !solanaProgram) return;
     // Refresh game
-    setGame((await fetch_games(solanaProgram, authority, [data.gameId]))[0]);
+    const g = (await fetch_games(solanaProgram, authority, [data.gameId]))[0];
+    setPrevGame(update_prev_game(g.data));
+    setGame(g);
     setRefreshGame(false);
   };
   return (
@@ -156,67 +225,32 @@ const Game: NextPage = ({ data, path }: any) => {
       </Head>
       <main className={styles.main}>
         <AnimatePresence>
-          {game ? (
-            <>
-              <motion.ul className="aligned">
-                <li>
-                  Open<div>{format_time(game.data.openTime)}</div>
-                </li>
-                <li>
-                  Closed<div>{format_time(game.data.closeTime)}</div>
-                </li>
-                <li>
-                  Settled<div>{format_time(game.data.settleTime)}</div>
-                </li>
-              </motion.ul>
-              <motion.div {...DEFAULT_ANIMATION}>
-                <h1 className={styles.title}>
-                  {game.cached.definition?.title}
-                </h1>
-                <div>
-                  <Markdown>
-                    {game.cached.definition?.description as string}
-                  </Markdown>
-                </div>
-              </motion.div>
-              <motion.div>STATS</motion.div>
-              <motion.div className={styles.options}>
-                {game.cached.definition?.options.map(
-                  (o: OptionType, k: number) => (
-                    <div key={`betOpt${k}`} className="aligned">
-                      <div>
-                        <h4>{o.title}</h4>
-                        {o.description ? <p>{o.description}</p> : ""}
-                      </div>
-                      <ul className="aligned">
-                        {game.data.stakeButtons.map(
-                          (stakeAmount: number, k: number) => (
-                            <li key={`stakeBtn${k}`}>
-                              <Button style={{ backgroundColor: o.color }}>
-                                {stakeAmount}
-                              </Button>
-                            </li>
-                          )
-                        )}
-                        {game.data.customStakeButton ? (
-                          <li>
-                            <Button style={{ backgroundColor: o.color }}>
-                              Custom stake!
-                            </Button>
-                          </li>
-                        ) : (
-                          ""
-                        )}
-                      </ul>
-                    </div>
-                  )
-                )}
-              </motion.div>
-            </>
+          {solanaProgram && pdas && systemConfig && game && prevGame ? (
+            <Game
+              template={game.data.designTemplate}
+              solanaProgram={solanaProgram}
+              connection={connection}
+              systemConfig={systemConfig}
+              game={game}
+              pdas={pdas}
+              prevGame={prevGame}
+              modals={modals}
+              setModals={setModals}
+              setMainModal={setMainModal}
+              customStake={customStake}
+              setCustomStake={setCustomStake}
+              setWalletVisible={setWalletVisible}
+              terms={terms}
+              setTerms={setTerms}
+              publickey={publicKey}
+            />
           ) : (
             <div>Loading...</div>
           )}
         </AnimatePresence>
+        <Modal modalId={"main"} modals={modals} setIsOpen={setModals}>
+          {mainModalContent}
+        </Modal>
       </main>
     </div>
   );
@@ -237,7 +271,7 @@ export async function getServerSideProps(context: any) {
   );
   const provider = new AnchorProvider(
     connection,
-    AnchorProvider.env().wallet,
+    new PhantomWalletAdapter() as any,
     AnchorProvider.defaultOptions()
   );
   setProvider(provider);
@@ -274,4 +308,4 @@ export async function getServerSideProps(context: any) {
   return { notFound: true };
 }
 
-export default Game;
+export default GamePage;

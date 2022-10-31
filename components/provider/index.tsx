@@ -22,7 +22,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const network = process.env.NEXT_PUBLIC_SOLANA_NETWORK as any;
   const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string;
 
-  const wallets = useMemo(
+  const wallets: any = useMemo(
     () => [
       new PhantomWalletAdapter(),
       new SlopeWalletAdapter(),

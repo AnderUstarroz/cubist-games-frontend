@@ -3301,6 +3301,11 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+countup.js@^2.2.0:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/countup.js/-/countup.js-2.3.2.tgz#9a91d95780be1c908d1e6feb548625f353f57988"
+  integrity sha512-dQ7F/CmKGjaO6cDfhtEXwsKVlXIpJ89dFs8PvkaZH9jBVJ2Z8GU4iwG/qP7MgY8qwr+1skbwR6qecWWQLUzB8Q==
+
 crc@^3.8.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/crc/-/crc-3.8.0.tgz#ad60269c2c856f8c299e2c4cc0de4556914056c6"
@@ -6521,6 +6526,13 @@ randomfill@^1.0.3:
   dependencies:
     randombytes "^2.0.5"
     safe-buffer "^5.1.0"
+
+react-countup@^6.3.2:
+  version "6.3.2"
+  resolved "https://registry.yarnpkg.com/react-countup/-/react-countup-6.3.2.tgz#37359bb4262c2af52ae1e0ad36d2d0feff01d278"
+  integrity sha512-ID3344D1Yo0X5CWQiJYXBpiPCYLwMOw1VvNP9geJE+PqpdDmx6iuoMhxXAqjpdaRWiD6zUnLRK6rrnGgDg09pg==
+  dependencies:
+    countup.js "^2.2.0"
 
 react-dom@16.13.1:
   version "16.13.1"

@@ -28,18 +28,18 @@ import { fetcher, fetch_games } from "../components/utils/requests";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { GamesByStateType, GameType } from "./types/game";
 import { game_batch, game_state } from "../components/utils/game";
+import { Wallet } from "@project-serum/anchor";
 import {
   fetch_configs,
   rustToInputsSettings,
 } from "../components/utils/game-settings";
 import Router from "next/router";
 import slugify from "slugify";
-
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 const Button = dynamic(() => import("../components/button"));
 
 const Home: NextPage = () => {
   const { data: idl } = useSWR("/api/idl", fetcher);
-  const { publicKey, wallet } = useWallet();
   const { connection } = useConnection();
   const [pdas, setPdas] = useState<PDAType[] | null>(null);
   const [openGames, setOpenGames] = useState<GameType[]>([]);
@@ -96,8 +96,7 @@ const Home: NextPage = () => {
   };
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!is_authorized(publicKey) || !wallet || solanaProgram || !idl || pdas)
-      return;
+    if (!connection || solanaProgram || !idl || pdas) return;
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -107,10 +106,14 @@ const Home: NextPage = () => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(JSON.parse(idl), connection, wallet.adapter)
+        await initSolanaProgram(
+          JSON.parse(idl),
+          connection,
+          new PhantomWalletAdapter()
+        )
       );
     })();
-  }, [publicKey, wallet, connection, idl, solanaProgram, authority, pdas]);
+  }, [connection, idl, solanaProgram, authority, pdas]);
 
   // STEP 2 - Fetch Configs
   useEffect(() => {
@@ -158,86 +161,81 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {!publicKey ? (
-        <main className={styles.main}>Not registered</main>
-      ) : (
-        <main className={styles.main}>
-          <h1 className={styles.title}>List of Games</h1>
-          <div className={styles.grid}>
-            <div>
-              <h2>Open Games</h2>
-              <ul>
-                {openGames.map((game: GameType, k: number) => (
-                  <li key={`openGames${k}`}>
-                    {" "}
-                    <a
-                      href={`/game/${slugify(
-                        game.cached.definition?.title as string,
-                        { lower: true }
-                      )}?id=${game.data.gameId}`}
-                    >
-                      {game.cached.definition?.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>{" "}
-            <div>
-              <h2>Closed Games</h2>
-              <ul>
-                {closedGames.map((game: GameType, k: number) => (
-                  <li key={`closedGames${k}`}>
-                    <a
-                      href={`/game/${slugify(
-                        game.cached.definition?.title as string,
-                        { lower: true }
-                      )}?id=${game.data.gameId}`}
-                    >
-                      {game.cached.definition?.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>{" "}
-            <div>
-              <h2>Settled Games</h2>
-              <ul>
-                {settledGames.map((game: GameType, k: number) => (
-                  <li key={`settledGames${k}`}>
-                    <a
-                      href={`/game/${slugify(
-                        game.cached.definition?.title as string,
-                        { lower: true }
-                      )}?id=${game.data.gameId}`}
-                    >
-                      {game.cached.definition?.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              {nextGameId ? (
-                <div>
-                  <Button
-                    onClick={() =>
-                      fetchMoreGames(
-                        {
-                          Open: openGames,
-                          Closed: closedGames,
-                          Settled: settledGames,
-                        },
-                        10,
-                        nextGameId
-                      )
-                    }
-                  ></Button>
-                </div>
-              ) : (
-                ""
-              )}
-            </div>
+      <main className={styles.main}>
+        <h1 className={styles.title}>List of Games</h1>
+        <div className={styles.grid}>
+          <div>
+            <h2>Open Games</h2>
+            <ul>
+              {openGames.map((game: GameType, k: number) => (
+                <li key={`openGames${k}`}>
+                  <a
+                    href={`/game/${slugify(
+                      game.cached.definition?.title as string,
+                      { lower: true }
+                    )}?id=${game.data.gameId}`}
+                  >
+                    {game.cached.definition?.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>{" "}
+          <div>
+            <h2>Closed Games</h2>
+            <ul>
+              {closedGames.map((game: GameType, k: number) => (
+                <li key={`closedGames${k}`}>
+                  <a
+                    href={`/game/${slugify(
+                      game.cached.definition?.title as string,
+                      { lower: true }
+                    )}?id=${game.data.gameId}`}
+                  >
+                    {game.cached.definition?.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>{" "}
+          <div>
+            <h2>Settled Games</h2>
+            <ul>
+              {settledGames.map((game: GameType, k: number) => (
+                <li key={`settledGames${k}`}>
+                  <a
+                    href={`/game/${slugify(
+                      game.cached.definition?.title as string,
+                      { lower: true }
+                    )}?id=${game.data.gameId}`}
+                  >
+                    {game.cached.definition?.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {nextGameId ? (
+              <div>
+                <Button
+                  onClick={() =>
+                    fetchMoreGames(
+                      {
+                        Open: openGames,
+                        Closed: closedGames,
+                        Settled: settledGames,
+                      },
+                      10,
+                      nextGameId
+                    )
+                  }
+                ></Button>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
-        </main>
-      )}
+        </div>
+      </main>
     </div>
   );
 };

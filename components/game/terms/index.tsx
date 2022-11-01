@@ -41,7 +41,7 @@ export default function Terms({
                         setTerms({ ...terms, agreed: !terms.agreed })
                       }
                     />
-                    I ACCEPT THESE TERMS AND CONDITIONS
+                    I ACCEPT THESE TERMS &amp; CONDITIONS
                   </label>
                 </div>
               ) : (
@@ -56,7 +56,7 @@ export default function Terms({
         }
       >
         <span className="subMsg">
-          {`${display ? "I accept the " : ""}Terms &amp; Conditions`}
+          {`${display ? "I accept the " : ""}Terms & Conditions`}
         </span>{" "}
         <Icon cType="info" width={15} height={15} />
       </div>

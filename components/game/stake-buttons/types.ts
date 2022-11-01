@@ -15,6 +15,7 @@ export interface DefaultStakeButtonsPropsType {
   modals: { [key: string]: boolean };
   setModals: Function;
   setWalletVisible: Function;
+  sendTransaction: Function;
   customStake: CustomStakeType;
   setCustomStake: Function;
   termsAgreed: boolean;

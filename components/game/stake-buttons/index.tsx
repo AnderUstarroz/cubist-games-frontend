@@ -26,124 +26,153 @@ function DefaultStakeButtons({
   customStake,
   setCustomStake,
   setWalletVisible,
+  sendTransaction,
   termsAgreed,
   publickey,
 }: DefaultStakeButtonsPropsType) {
   return (
     <motion.div className={styles.options}>
-      {game.cached.definition?.options.map((o: OptionType, k: number) => (
-        <div key={`betOpt${k}`} className="aligned">
-          <div>
-            <h4>{o.title}</h4>
-            {o.description ? <p>{o.description}</p> : ""}
-          </div>
-          <ul className="aligned">
-            {game.data.stakeButtons.map((stakeAmount: number, k: number) => (
-              <li key={`stakeBtn${k}`}>
-                <Button style={{ backgroundColor: o.color }}>
-                  {stakeAmount}
-                </Button>
-              </li>
-            ))}
-            {game.data.customStakeButton ? (
-              <li>
-                <Button
-                  style={{ backgroundColor: o.color }}
-                  onClick={() => {
-                    setCustomStake({
-                      id: k,
-                      title: o.title,
-                      description: o.description,
-                      stake: customStake.stake,
-                      color: o.color,
-                      error: null,
-                    });
-                    setModals({ ...modals, customStake: true });
-                  }}
-                >
-                  Custom stake!
-                </Button>
-              </li>
-            ) : (
-              ""
-            )}
-          </ul>
-          <Modal modalId={"customStake"} modals={modals} setIsOpen={setModals}>
+      {game.cached.definition?.options.map(
+        (o: OptionType, optionId: number) => (
+          <div key={`betOpt${optionId}`} className="aligned">
             <div>
-              <h3 style={{ color: customStake.color }}>{customStake.title}</h3>
-              {!!customStake.description && (
-                <Markdown>{customStake.description as string}</Markdown>
+              <h4>{o.title}</h4>
+              {o.description ? <p>{o.description}</p> : ""}
+            </div>
+            <ul className="aligned">
+              {game.data.stakeButtons.map((stakeAmount: number, k: number) => (
+                <li key={`stakeBtn${optionId}-${k}`}>
+                  <Button
+                    style={{ backgroundColor: o.color }}
+                    onClick={() =>
+                      place_bet(
+                        solanaProgram,
+                        connection,
+                        systemConfig,
+                        game,
+                        pdas,
+                        optionId,
+                        sol_to_lamports(stakeAmount),
+                        termsAgreed,
+                        publickey,
+                        modals,
+                        setModals,
+                        setWalletVisible,
+                        sendTransaction
+                      )
+                    }
+                  >
+                    {stakeAmount}
+                  </Button>
+                </li>
+              ))}
+              {game.data.customStakeButton ? (
+                <li>
+                  <Button
+                    style={{ backgroundColor: o.color }}
+                    onClick={() => {
+                      setCustomStake({
+                        id: optionId,
+                        title: o.title,
+                        description: o.description,
+                        stake: customStake.stake,
+                        color: o.color,
+                        error: null,
+                      });
+                      setModals({ ...modals, customStake: true });
+                    }}
+                  >
+                    Custom stake!
+                  </Button>
+                </li>
+              ) : (
+                ""
               )}
-              <div className="aligned">
-                <Input
-                  type="number"
-                  autoComplete="off"
-                  value={customStake.stake}
-                  placeholder={`Enter SOL amount`}
-                  style={{
-                    width: 110,
-                    borderColor: customStake.error ? "red" : "gray",
-                  }}
-                  onClick={(e: any) => e.target.select()}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCustomStake({
-                      ...customStake,
-                      stake: e.target.value,
-                    })
-                  }
-                  maxLength="5"
-                />
-                <span>SOL</span>
-                <Button
-                  onClick={() => {
-                    const solAmount = parseFloat(customStake.stake);
-                    let error = false;
-                    if (solAmount < game.data.minStake) {
-                      error = true;
-                      flashMsg(
-                        `The minimum stake is ${game.data.minStake} SOL`
-                      );
-                    }
-                    const lamports = sol_to_lamports(solAmount);
-                    if (lamports % sol_to_lamports(game.data.minStep) !== 0) {
-                      error = true;
-                      flashMsg(
-                        `The minimum amount to increase/decrease a bet is ${game.data.minStep} SOL`
-                      );
-                    }
-                    if (error) {
+            </ul>
+            <Modal
+              modalId={"customStake"}
+              modals={modals}
+              setIsOpen={setModals}
+            >
+              <div>
+                <h3 style={{ color: customStake.color }}>
+                  {customStake.title}
+                </h3>
+                {!!customStake.description && (
+                  <Markdown>{customStake.description as string}</Markdown>
+                )}
+                <div className="aligned">
+                  <Input
+                    type="number"
+                    autoComplete="off"
+                    value={customStake.stake}
+                    placeholder={`Enter SOL amount`}
+                    style={{
+                      width: 110,
+                      borderColor: customStake.error ? "red" : "gray",
+                    }}
+                    onClick={(e: any) => e.target.select()}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCustomStake({
                         ...customStake,
-                        error: error,
-                      });
-                      return;
+                        stake: e.target.value,
+                      })
                     }
-                    place_bet(
-                      solanaProgram,
-                      connection,
-                      systemConfig,
-                      game,
-                      pdas,
-                      customStake.id,
-                      lamports,
-                      termsAgreed,
-                      publickey,
-                      modals,
-                      setModals,
-                      setWalletVisible
-                    );
-                  }}
-                >
-                  Place Bet
-                </Button>
-              </div>
-              {/* {props.prize && !props.prediction.spl_token
+                    maxLength="5"
+                  />
+                  <span>SOL</span>
+                  <Button
+                    onClick={() => {
+                      const solAmount = parseFloat(customStake.stake);
+                      let error = false;
+                      if (solAmount < game.data.minStake) {
+                        error = true;
+                        flashMsg(
+                          `The minimum stake is ${game.data.minStake} SOL`
+                        );
+                      }
+                      const lamports = sol_to_lamports(solAmount);
+                      if (lamports % sol_to_lamports(game.data.minStep) !== 0) {
+                        error = true;
+                        flashMsg(
+                          `The minimum amount to increase/decrease a bet is ${game.data.minStep} SOL`
+                        );
+                      }
+                      if (error) {
+                        setCustomStake({
+                          ...customStake,
+                          error: error,
+                        });
+                        return;
+                      }
+                      place_bet(
+                        solanaProgram,
+                        connection,
+                        systemConfig,
+                        game,
+                        pdas,
+                        customStake.id,
+                        lamports,
+                        termsAgreed,
+                        publickey,
+                        modals,
+                        setModals,
+                        setWalletVisible,
+                        sendTransaction
+                      );
+                    }}
+                  >
+                    Place Bet
+                  </Button>
+                </div>
+                {/* {props.prize && !props.prediction.spl_token
                 ? profitText(props.prize, props.profit)
                 : null} */}
-            </div>
-          </Modal>
-        </div>
-      ))}
+              </div>
+            </Modal>
+          </div>
+        )
+      )}
     </motion.div>
   );
 }

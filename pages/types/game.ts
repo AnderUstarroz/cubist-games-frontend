@@ -1,5 +1,3 @@
-import { CubistGames } from "@cubist-collective/cubist-games-lib";
-import { IdlAccounts } from "@project-serum/anchor";
 import { GameSettingsInputType } from "./game-settings";
 
 export interface OptionType {

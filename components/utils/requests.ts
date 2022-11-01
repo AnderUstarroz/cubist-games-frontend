@@ -30,7 +30,7 @@ export const multi_request = async (
   requests: MultiRequestType[]
 ): Promise<any[]> => {
   const data = await Promise.allSettled(
-    requests.map((params: MultiRequestType) => params[0](...params[1]))
+    requests.map(async (params: MultiRequestType) => params[0](...params[1]))
   );
   if (data.find(isRejected)) {
     const errorMsg = `Failed to fetch all requests`;
@@ -50,7 +50,7 @@ export const fetch_games = async (
     gameIds.map((id: number) => [game_pda, authority, new BN(id)])
   );
   let gamesData: any = await Promise.allSettled(
-    pdas.map((pda: PDAType) => solanaProgram.account.game.fetch(pda[0]))
+    pdas.map(async (pda: PDAType) => solanaProgram.account.game.fetch(pda[0]))
   );
   let games: GamesType = {};
   // Filter out not existing games:
@@ -74,7 +74,7 @@ export const fetch_games = async (
 
   // Fetch cached games:
   let cachedGames = await Promise.allSettled(
-    gamesData.map((game: any) => get_cached_game(game.gameId))
+    gamesData.map(async (game: any) => get_cached_game(game.gameId))
   );
 
   // Populates games from cache or fetch missing assets:
@@ -100,7 +100,7 @@ export const fetch_games = async (
     let fetchedGames: number | null[] = await Promise.all(
       (
         await Promise.allSettled(
-          missingAssets.map((requests: [number, string]) =>
+          missingAssets.map(async (requests: [number, string]) =>
             fetch(`https://arweave.net/${requests[1]}`)
           )
         )

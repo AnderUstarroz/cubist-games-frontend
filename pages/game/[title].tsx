@@ -21,7 +21,7 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import fs from "fs";
 import {
   GameType,
@@ -38,12 +38,15 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { update_prev_game } from "../../components/utils/game";
+import { fetch_my_bets, MyBetType } from "../../components/utils/bet";
+import Button from "../../components/button";
+import { useInterval } from "../../components/useInterval";
 
 const Game = dynamic(() => import("../../components/game"));
 const Modal = dynamic(() => import("../../components/modal"));
 
 const GamePage: NextPage = ({ data, path }: any) => {
-  const { publicKey, wallet } = useWallet();
+  const { publicKey, wallet, sendTransaction } = useWallet();
   const { setVisible: setWalletVisible } = useWalletModal();
   const { connection } = useConnection();
   const [pdas, setPdas] = useState<PDAType[] | null>(null);
@@ -64,11 +67,13 @@ const GamePage: NextPage = ({ data, path }: any) => {
     title: "",
     description: "",
     color: "",
-    stake: "1",
+    stake: "1.0",
     error: false,
   });
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
+  const [myBets, setMyBets] = useState<MyBetType[]>([]);
   const [refreshGame, setRefreshGame] = useState<boolean>(false);
+  const refreshRef = useRef();
   const [prevGame, setPrevGame] = useState<PrevGameType | null>(null);
   const [modals, setModals] = useState({
     main: false,
@@ -87,6 +92,22 @@ const GamePage: NextPage = ({ data, path }: any) => {
       setMainModalContent(content);
     }
     setModals({ ...modals, main: show });
+  };
+
+  const handleRefreshGame = async () => {
+    // Refreshes game every 15 secs (if needed)
+    console.log("Refresh:", refreshGame);
+    if (!refreshGame || !solanaProgram) return;
+    // Refresh game
+    const g = (await fetch_games(solanaProgram, authority, [data.gameId]))[0];
+    console.log("Refreshing game!!");
+    console.log(g);
+    setPrevGame(update_prev_game(g.data));
+    setGame(g);
+    setRefreshGame(false);
+    if (publicKey) {
+      setMyBets(await fetch_my_bets(connection, publicKey, g));
+    }
   };
 
   // STEP 1 - Init Program and PDAs
@@ -135,27 +156,33 @@ const GamePage: NextPage = ({ data, path }: any) => {
           fetchedGame.data.termsHash
         )),
       });
+      setCustomStake({
+        ...customStake,
+        stake: (fetchedGame.data.minStep * 10.0).toFixed(2),
+      });
+      if (publicKey) {
+        setMyBets(await fetch_my_bets(connection, publicKey, fetchedGame));
+      }
     })();
     // Create Websocket connection to apply Game updates.
     websocket = connection.onAccountChange(
       pdas[2][0],
       (updatedAccountInfo: any, context: any) => {
         if (!refreshGame) setRefreshGame(true);
-        // console.log("Updated game account:", updatedAccountInfo);
+        console.log("Updated game account:", updatedAccountInfo);
         // console.log("game account context:", context);
       },
       "confirmed"
     );
-    // Refresh game every 15 seconds (if needed)
-    const refreshGameInterval = setInterval(
-      () => handleRefreshGame(),
-      15 * 1000
-    );
     return () => {
       if (websocket) connection.removeAccountChangeListener(websocket);
-      clearInterval(refreshGameInterval);
     };
   }, [solanaProgram, pdas]);
+
+  // Refresh game every 15 seconds (when updated)
+  useInterval(() => {
+    handleRefreshGame();
+  }, 15 * 1000);
 
   // Wallet connected
   useEffect(() => {
@@ -167,14 +194,6 @@ const GamePage: NextPage = ({ data, path }: any) => {
     })();
   }, [publicKey, wallet, connection, data.idl]);
 
-  const handleRefreshGame = async () => {
-    if (!refreshGame || !solanaProgram) return;
-    // Refresh game
-    const g = (await fetch_games(solanaProgram, authority, [data.gameId]))[0];
-    setPrevGame(update_prev_game(g.data));
-    setGame(g);
-    setRefreshGame(false);
-  };
   return (
     <div className={styles.container}>
       <Head>
@@ -224,6 +243,14 @@ const GamePage: NextPage = ({ data, path }: any) => {
         ))}
       </Head>
       <main className={styles.main}>
+        <Button
+          onClick={() => {
+            console.log("REFRESH GAME!");
+            setRefreshGame(true);
+          }}
+        >
+          ACTIVATE
+        </Button>
         <AnimatePresence>
           {solanaProgram && pdas && systemConfig && game && prevGame ? (
             <Game
@@ -240,9 +267,11 @@ const GamePage: NextPage = ({ data, path }: any) => {
               customStake={customStake}
               setCustomStake={setCustomStake}
               setWalletVisible={setWalletVisible}
+              sendTransaction={sendTransaction}
               terms={terms}
               setTerms={setTerms}
               publickey={publicKey}
+              myBets={myBets}
             />
           ) : (
             <div>Loading...</div>

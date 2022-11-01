@@ -10,6 +10,7 @@ import {
   SystemConfigType,
 } from "@cubist-collective/cubist-games-lib";
 import { PDAType } from "../../pages/types/game-settings";
+import { MyBetType } from "../utils/bet";
 
 export interface GamePropsType {
   template: string | null;
@@ -24,10 +25,12 @@ export interface GamePropsType {
   customStake: CustomStakeType;
   setCustomStake: Function;
   setWalletVisible: Function;
+  sendTransaction: Function;
   terms: GameTermsType;
   setTerms: Function;
   setMainModal: Function;
   publickey: PublicKey | null;
+  myBets: MyBetType[];
 }
 
 export interface DefaultGamePropsType extends GamePropsType {}

@@ -10,6 +10,7 @@ const Definition = dynamic(() => import("./definition"));
 const StakeButtons = dynamic(() => import("./stake-buttons"));
 const Stats = dynamic(() => import("./stats"));
 const Results = dynamic(() => import("./results"));
+const MyBets = dynamic(() => import("./my-bets"));
 
 function DefaultGame({ template, ...props }: DefaultGamePropsType) {
   return (
@@ -46,10 +47,12 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         customStake={props.customStake}
         setCustomStake={props.setCustomStake}
         setWalletVisible={props.setWalletVisible}
+        sendTransaction={props.sendTransaction}
         termsAgreed={props.terms.agreed}
         publickey={props.publickey}
       />
       <Results template={template} game={props.game} />
+      <MyBets template={template} myBets={props.myBets} />
     </>
   );
 }

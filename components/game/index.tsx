@@ -3,6 +3,7 @@ import styles from "./DefaultGame.module.scss";
 import dynamic from "next/dynamic";
 import { GamePropsType, DefaultGamePropsType } from "./types";
 import { format_time } from "../utils/date";
+import { game_state } from "../utils/game";
 
 const Templates: any = {};
 
@@ -10,7 +11,7 @@ const Definition = dynamic(() => import("./definition"));
 const StakeButtons = dynamic(() => import("./stake-buttons"));
 const Stats = dynamic(() => import("./stats"));
 const Results = dynamic(() => import("./results"));
-const MyBets = dynamic(() => import("./my-bets"));
+const CTA = dynamic(() => import("./cta"));
 
 function DefaultGame({ template, ...props }: DefaultGamePropsType) {
   return (
@@ -35,24 +36,39 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         setMainModal={props.setMainModal}
       />
       <Stats template={template} game={props.game} />
-      <StakeButtons
+      {game_state(props.game.data) === "Open" && (
+        <StakeButtons
+          template={template}
+          solanaProgram={props.solanaProgram}
+          connection={props.connection}
+          systemConfig={props.systemConfig}
+          game={props.game}
+          pdas={props.pdas}
+          modals={props.modals}
+          setModals={props.setModals}
+          customStake={props.customStake}
+          setCustomStake={props.setCustomStake}
+          setWalletVisible={props.setWalletVisible}
+          sendTransaction={props.sendTransaction}
+          termsAgreed={props.terms.agreed}
+          publickey={props.publickey}
+          playerBets={props.playerBets}
+        />
+      )}
+      {!!props.game.data.settledAt && !!props.myBets.length && (
+        <Results
+          template={template}
+          game={props.game}
+          publickey={props.publickey}
+          myBets={props.myBets}
+          playerBets={props.playerBets}
+        />
+      )}
+      <CTA
         template={template}
-        solanaProgram={props.solanaProgram}
-        connection={props.connection}
-        systemConfig={props.systemConfig}
-        game={props.game}
-        pdas={props.pdas}
-        modals={props.modals}
-        setModals={props.setModals}
-        customStake={props.customStake}
-        setCustomStake={props.setCustomStake}
-        setWalletVisible={props.setWalletVisible}
-        sendTransaction={props.sendTransaction}
-        termsAgreed={props.terms.agreed}
-        publickey={props.publickey}
+        myBets={props.myBets}
+        playerBets={props.playerBets}
       />
-      <Results template={template} game={props.game} />
-      <MyBets template={template} myBets={props.myBets} />
     </>
   );
 }

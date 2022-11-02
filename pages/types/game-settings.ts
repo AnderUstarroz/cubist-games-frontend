@@ -77,11 +77,10 @@ export interface GameSettingsInputType
   termsHash: string;
   definitionHash: string;
   category: string | null;
+  useToken: boolean;
   image1Hash: string | null;
   hasBets: boolean;
   totalBetsPaid: number;
   options: OptionInputType[];
   result: number | null;
 }
-
-export type PDAType = [PublicKey, number];

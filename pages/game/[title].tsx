@@ -4,6 +4,7 @@ import styles from "../../styles/Game.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { AnchorProvider, Program, setProvider } from "@project-serum/anchor";
+import { IdlAccounts } from "@project-serum/anchor";
 import {
   arweave_json,
   arweave_url,
@@ -12,6 +13,8 @@ import {
   fetch_pdas,
   game_pda,
   initSolanaProgram,
+  PDATypes,
+  player_bets_pda,
   PROGRAM_ID,
   SolanaProgramType,
   solana_usd_price,
@@ -19,9 +22,9 @@ import {
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
-import { PublicKey, Connection, Keypair } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
-import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import fs from "fs";
 import {
   GameType,
@@ -30,17 +33,15 @@ import {
   CustomStakeType,
   GameTermsType,
 } from "../types/game";
-import { PDAType } from "../types/game-settings";
 import { flashError } from "../../components/utils/helpers";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import { fetch_games, fetch_terms } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { update_prev_game } from "../../components/utils/game";
 import { fetch_my_bets, MyBetType } from "../../components/utils/bet";
-import Button from "../../components/button";
-import { useInterval } from "../../components/useInterval";
+import { useInterval } from "../../components/utils/helpers";
 
 const Game = dynamic(() => import("../../components/game"));
 const Modal = dynamic(() => import("../../components/modal"));
@@ -49,7 +50,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
   const { publicKey, wallet, sendTransaction } = useWallet();
   const { setVisible: setWalletVisible } = useWalletModal();
   const { connection } = useConnection();
-  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
   const [terms, setTerms] = useState<GameTermsType>({
     agreed: false,
@@ -72,8 +73,10 @@ const GamePage: NextPage = ({ data, path }: any) => {
   });
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
   const [myBets, setMyBets] = useState<MyBetType[]>([]);
+  const [playerBets, setPlayerBets] = useState<
+    IdlAccounts<CubistGames>["playerBets"] | null
+  >(null);
   const [refreshGame, setRefreshGame] = useState<boolean>(false);
-  const refreshRef = useRef();
   const [prevGame, setPrevGame] = useState<PrevGameType | null>(null);
   const [modals, setModals] = useState({
     main: false,
@@ -96,18 +99,32 @@ const GamePage: NextPage = ({ data, path }: any) => {
 
   const handleRefreshGame = async () => {
     // Refreshes game every 15 secs (if needed)
-    console.log("Refresh:", refreshGame);
     if (!refreshGame || !solanaProgram) return;
     // Refresh game
     const g = (await fetch_games(solanaProgram, authority, [data.gameId]))[0];
-    console.log("Refreshing game!!");
-    console.log(g);
     setPrevGame(update_prev_game(g.data));
     setGame(g);
     setRefreshGame(false);
-    if (publicKey) {
-      setMyBets(await fetch_my_bets(connection, publicKey, g));
-    }
+    refreshBets(g);
+  };
+
+  const refreshBets = async (game: GameType) => {
+    if (!publicKey || !solanaProgram || !pdas) return;
+    setMyBets(await fetch_my_bets(connection, publicKey, game));
+    const [playerBetsPda, playerBetsBump] = await player_bets_pda(
+      publicKey,
+      pdas.game.pda // Game PDA
+    );
+    setPdas({
+      ...pdas,
+      playerBets: { pda: playerBetsPda, bump: playerBetsBump },
+    });
+    // Fetch playerBets (only exists if at least one bet has been placed)
+    try {
+      setPlayerBets(
+        await solanaProgram.account.playerBets.fetch(playerBetsPda)
+      );
+    } catch (e) {}
   };
 
   // STEP 1 - Init Program and PDAs
@@ -119,9 +136,9 @@ const GamePage: NextPage = ({ data, path }: any) => {
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
-          [system_config_pda, SYSTEM_AUTHORITY],
-          [config_pda, authority],
-          [game_pda, authority, new BN(data.gameId)],
+          ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
+          ["config", config_pda, authority],
+          ["game", game_pda, authority, new BN(data.gameId)],
         ])
       );
       setSolanaProgram(
@@ -146,7 +163,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
       setPrevGame(update_prev_game(fetchedGame.data, true));
       setGame(fetchedGame);
       setSystemConfig(
-        await solanaProgram.account.systemConfig.fetch(pdas[0][0])
+        await solanaProgram.account.systemConfig.fetch(pdas.systemConfig.pda)
       );
       setTerms({
         ...terms,
@@ -160,16 +177,14 @@ const GamePage: NextPage = ({ data, path }: any) => {
         ...customStake,
         stake: (fetchedGame.data.minStep * 10.0).toFixed(2),
       });
-      if (publicKey) {
-        setMyBets(await fetch_my_bets(connection, publicKey, fetchedGame));
-      }
+      refreshBets(fetchedGame);
     })();
     // Create Websocket connection to apply Game updates.
     websocket = connection.onAccountChange(
-      pdas[2][0],
+      pdas.game.pda,
       (updatedAccountInfo: any, context: any) => {
         if (!refreshGame) setRefreshGame(true);
-        console.log("Updated game account:", updatedAccountInfo);
+        // console.log("Updated game account:", updatedAccountInfo);
         // console.log("game account context:", context);
       },
       "confirmed"
@@ -184,13 +199,21 @@ const GamePage: NextPage = ({ data, path }: any) => {
     handleRefreshGame();
   }, 15 * 1000);
 
-  // Wallet connected
+  // Wallet connected/Disconnected
   useEffect(() => {
-    if (!wallet || !publicKey || !connection || !data.idl) return;
+    // Reset Mybets, playerBets, pdas when disconnedted
+    if (!wallet || !publicKey || !connection || !data.idl) {
+      if (myBets) setMyBets([]);
+      if (playerBets) setPlayerBets(null);
+      return;
+    }
     (async () => {
       setSolanaProgram(
         await initSolanaProgram(data.idl, connection, wallet.adapter)
       );
+      if (game) {
+        refreshBets(game);
+      }
     })();
   }, [publicKey, wallet, connection, data.idl]);
 
@@ -243,14 +266,6 @@ const GamePage: NextPage = ({ data, path }: any) => {
         ))}
       </Head>
       <main className={styles.main}>
-        <Button
-          onClick={() => {
-            console.log("REFRESH GAME!");
-            setRefreshGame(true);
-          }}
-        >
-          ACTIVATE
-        </Button>
         <AnimatePresence>
           {solanaProgram && pdas && systemConfig && game && prevGame ? (
             <Game
@@ -272,6 +287,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
               setTerms={setTerms}
               publickey={publicKey}
               myBets={myBets}
+              playerBets={playerBets}
             />
           ) : (
             <div>Loading...</div>
@@ -306,14 +322,14 @@ export async function getServerSideProps(context: any) {
   setProvider(provider);
   const program = new Program<CubistGames>(idl, PROGRAM_ID, provider);
   try {
-    const [configPda, gamePda] = await fetch_pdas([
-      [config_pda, authority],
-      [game_pda, authority, new BN(context.query.id)],
+    const pdas = await fetch_pdas([
+      ["config", config_pda, authority],
+      ["game", game_pda, authority, new BN(context.query.id)],
     ]);
     const [config, game] = (
       await Promise.allSettled([
-        program.account.config.fetch(configPda[0]),
-        program.account.game.fetch(gamePda[0]),
+        program.account.config.fetch(pdas.config.pda),
+        program.account.game.fetch(pdas.game.pda),
       ])
     )
       .filter((i: any) => i.status === "fulfilled")

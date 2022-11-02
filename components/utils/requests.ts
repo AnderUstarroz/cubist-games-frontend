@@ -1,7 +1,6 @@
 import {
   arweave_json,
   compress_image,
-  fetch_pdas,
   isRejected,
   SolanaProgramType,
   terms_pda,
@@ -17,7 +16,6 @@ import {
 import { GamesType, GameTermsType, GameType } from "../../pages/types/game";
 import { PublicKey } from "@solana/web3.js";
 import { game_pda } from "@cubist-collective/cubist-games-lib";
-import { PDAType } from "../../pages/types/game-settings";
 import { rustToInputsSettings } from "./game-settings";
 export type MultiRequestType = [Function, any[]];
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -46,11 +44,15 @@ export const fetch_games = async (
   authority: PublicKey,
   gameIds: number[]
 ): Promise<GameType[]> => {
-  let pdas = await fetch_pdas(
-    gameIds.map((id: number) => [game_pda, authority, new BN(id)])
-  );
+  let pdas = (
+    await Promise.allSettled(
+      gameIds.map(async (id: number) => game_pda(authority, new BN(id)))
+    )
+  ).map((r: any) => r.value);
   let gamesData: any = await Promise.allSettled(
-    pdas.map(async (pda: PDAType) => solanaProgram.account.game.fetch(pda[0]))
+    pdas.map(async (pda: [PublicKey, number]) =>
+      solanaProgram.account.game.fetch(pda[0])
+    )
   );
   let games: GamesType = {};
   // Filter out not existing games:

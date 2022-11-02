@@ -258,7 +258,7 @@ export function stakeButtonsValidator(
   minStake: number,
   minStep: number
 ) {
-  if (btns.length > 10) {
+  if (btns.length > 5) {
     throw new SettingsError(
       "stakeButtons",
       "Too many stake buttons! Cannot create more than 10"

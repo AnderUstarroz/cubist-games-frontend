@@ -5,15 +5,12 @@ import styles from "../styles/Home.module.scss";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import {
-  flashError,
-  flashMsg,
-  is_authorized,
-} from "../components/utils/helpers";
+import { flashError, flashMsg } from "../components/utils/helpers";
 import {
   config_pda,
   fetch_pdas,
   initSolanaProgram,
+  PDATypes,
   SolanaProgramType,
   StatsType,
   stats_pda,
@@ -21,19 +18,14 @@ import {
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
-import { ConfigInputType, PDAType } from "./types/game-settings";
+import { ConfigInputType } from "./types/game-settings";
 import { PublicKey } from "@solana/web3.js";
 import useSWR from "swr";
 import { fetcher, fetch_games } from "../components/utils/requests";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useConnection } from "@solana/wallet-adapter-react";
 import { GamesByStateType, GameType } from "./types/game";
 import { game_batch, game_state } from "../components/utils/game";
-import { Wallet } from "@project-serum/anchor";
-import {
-  fetch_configs,
-  rustToInputsSettings,
-} from "../components/utils/game-settings";
-import Router from "next/router";
+import { fetch_configs } from "../components/utils/game-settings";
 import slugify from "slugify";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 const Button = dynamic(() => import("../components/button"));
@@ -41,7 +33,7 @@ const Button = dynamic(() => import("../components/button"));
 const Home: NextPage = () => {
   const { data: idl } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
-  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [openGames, setOpenGames] = useState<GameType[]>([]);
   const [closedGames, setClosedGames] = useState<GameType[]>([]);
   const [settledGames, setSettledGames] = useState<GameType[]>([]);
@@ -100,9 +92,9 @@ const Home: NextPage = () => {
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
-          [system_config_pda, SYSTEM_AUTHORITY],
-          [config_pda, authority],
-          [stats_pda, authority],
+          ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
+          ["config", config_pda, authority],
+          ["stats", stats_pda, authority],
         ])
       );
       setSolanaProgram(

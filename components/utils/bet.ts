@@ -2,7 +2,10 @@ import {
   ActionType,
   BetMsgType,
   lamports_to_sol,
+  MAX_PERCENTAGE,
   MEMO_PROGRAM_ID,
+  num_format,
+  PDATypes,
   player_bets_pda,
   SolanaProgramType,
   SystemConfigType,
@@ -15,7 +18,6 @@ import {
   Transaction,
   SignaturesForAddressOptions,
 } from "@solana/web3.js";
-import { PDAType } from "../../pages/types/game-settings";
 import { BN } from "@project-serum/anchor";
 import { human_number } from "./number";
 import { CubistGames } from "@cubist-collective/cubist-games-lib";
@@ -26,7 +28,7 @@ export const place_bet = async (
   connection: Connection,
   systemConfig: SystemConfigType,
   game: GameType,
-  pdas: PDAType[],
+  pdas: PDATypes,
   optionId: number,
   lamports: number,
   agreedTerms: Boolean,
@@ -34,7 +36,8 @@ export const place_bet = async (
   modals: { [k: string]: boolean },
   setModals: Function,
   setWalletVisible: Function,
-  sendTransaction: Function
+  sendTransaction: Function,
+  playerBets: IdlAccounts<CubistGames>["playerBets"] | null
 ) => {
   if (new Date() < game.data.openTime) {
     return flashMsg("Game is not open yet");
@@ -50,18 +53,17 @@ export const place_bet = async (
     return flashMsg("You must accept the Terms & Conditions");
   }
 
-  const systemConfigPda = pdas[0][0];
-  const gamePda = pdas[2][0];
-  const [playerBetsPda, _] = await player_bets_pda(publickey, gamePda);
-  const [tx, playerBets, msg] = await bet_tx(
+  const [tx, msg] = await bet_tx(
     solanaProgram,
     connection,
-    lamports + systemConfig.betFee.toNumber(),
+    lamports,
+    systemConfig.betFee.toNumber(),
     optionId,
-    playerBetsPda,
+    pdas.playerBets.pda,
+    playerBets,
     publickey,
-    gamePda,
-    systemConfigPda,
+    pdas.game.pda,
+    pdas.systemConfig.pda,
     systemConfig.treasury,
     game.data.gameId
   );
@@ -120,32 +122,29 @@ export async function bet_tx(
   solanaProgram: SolanaProgramType,
   connection: Connection,
   lamports: number,
+  feeLamports: number,
   optionId: number,
   playerBetsPDA: PublicKey,
+  playerBets: IdlAccounts<CubistGames>["playerBets"] | null,
   playerPublicKey: PublicKey,
   gamePDA: PublicKey,
   systemConfigPDA: PublicKey,
   systemTreasury: PublicKey,
   gameId: number
-): Promise<
-  [Transaction, IdlAccounts<CubistGames>["playerBets"] | null, BetMsgType]
-> {
+): Promise<[Transaction, BetMsgType]> {
   const msg = {
     siteId: (process.env.NEXT_PUBLIC_AUTHORITY as string).slice(0, 7),
     gameId: gameId,
     type: ActionType.Bet,
     optionId: optionId,
-    stake: lamports,
+    stake: num_format(lamports_to_sol(lamports), 9),
     referral: null,
   };
 
   const transaction = new Transaction(await connection.getLatestBlockhash());
   transaction.feePayer = playerPublicKey;
   // Initialize player's betting account if doesn't exist already
-  let playerBets = null;
-  try {
-    playerBets = await solanaProgram.account.playerBets.fetch(playerBetsPDA);
-  } catch (_err) {
+  if (!playerBets) {
     transaction.add(
       await solanaProgram.methods
         .initializePlayerBets()
@@ -160,7 +159,7 @@ export async function bet_tx(
 
   transaction.add(
     await solanaProgram.methods
-      .placeSolBet(optionId, new BN(lamports))
+      .placeSolBet(optionId, new BN(lamports + feeLamports))
       .accounts({
         player: playerPublicKey,
         game: gamePDA,
@@ -175,11 +174,7 @@ export async function bet_tx(
     keys: [],
     data: Buffer.from(JSON.stringify(msg), "utf8"),
   });
-  return [transaction, playerBets, msg] as [
-    Transaction,
-    IdlAccounts<CubistGames>["playerBets"] | null,
-    BetMsgType
-  ];
+  return [transaction, msg] as [Transaction, BetMsgType];
 }
 
 export interface MyBetType {
@@ -187,9 +182,12 @@ export interface MyBetType {
   gameId: number;
   optionId: number;
   stake: number;
-  name: string;
+  title: string;
+  color: string;
   referral: string;
   signature: string;
+  payment: number | null;
+  paySignature: string | null;
 }
 
 export const fetch_my_bets = async (
@@ -198,9 +196,9 @@ export const fetch_my_bets = async (
   game: GameType
 ): Promise<MyBetType[]> => {
   if (!game.cached?.definition?.options) return [];
-  const optionMap: { [key: number]: string } =
+  const optionMap: { [key: number]: { title: string; color: string } } =
     game.cached.definition.options.reduce((newObj, option, k: number) => {
-      return { ...newObj, [k]: option.title };
+      return { ...newObj, [k]: { title: option.title, color: option.color } };
     }, {});
   let bets: MyBetType[] = [];
   let completed = false;
@@ -239,8 +237,11 @@ export const fetch_my_bets = async (
               referral: data.referral,
               optionId: data.optionId,
               stake: data.stake,
-              name: optionMap[data.optionId],
+              title: optionMap[data.optionId].title,
+              color: optionMap[data.optionId].color,
               signature: signatures[i].signature,
+              payment: null,
+              paySignature: null,
             });
           } catch (error) {
             console.error(error);
@@ -276,3 +277,28 @@ export const fetch_my_bets = async (
   // }
   // return verifiedBets;
 };
+
+export function final_fee(
+  totalStake: number,
+  loserStake: number,
+  fee: number
+): number {
+  let fee_amount = (fee / MAX_PERCENTAGE) * totalStake;
+  if (fee_amount > loserStake) {
+    fee_amount = loserStake / 2.0;
+  }
+  return Math.floor(fee_amount);
+}
+
+export function calculate_payment(
+  stake: number,
+  totalStake: number,
+  winnerStake: number,
+  fee: number
+) {
+  let loserStake = totalStake - winnerStake;
+  return Math.floor(
+    ((totalStake - final_fee(totalStake, loserStake, fee)) / winnerStake) *
+      stake
+  );
+}

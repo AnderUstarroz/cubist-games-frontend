@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import useSWR from "swr";
-import NextImage from "next/image";
 import styles from "../../styles/AdminGame.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { AnchorError } from "@project-serum/anchor";
@@ -18,8 +17,6 @@ import {
   ConfigInputType,
   GameSettingsInputType,
   GameStateType,
-  OptionInputType,
-  PDAType,
 } from "../types/game-settings";
 import { BN } from "@project-serum/anchor";
 import { addHours } from "date-fns";
@@ -47,6 +44,7 @@ import {
   terms_pda,
   arweave_image,
   blob_to_base64,
+  PDATypes,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS, ordinal } from "../../components/utils/number";
 import {
@@ -141,7 +139,7 @@ const Game: NextPage = () => {
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
   const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
-  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [rechargeArweave, setRechargeArweave] = useState<RechargeArweaveType>({
     display: false,
     value: 1,
@@ -182,6 +180,7 @@ const Game: NextPage = () => {
     fee: 7,
     showPot: true,
     useCategories: false,
+    useToken: false,
     allowReferral: true,
     fireThreshold: 100,
     minStake: 0.1,
@@ -300,10 +299,10 @@ const Game: NextPage = () => {
               .createGame(inputsToRustSettings(params, maxDecimals))
               .accounts({
                 authority: authority,
-                systemConfig: pdas[0][0],
-                config: pdas[1][0],
-                stats: pdas[2][0],
-                game: pdas[3][0],
+                systemConfig: pdas.systemConfig.pda,
+                config: pdas.config.pda,
+                stats: pdas.stats.pda,
+                game: pdas.game.pda,
               })
               .rpc()
           : // Update existing Game
@@ -311,9 +310,9 @@ const Game: NextPage = () => {
               .updateGame(inputsToRustSettings(params, maxDecimals))
               .accounts({
                 authority: authority,
-                systemConfig: pdas[0][0],
-                config: pdas[1][0],
-                game: pdas[3][0],
+                systemConfig: pdas.systemConfig.pda,
+                config: pdas.config.pda,
+                game: pdas.game.pda,
               })
               .rpc();
 
@@ -426,9 +425,9 @@ const Game: NextPage = () => {
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
-          [system_config_pda, SYSTEM_AUTHORITY],
-          [config_pda, authority],
-          [stats_pda, authority],
+          ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
+          ["config", config_pda, authority],
+          ["stats", stats_pda, authority],
         ])
       );
       setSolanaProgram(
@@ -468,7 +467,7 @@ const Game: NextPage = () => {
           : stats.totalGames.toNumber() + 1
       );
       const [gamePda, bump] = await game_pda(authority, new BN(gameId));
-      setPdas(pdas.concat([[gamePda, bump]])); // Add Game to the existing PDAs
+      setPdas({ ...pdas, game: { pda: gamePda, bump: bump } }); // Add Game to the existing PDAs
       try {
         const existingGame = rustToInputsSettings(
           await solanaProgram.account.game.fetch(gamePda),
@@ -552,7 +551,7 @@ const Game: NextPage = () => {
       .toggleGame(value)
       .accounts({
         authority: authority,
-        game: pdas[3][0],
+        game: pdas.game.pda,
       })
       .rpc();
     setGameSettings({ ...gameSettings, isActive: value });
@@ -567,7 +566,7 @@ const Game: NextPage = () => {
           .voidGame()
           .accounts({
             authority: authority,
-            game: pdas[3][0],
+            game: pdas.game.pda,
           })
           .rpc();
         flashMsg("Game voided", "success");
@@ -577,7 +576,7 @@ const Game: NextPage = () => {
           .settleGame(optionId)
           .accounts({
             authority: authority,
-            game: pdas[3][0],
+            game: pdas.game.pda,
           })
           .rpc();
         flashMsg("Game settled", "success");
@@ -605,8 +604,14 @@ const Game: NextPage = () => {
           ) : (
             <>
               <h1 className={styles.title}>Game</h1>
-              <p>New games will be created with this settings by default</p>
-              {!!gameSettings.createdAt && <Info gameSettings={gameSettings} />}
+              <p>Game definition</p>
+              {!!gameSettings.createdAt && !!config && (
+                <Info
+                  gameSettings={gameSettings}
+                  definition={definition}
+                  config={config}
+                />
+              )}
               {!gameSettings.settledAt ? (
                 <div className="aligned">
                   <Switch

@@ -4,7 +4,7 @@ import styles from "./DefaultDefinition.module.scss";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
 import { DefaultDefinitionPropsType, DefinitionPropsType } from "./types";
 import CountUp from "react-countup";
-import { get_pot } from "../../utils/game";
+import { game_state, get_pot } from "../../utils/game";
 
 const Templates: any = {};
 
@@ -41,7 +41,7 @@ function DefaultDefinition({
       <div>
         <Markdown>{game.cached.definition?.description as string}</Markdown>
         <Terms
-          display={game.data.closeTime > new Date()}
+          display={game_state(game.data) === "Open"}
           terms={terms}
           setTerms={setTerms}
           setMainModal={setMainModal}

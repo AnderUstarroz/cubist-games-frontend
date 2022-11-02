@@ -1,24 +1,40 @@
-import { parse_float_input } from "../../utils/number";
-import dynamic from "next/dynamic";
-import { InfoType } from "./types";
+import { InfoPropsType } from "./types";
 import { formatRelative } from "date-fns";
 import { game_state } from "../../utils/game";
+import slugify from "slugify";
 
-export default function Info({ gameSettings }: InfoType) {
+export default function Info({
+  gameSettings,
+  definition,
+  config,
+}: InfoPropsType) {
+  const gameLink = `http${config.https ? "s" : ""}://${
+    config.domain
+  }/game/${slugify(definition.title.toLowerCase())}?id=${gameSettings.gameId}`;
   return (
     <div>
       <h2>Info</h2>
       <fieldset>
         <div>
-          <label>State</label>
+          <label>State: </label>
           <span>{game_state(gameSettings)}</span>
         </div>
         <div>
-          <label>Created at</label>
-          <span>{formatRelative(gameSettings.createdAt, new Date())}</span>
+          <label>Game link: </label>
+          <span>
+            <a href={gameLink} target="_blank" rel="noreferrer">
+              {gameLink}
+            </a>
+          </span>
         </div>
         <div>
-          <label>Updated at</label>
+          <label>Created at: </label>
+          <span>
+            {formatRelative(gameSettings.createdAt as Date, new Date())}
+          </span>
+        </div>
+        <div>
+          <label>Updated at: </label>
           <span>
             {gameSettings.updatedAt
               ? formatRelative(gameSettings.updatedAt, new Date())
@@ -26,7 +42,7 @@ export default function Info({ gameSettings }: InfoType) {
           </span>
         </div>
         <div>
-          <label>Settled at</label>
+          <label>Settled at: </label>
           <span>
             {gameSettings.settledAt
               ? formatRelative(gameSettings.settledAt, new Date())
@@ -34,7 +50,7 @@ export default function Info({ gameSettings }: InfoType) {
           </span>
         </div>
         <div>
-          <label>Cashed at</label>
+          <label>Cashed at: </label>
           <span>
             {gameSettings.cashedAt
               ? formatRelative(gameSettings.cashedAt, new Date())
@@ -42,7 +58,7 @@ export default function Info({ gameSettings }: InfoType) {
           </span>
         </div>
 
-        {gameSettings.use_token ? (
+        {gameSettings.useToken ? (
           <div>
             <label>Token profits</label>
             <span>

@@ -13,6 +13,7 @@ import {
   config_pda,
   fetch_pdas,
   initSolanaProgram,
+  PDATypes,
   SolanaProgramType,
   StatsType,
   stats_pda,
@@ -20,7 +21,7 @@ import {
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
-import { ConfigInputType, PDAType } from "../types/game-settings";
+import { ConfigInputType } from "../types/game-settings";
 import useSWR from "swr";
 import { fetcher, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
@@ -32,7 +33,7 @@ const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
-  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );

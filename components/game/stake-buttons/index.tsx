@@ -29,6 +29,7 @@ function DefaultStakeButtons({
   sendTransaction,
   termsAgreed,
   publickey,
+  playerBets,
 }: DefaultStakeButtonsPropsType) {
   return (
     <motion.div className={styles.options}>
@@ -58,7 +59,8 @@ function DefaultStakeButtons({
                         modals,
                         setModals,
                         setWalletVisible,
-                        sendTransaction
+                        sendTransaction,
+                        playerBets
                       )
                     }
                   >
@@ -158,7 +160,8 @@ function DefaultStakeButtons({
                         modals,
                         setModals,
                         setWalletVisible,
-                        sendTransaction
+                        sendTransaction,
+                        playerBets
                       );
                     }}
                   >

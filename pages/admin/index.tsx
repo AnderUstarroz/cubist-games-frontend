@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../../styles/Admin.module.scss";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { flashError, is_authorized } from "../../components/utils/helpers";
@@ -10,12 +9,12 @@ import {
   config_pda,
   fetch_pdas,
   initSolanaProgram,
+  PDATypes,
   SolanaProgramType,
   stats_pda,
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
-import { PDAType } from "../types/game-settings";
 import useSWR from "swr";
 import { fetcher } from "../../components/utils/requests";
 
@@ -23,7 +22,7 @@ const AdminHome: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
-  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
@@ -38,9 +37,9 @@ const AdminHome: NextPage = () => {
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
-          [system_config_pda, SYSTEM_AUTHORITY],
-          [config_pda, authority],
-          [stats_pda, authority],
+          ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
+          ["config", config_pda, authority],
+          ["stats", stats_pda, authority],
         ])
       );
       setSolanaProgram(

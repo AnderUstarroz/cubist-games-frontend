@@ -18,14 +18,14 @@ export const game_batch = (maxGameId: number, max = 10): number[] => {
 
 export const game_state = (game: GameSettingsInputType) => {
   const now = new Date();
+  if (game.settledAt) {
+    return game.state.hasOwnProperty("Voided") ? "Voided" : "Settled";
+  }
   if (now < game.openTime) {
     return "Pending";
   }
   if (now >= game.openTime && now < game.closeTime) {
     return "Open";
-  }
-  if (game.settledAt) {
-    return game.state.hasOwnProperty("Voided") ? "Voided" : "Settled";
   }
   return "Closed";
 };
@@ -53,4 +53,10 @@ export const update_prev_game = (
     },
     { pot: 0 }
   );
+};
+
+export const tx_link = (signature: string): string => {
+  return `https://explorer.solana.com/tx/${signature}${
+    process.env.NEXT_PUBLIC_SOLANA_NETWORK === "devnet" ? "?cluster=devnet" : ""
+  }`;
 };

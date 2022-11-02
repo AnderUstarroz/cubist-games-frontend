@@ -16,7 +16,8 @@ function DefaultMyBets({ myBets }: DefaultMyBetsPropsType) {
         <ul>
           {myBets.map((bet: MyBetType, k: number) => (
             <li key={`bet${k}`}>
-              {bet.name} {lamports_to_sol(bet.stake)} SOL
+              <strong style={{ color: bet.color }}>{bet.title}</strong>{" "}
+              {lamports_to_sol(bet.stake)} SOL
             </li>
           ))}
         </ul>

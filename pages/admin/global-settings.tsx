@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import useSWR from "swr";
-import Image from "next/image";
 import styles from "../../styles/GlobalSettings.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
@@ -11,17 +10,12 @@ import {
   BundlrWrapper,
   displayRechargeArweave,
 } from "../../components/utils/bundlr";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import Router from "next/router";
-import {
-  ConfigInputType,
-  PDAType,
-  TermsInputsType,
-} from "../types/game-settings";
+import { ConfigInputType, TermsInputsType } from "../types/game-settings";
 
 import {
   Bundlr,
-  FileType,
   FilesType,
   initSolanaProgram,
   SolanaProgramType,
@@ -31,14 +25,13 @@ import {
   MAX_TERMS,
   solana_usd_price,
   terms_pda,
-  lamports_to_sol,
-  solana_to_usd,
   TermsType,
   arweave_json,
   system_config_pda,
   SYSTEM_AUTHORITY,
   SystemConfigType,
   StatsType,
+  PDATypes,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
@@ -101,7 +94,7 @@ const GameSettings: NextPage = () => {
   );
   const [configExists, setConfigExists] = useState<boolean>(false);
   const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
-  const [pdas, setPdas] = useState<PDAType[] | null>(null);
+  const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [rechargeArweave, setRechargeArweave] = useState<RechargeArweaveType>({
     display: false,
     value: 1,
@@ -232,9 +225,9 @@ const GameSettings: NextPage = () => {
               .initializeConfig(inputsToRustSettings(config, maxDecimals))
               .accounts({
                 authority: authority,
-                systemConfig: pdas[0][0],
-                config: pdas[1][0],
-                stats: pdas[2][0],
+                systemConfig: pdas.systemConfig.pda,
+                config: pdas.config.pda,
+                stats: pdas.stats.pda,
               })
               .rpc()
           : // Update existing config
@@ -242,8 +235,8 @@ const GameSettings: NextPage = () => {
               .updateConfig(inputsToRustSettings(config, maxDecimals))
               .accounts({
                 authority: authority,
-                systemConfig: pdas[0][0],
-                config: pdas[1][0],
+                systemConfig: pdas.systemConfig.pda,
+                config: pdas.config.pda,
               })
               .rpc();
 
@@ -301,7 +294,7 @@ const GameSettings: NextPage = () => {
           .updateTerms(terms.id as string, arweaveHash as string)
           .accounts({
             authority: authority,
-            config: pdas[1][0],
+            config: pdas.config.pda,
             terms: termsPda,
           })
           .rpc();
@@ -311,7 +304,7 @@ const GameSettings: NextPage = () => {
           .createTerms(terms.id as string, arweaveHash as string)
           .accounts({
             authority: authority,
-            config: pdas[1][0],
+            config: pdas.config.pda,
             terms: termsPda,
           })
           .rpc();
@@ -385,9 +378,9 @@ const GameSettings: NextPage = () => {
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
-          [system_config_pda, SYSTEM_AUTHORITY],
-          [config_pda, authority],
-          [stats_pda, authority],
+          ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
+          ["config", config_pda, authority],
+          ["stats", stats_pda, authority],
         ])
       );
       setSolanaProgram(

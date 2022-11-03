@@ -7,6 +7,7 @@ import {
   addProfitShare,
   profitSharingCompleted,
 } from "../../utils/game-settings";
+import { short_key } from "@cubist-collective/cubist-games-lib";
 
 const Input = dynamic(() => import("../../input"));
 const Button = dynamic(() => import("../../button"));
@@ -61,12 +62,7 @@ export default function ProfitSharing({
             (item: ProfitShareInputType, k: number) => (
               <li key={`ps-${k}`}>
                 <span>
-                  {item.treasury
-                    ? `${item.treasury.slice(0, 4)}...${item.treasury.slice(
-                        item.treasury.length - 4,
-                        item.treasury.length
-                      )}`
-                    : "__________"}{" "}
+                  {item.treasury ? `${short_key(item.treasury)}` : "__________"}{" "}
                   -&gt; {item.share}%
                   {item.treasury === systemConfig?.treasury.toBase58() ? (
                     <Icon

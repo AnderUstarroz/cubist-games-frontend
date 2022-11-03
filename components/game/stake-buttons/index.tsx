@@ -7,6 +7,8 @@ import { OptionType } from "../../../pages/types/game";
 import { flashMsg } from "../../utils/helpers";
 import { place_bet } from "../../utils/bet";
 import { sol_to_lamports } from "@cubist-collective/cubist-games-lib";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Scrollbar, A11y } from "swiper";
 
 const Button = dynamic(() => import("../../../components/button"));
 const Input = dynamic(() => import("../../../components/input"));
@@ -33,6 +35,27 @@ function DefaultStakeButtons({
 }: DefaultStakeButtonsPropsType) {
   return (
     <motion.div className={styles.options}>
+      <Swiper
+        modules={[Navigation, Pagination, Scrollbar, A11y]}
+        pagination={{ clickable: true, dynamicBullets: true }}
+        slidesPerView={1}
+        spaceBetween={0}
+        loop={true}
+        loopFillGroupWithBlank={false}
+        className={styles.swiper}
+        navigation={true}
+      >
+        <SwiperSlide>
+          <div>
+            <div>marico 1</div>
+          </div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div>
+            <div>marico 2</div>
+          </div>
+        </SwiperSlide>
+      </Swiper>
       {game.cached.definition?.options.map(
         (o: OptionType, optionId: number) => (
           <div key={`betOpt${optionId}`} className="aligned">

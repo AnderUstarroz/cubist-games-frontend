@@ -60,7 +60,7 @@ export const displayRechargeArweave = (
   balance: BN,
   rechargeArweave: RechargeArweaveType,
   setRechargeArweave: Function,
-  solUsdPrice: number,
+  solFiatPrice: number,
   maxDecimals: number
 ) => {
   // Reacharge Arweave when there is not enough balance
@@ -70,15 +70,15 @@ export const displayRechargeArweave = (
       ...rechargeArweave,
       display: true,
       value: Math.max(
-        ...[1 / (solUsdPrice as number), lamports_to_sol(requiredLamports)]
+        ...[1 / (solFiatPrice as number), lamports_to_sol(requiredLamports)]
       ),
       requiredSol: lamports_to_sol(requiredLamports),
       solBalance: lamports_to_sol(balance.toNumber()),
       requiredUsd: solana_to_usd(
         lamports_to_sol(requiredLamports),
-        solUsdPrice as number
+        solFiatPrice as number
       ),
-      recommendedSol: 1 / (solUsdPrice as number),
+      recommendedSol: 1 / (solFiatPrice as number),
       decimals: maxDecimals,
     });
     return true;

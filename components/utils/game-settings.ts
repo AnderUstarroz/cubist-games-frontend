@@ -1,6 +1,7 @@
 import {
   isRejected,
   OptionType,
+  PDATypes,
   ProfitShareType,
   SolanaProgramType,
   SystemConfigType,
@@ -293,16 +294,16 @@ export function default_profit_sharing(
 export async function fetch_configs(
   config: ConfigInputType,
   solanaProgram: SolanaProgramType,
-  pdas: any,
+  pdas: PDATypes,
   setSystemConfig: Function,
   setConfig: Function,
   setStats: Function,
   maxDecimals: number
 ): Promise<boolean> {
   const result = await Promise.allSettled([
-    solanaProgram.account.systemConfig.fetch(pdas[0][0]),
-    solanaProgram.account.config.fetch(pdas[1][0]),
-    solanaProgram.account.stats.fetch(pdas[2][0]),
+    solanaProgram.account.systemConfig.fetch(pdas.systemConfig.pda),
+    solanaProgram.account.config.fetch(pdas.config.pda),
+    solanaProgram.account.stats.fetch(pdas.stats.pda),
   ]);
   const [systemConfigData, configData, statsData] = result.map((k: any) =>
     k.status === "fulfilled" ? k.value : null

@@ -7,12 +7,11 @@ import {
 import { PublicKey, Connection } from "@solana/web3.js";
 import {
   PDATypes,
+  PlayerBetsType,
   SolanaProgramType,
   SystemConfigType,
 } from "@cubist-collective/cubist-games-lib";
 import { MyBetType } from "../utils/bet";
-import { CubistGames } from "@cubist-collective/cubist-games-lib";
-import { IdlAccounts } from "@project-serum/anchor";
 
 export interface GamePropsType {
   template: string | null;
@@ -33,7 +32,8 @@ export interface GamePropsType {
   setMainModal: Function;
   publickey: PublicKey | null;
   myBets: MyBetType[];
-  playerBets: IdlAccounts<CubistGames>["playerBets"] | null;
+  playerBets: PlayerBetsType | null;
+  handleClaim: Function;
 }
 
 export interface DefaultGamePropsType extends GamePropsType {}

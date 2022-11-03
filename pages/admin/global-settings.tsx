@@ -23,7 +23,7 @@ import {
   fetch_pdas,
   stats_pda,
   MAX_TERMS,
-  solana_usd_price,
+  solana_fiat_price,
   terms_pda,
   TermsType,
   arweave_json,
@@ -93,7 +93,7 @@ const GameSettings: NextPage = () => {
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
   const [configExists, setConfigExists] = useState<boolean>(false);
-  const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
+  const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
   const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [rechargeArweave, setRechargeArweave] = useState<RechargeArweaveType>({
     display: false,
@@ -132,7 +132,7 @@ const GameSettings: NextPage = () => {
     minStake: 0.1,
     minStep: 0.1,
     customStakeButton: true,
-    stakeButtons: [0.1, 0.2, 0.5, 1],
+    stakeButtons: [0.5, 1],
     designTemplatesHash: null,
     categoriesHash: null,
     profitSharing: [],
@@ -271,7 +271,7 @@ const GameSettings: NextPage = () => {
         balance,
         rechargeArweave,
         setRechargeArweave,
-        solUsdPrice as number,
+        solFiatPrice as number,
         maxDecimals
       )
     ) {
@@ -374,7 +374,7 @@ const GameSettings: NextPage = () => {
   useEffect(() => {
     if (!publicKey || !wallet || !data || solanaProgram) return;
     (async () => {
-      setSolUsdPrice(await solana_usd_price());
+      setSolFiatPrice(await solana_fiat_price());
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
@@ -415,7 +415,7 @@ const GameSettings: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {!is_authorized(publicKey) ? (
-        <main className={styles.main}>Not registered</main>
+        <main className={styles.main}>Not authorized</main>
       ) : (
         <main className={styles.main}>
           <h1 className={styles.title}>Games Settings</h1>

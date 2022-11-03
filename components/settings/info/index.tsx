@@ -80,7 +80,7 @@ export default function Info({
 
         <div>
           <label>Total bets paid</label>
-          <span>{gameSettings.totalBetsPaid}</span>
+          <span>{gameSettings.totalBetsClaimed}</span>
         </div>
       </fieldset>
     </div>

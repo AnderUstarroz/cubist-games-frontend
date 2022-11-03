@@ -6,7 +6,10 @@ import { DefaultResultsPropsType, ResultsPropsType } from "./types";
 import { MyBetType } from "../../utils/bet";
 import { human_number } from "../../utils/number";
 import { game_state, tx_link } from "../../utils/game";
-import { lamports_to_sol } from "@cubist-collective/cubist-games-lib";
+import {
+  lamports_to_sol,
+  short_key,
+} from "@cubist-collective/cubist-games-lib";
 
 const Templates: any = {};
 
@@ -16,6 +19,7 @@ function DefaultResults({
   myBets,
   playerBets,
 }: DefaultResultsPropsType) {
+  const gameState = game_state(game.data);
   return (
     <motion.div {...DEFAULT_ANIMATION}>
       <table>
@@ -34,7 +38,7 @@ function DefaultResults({
               <td>{bet.stake} SOL</td>
               <td>{bet.title}</td>
               <td>
-                {game_state(game.data) === "Voided"
+                {gameState === "Voided"
                   ? "VOIDED"
                   : game.data.result === bet.optionId
                   ? "WON"
@@ -45,6 +49,8 @@ function DefaultResults({
                   ? `+${bet.payment} SOL`
                   : game.data.result === bet.optionId
                   ? "Not claimed"
+                  : gameState === "Voided"
+                  ? "Not refunded"
                   : `-${bet.stake} SOL`}
               </td>
               <td>
@@ -54,7 +60,7 @@ function DefaultResults({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {bet.paySignature.slice(0, 4)}...
+                    {short_key(bet.paySignature)}
                   </a>
                 ) : (
                   ""

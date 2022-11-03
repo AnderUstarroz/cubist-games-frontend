@@ -4,20 +4,23 @@ import styles from "../../styles/Game.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { AnchorProvider, Program, setProvider } from "@project-serum/anchor";
-import { IdlAccounts } from "@project-serum/anchor";
 import {
   arweave_json,
   arweave_url,
+  claim_sol_bets_tx,
   config_pda,
   CubistGames,
   fetch_pdas,
   game_pda,
   initSolanaProgram,
   PDATypes,
+  PlayerBetsType,
   player_bets_pda,
   PROGRAM_ID,
+  refund_sol_bets_tx,
+  short_key,
   SolanaProgramType,
-  solana_usd_price,
+  solana_fiat_price,
   SystemConfigType,
   SYSTEM_AUTHORITY,
   system_config_pda,
@@ -33,15 +36,24 @@ import {
   CustomStakeType,
   GameTermsType,
 } from "../types/game";
-import { flashError } from "../../components/utils/helpers";
+import { flashError, flashMsg } from "../../components/utils/helpers";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import { fetch_games, fetch_terms } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
 import { AnimatePresence } from "framer-motion";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { update_prev_game } from "../../components/utils/game";
-import { fetch_my_bets, MyBetType } from "../../components/utils/bet";
 import { useInterval } from "../../components/utils/helpers";
+import { ShowCTA } from "../../components/game/cta/types";
+import {
+  calculate_stakes,
+  fetch_my_bets,
+  MyBetType,
+} from "../../components/utils/bet";
+import "swiper/css";
+import "swiper/css/lazy";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const Game = dynamic(() => import("../../components/game"));
 const Modal = dynamic(() => import("../../components/modal"));
@@ -51,7 +63,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
   const { setVisible: setWalletVisible } = useWalletModal();
   const { connection } = useConnection();
   const [pdas, setPdas] = useState<PDATypes | null>(null);
-  const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
+  const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
   const [terms, setTerms] = useState<GameTermsType>({
     agreed: false,
     id: "",
@@ -73,9 +85,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
   });
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
   const [myBets, setMyBets] = useState<MyBetType[]>([]);
-  const [playerBets, setPlayerBets] = useState<
-    IdlAccounts<CubistGames>["playerBets"] | null
-  >(null);
+  const [playerBets, setPlayerBets] = useState<PlayerBetsType | null>(null);
   const [refreshGame, setRefreshGame] = useState<boolean>(false);
   const [prevGame, setPrevGame] = useState<PrevGameType | null>(null);
   const [modals, setModals] = useState({
@@ -98,7 +108,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
   };
 
   const handleRefreshGame = async () => {
-    // Refreshes game every 15 secs (if needed)
+    // Refreshes game every 5 secs (if needed)
     if (!refreshGame || !solanaProgram) return;
     // Refresh game
     const g = (await fetch_games(solanaProgram, authority, [data.gameId]))[0];
@@ -108,6 +118,53 @@ const GamePage: NextPage = ({ data, path }: any) => {
     refreshBets(g);
   };
 
+  const handleClaim = async (action: ShowCTA, bets: PlayerBetsType) => {
+    if (!solanaProgram || !game || !pdas || !publicKey) return;
+    const [totalStake, winnerStake] = calculate_stakes(
+      game.data.result as number,
+      game.data.options
+    );
+    const [tx, _] =
+      action === ShowCTA.Pay
+        ? await claim_sol_bets_tx(
+            solanaProgram,
+            game.data.gameId,
+            game.data.result as number,
+            game.data.fee,
+            pdas,
+            publicKey,
+            totalStake,
+            winnerStake,
+            bets
+          )
+        : await refund_sol_bets_tx(
+            solanaProgram,
+            game?.data.gameId,
+            pdas,
+            publicKey,
+            bets
+          );
+    try {
+      const latestBlockHash = await connection.getLatestBlockhash();
+      const signature = await sendTransaction(tx, connection);
+      await connection.confirmTransaction({
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+        signature: signature,
+      });
+      flashMsg(
+        `${action === ShowCTA.Pay ? "Payment" : "Refund"} claimed: ${short_key(
+          signature
+        )}`,
+        "success"
+      );
+    } catch (error) {
+      console.error(error);
+      flashMsg(
+        `Failed to claim ${action === ShowCTA.Pay ? "payment" : "refund"}`
+      );
+    }
+  };
   const refreshBets = async (game: GameType) => {
     if (!publicKey || !solanaProgram || !pdas) return;
     setMyBets(await fetch_my_bets(connection, publicKey, game));
@@ -115,13 +172,20 @@ const GamePage: NextPage = ({ data, path }: any) => {
       publicKey,
       pdas.game.pda // Game PDA
     );
-    setPdas({
-      ...pdas,
-      playerBets: { pda: playerBetsPda, bump: playerBetsBump },
-    });
-    // Fetch playerBets (only exists if at least one bet has been placed)
+    // Fetch only when necessary
+    if (
+      !pdas.playerBets ||
+      pdas.playerBets.pda.toBase58() != publicKey.toBase58()
+    ) {
+      setPdas({
+        ...pdas,
+        playerBets: { pda: playerBetsPda, bump: playerBetsBump },
+      });
+    }
+    // Fetch playerBets (account only exists if at least one bet has been placed)
     try {
       setPlayerBets(
+        //@ts-ignore
         await solanaProgram.account.playerBets.fetch(playerBetsPda)
       );
     } catch (e) {}
@@ -132,7 +196,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
     if (!data || solanaProgram || pdas) return;
     (async () => {
       // Init
-      setSolUsdPrice(await solana_usd_price());
+      setSolFiatPrice(await solana_fiat_price());
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
@@ -194,10 +258,10 @@ const GamePage: NextPage = ({ data, path }: any) => {
     };
   }, [solanaProgram, pdas]);
 
-  // Refresh game every 15 seconds (when updated)
+  // Refresh game every 5 seconds (when updated)
   useInterval(() => {
     handleRefreshGame();
-  }, 15 * 1000);
+  }, 5 * 1000);
 
   // Wallet connected/Disconnected
   useEffect(() => {
@@ -288,6 +352,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
               publickey={publicKey}
               myBets={myBets}
               playerBets={playerBets}
+              handleClaim={handleClaim}
             />
           ) : (
             <div>Loading...</div>

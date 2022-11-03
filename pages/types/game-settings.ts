@@ -80,7 +80,7 @@ export interface GameSettingsInputType
   useToken: boolean;
   image1Hash: string | null;
   hasBets: boolean;
-  totalBetsPaid: number;
+  totalBetsClaimed: number;
   options: OptionInputType[];
   result: number | null;
 }

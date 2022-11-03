@@ -1,10 +1,8 @@
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
 import styles from "./MyBets.module.scss";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
 import { DefaultMyBetsPropsType, MyBetsPropsType } from "./types";
 import { MyBetType } from "../../utils/bet";
-import { lamports_to_sol } from "@cubist-collective/cubist-games-lib";
 
 const Templates: any = {};
 
@@ -17,7 +15,7 @@ function DefaultMyBets({ myBets }: DefaultMyBetsPropsType) {
           {myBets.map((bet: MyBetType, k: number) => (
             <li key={`bet${k}`}>
               <strong style={{ color: bet.color }}>{bet.title}</strong>{" "}
-              {lamports_to_sol(bet.stake)} SOL
+              {bet.stake} SOL
             </li>
           ))}
         </ul>

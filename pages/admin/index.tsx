@@ -57,7 +57,7 @@ const AdminHome: NextPage = () => {
       </Head>
 
       {!is_authorized(publicKey) ? (
-        <main className={styles.main}>Not registered</main>
+        <main className={styles.main}>Not authorized</main>
       ) : (
         <main className={styles.main}>
           <h1 className={styles.title}>Admin site</h1>

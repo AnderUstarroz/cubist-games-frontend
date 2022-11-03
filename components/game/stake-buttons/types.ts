@@ -2,11 +2,10 @@ import { CustomStakeType, GameType } from "../../../pages/types/game";
 import { PublicKey, Connection } from "@solana/web3.js";
 import {
   PDATypes,
+  PlayerBetsType,
   SolanaProgramType,
   SystemConfigType,
 } from "@cubist-collective/cubist-games-lib";
-import { CubistGames } from "@cubist-collective/cubist-games-lib";
-import { IdlAccounts } from "@project-serum/anchor";
 
 export interface DefaultStakeButtonsPropsType {
   solanaProgram: SolanaProgramType;
@@ -22,7 +21,7 @@ export interface DefaultStakeButtonsPropsType {
   setCustomStake: Function;
   termsAgreed: boolean;
   publickey: PublicKey | null;
-  playerBets: IdlAccounts<CubistGames>["playerBets"] | null;
+  playerBets: PlayerBetsType | null;
 }
 
 export interface StakeButtonsPropsType extends DefaultStakeButtonsPropsType {

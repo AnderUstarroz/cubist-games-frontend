@@ -30,7 +30,6 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
       <Definition
         template={template}
         game={props.game}
-        prevGame={props.prevGame}
         terms={props.terms}
         setTerms={props.setTerms}
         setMainModal={props.setMainModal}
@@ -66,8 +65,11 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
       )}
       <CTA
         template={template}
+        game={props.game}
+        prevGame={props.prevGame}
         myBets={props.myBets}
         playerBets={props.playerBets}
+        handleClaim={props.handleClaim}
       />
     </>
   );

@@ -30,8 +30,7 @@ import {
   config_pda,
   fetch_pdas,
   stats_pda,
-  MAX_TERMS,
-  solana_usd_price,
+  solana_fiat_price,
   TermsType,
   arweave_json,
   system_config_pda,
@@ -39,14 +38,12 @@ import {
   SystemConfigType,
   game_pda,
   StatsType,
-  lamports_to_sol,
-  solana_to_usd,
   terms_pda,
   arweave_image,
   blob_to_base64,
   PDATypes,
 } from "@cubist-collective/cubist-games-lib";
-import { DEFAULT_DECIMALS, ordinal } from "../../components/utils/number";
+import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
   COMBINED_INPUTS,
   validateCombinedInput,
@@ -82,7 +79,6 @@ import {
   orderedListCommand,
   checkedListCommand,
   divider,
-  fullscreen,
 } from "@uiw/react-md-editor/lib/commands";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
@@ -134,11 +130,12 @@ const Game: NextPage = () => {
   const router = useRouter();
   const { connection } = useConnection();
   const { data } = useSWR("/api/idl", fetcher);
-  const { publicKey, wallet, sendTransaction } = useWallet();
+  const { publicKey, wallet } = useWallet();
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
-  const [solUsdPrice, setSolUsdPrice] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
   const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [rechargeArweave, setRechargeArweave] = useState<RechargeArweaveType>({
     display: false,
@@ -195,7 +192,7 @@ const Game: NextPage = () => {
     definitionHash: "",
     category: null,
     hasBets: false,
-    totalBetsPaid: 0,
+    totalBetsClaimed: 0,
     options: [],
     result: null,
   });
@@ -293,6 +290,7 @@ const Game: NextPage = () => {
         return flashMsg(`Terms & Conditions "${params.termsId}" not found!`);
       }
       try {
+        setLoading(true);
         !gameSettings.createdAt
           ? // Create new Game
             await solanaProgram?.methods
@@ -319,6 +317,7 @@ const Game: NextPage = () => {
         flashMsg("Game saved!", "success");
         Router.push("/admin");
       } catch (error) {
+        setLoading(false);
         if (!(error instanceof AnchorError)) {
           throw error;
         }
@@ -367,7 +366,7 @@ const Game: NextPage = () => {
           closeModals: { rechargeArweave: false, definition: true },
         },
         setRechargeArweave,
-        solUsdPrice as number,
+        solFiatPrice as number,
         maxDecimals
       )
     ) {
@@ -421,7 +420,7 @@ const Game: NextPage = () => {
     if (!is_authorized(publicKey) || !wallet || !data || solanaProgram || pdas)
       return;
     (async () => {
-      setSolUsdPrice(await solana_usd_price());
+      setSolFiatPrice(await solana_fiat_price());
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
@@ -526,7 +525,7 @@ const Game: NextPage = () => {
         balance,
         { ...rechargeArweave, closeModals: { rechargeArweave: false } },
         setRechargeArweave,
-        solUsdPrice as number,
+        solFiatPrice as number,
         maxDecimals
       )
     ) {
@@ -546,7 +545,6 @@ const Game: NextPage = () => {
 
   const handleToggleGame = async (value: boolean) => {
     if (!pdas) return;
-    console.log("GAME STATE", value);
     await solanaProgram?.methods
       .toggleGame(value)
       .accounts({
@@ -596,10 +594,10 @@ const Game: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {!is_authorized(publicKey) ? (
-        <main className={styles.main}>Not registered</main>
+        <main className={styles.main}>Not authorized</main>
       ) : (
         <main className={styles.main}>
-          {!gameSettings.gameId ? (
+          {!gameSettings.gameId || loading ? (
             <div>LOADING..</div>
           ) : (
             <>
@@ -743,9 +741,11 @@ const Game: NextPage = () => {
                       <Markdown>{o.description}</Markdown>
                     </li>
                   ))}
-                </ul>{" "}
+                </ul>
               </div>
-              {gameSettings.isActive && !gameSettings.totalBetsPaid ? (
+              {gameSettings.createdAt &&
+              gameSettings.isActive &&
+              !gameSettings.totalBetsClaimed ? (
                 <div>
                   Game result:
                   <Select

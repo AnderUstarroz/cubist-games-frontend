@@ -133,6 +133,7 @@ const Home: NextPage = () => {
     (async () => {
       const batchSize = 10;
       const gamesByState: GamesByStateType = {
+        Pending: [],
         Open: [],
         Closed: [],
         Settled: [],

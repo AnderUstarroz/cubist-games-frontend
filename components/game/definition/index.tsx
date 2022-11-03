@@ -3,8 +3,7 @@ import dynamic from "next/dynamic";
 import styles from "./DefaultDefinition.module.scss";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
 import { DefaultDefinitionPropsType, DefinitionPropsType } from "./types";
-import CountUp from "react-countup";
-import { game_state, get_pot } from "../../utils/game";
+import { game_state } from "../../utils/game";
 
 const Templates: any = {};
 
@@ -13,7 +12,6 @@ const Terms = dynamic(() => import("../terms"));
 
 function DefaultDefinition({
   game,
-  prevGame,
   terms,
   setTerms,
   setMainModal,
@@ -22,21 +20,6 @@ function DefaultDefinition({
     <motion.div {...DEFAULT_ANIMATION}>
       <div>
         <h1 className={styles.title}>{game.cached.definition?.title}</h1>
-        <div>
-          {game.data.showPot ? (
-            <div>
-              <CountUp
-                start={prevGame.pot}
-                end={get_pot(game.data)}
-                decimals={2}
-                decimal="."
-                suffix="◎"
-              />
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
       </div>
       <div>
         <Markdown>{game.cached.definition?.description as string}</Markdown>

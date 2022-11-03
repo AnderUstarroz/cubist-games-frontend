@@ -1,13 +1,12 @@
 import {
-  ActionType,
-  BetMsgType,
+  bet_tx,
+  ClaimSolBetType,
   lamports_to_sol,
-  MAX_PERCENTAGE,
-  MEMO_PROGRAM_ID,
-  num_format,
   PDATypes,
-  player_bets_pda,
+  PlayerBetsType,
+  RefundSolBetType,
   SolanaProgramType,
+  sol_to_lamports,
   SystemConfigType,
 } from "@cubist-collective/cubist-games-lib";
 import { GameType } from "../../pages/types/game";
@@ -15,13 +14,10 @@ import { flashMsg } from "./helpers";
 import {
   PublicKey,
   Connection,
-  Transaction,
   SignaturesForAddressOptions,
 } from "@solana/web3.js";
-import { BN } from "@project-serum/anchor";
 import { human_number } from "./number";
-import { CubistGames } from "@cubist-collective/cubist-games-lib";
-import { IdlAccounts } from "@project-serum/anchor";
+import { OptionInputType } from "../../pages/types/game-settings";
 
 export const place_bet = async (
   solanaProgram: SolanaProgramType,
@@ -37,7 +33,7 @@ export const place_bet = async (
   setModals: Function,
   setWalletVisible: Function,
   sendTransaction: Function,
-  playerBets: IdlAccounts<CubistGames>["playerBets"] | null
+  playerBets: PlayerBetsType | null
 ) => {
   if (new Date() < game.data.openTime) {
     return flashMsg("Game is not open yet");
@@ -57,7 +53,6 @@ export const place_bet = async (
     solanaProgram,
     connection,
     lamports,
-    systemConfig.betFee.toNumber(),
     optionId,
     pdas.playerBets.pda,
     playerBets,
@@ -102,7 +97,12 @@ export const place_bet = async (
   }, 30000); // 30secs
   try {
     const signature = await sendTransaction(tx, connection);
-    await connection.confirmTransaction(signature, "processed");
+    const latestBlockHash = await connection.getLatestBlockhash();
+    await connection.confirmTransaction({
+      blockhash: latestBlockHash.blockhash,
+      lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+      signature: signature,
+    });
     flashMsg("Bet placed", "success");
     clearTimeout(timer);
   } catch (error) {
@@ -117,65 +117,6 @@ export const place_bet = async (
     setModals({ ...modals, customStake: false });
   }
 };
-
-export async function bet_tx(
-  solanaProgram: SolanaProgramType,
-  connection: Connection,
-  lamports: number,
-  feeLamports: number,
-  optionId: number,
-  playerBetsPDA: PublicKey,
-  playerBets: IdlAccounts<CubistGames>["playerBets"] | null,
-  playerPublicKey: PublicKey,
-  gamePDA: PublicKey,
-  systemConfigPDA: PublicKey,
-  systemTreasury: PublicKey,
-  gameId: number
-): Promise<[Transaction, BetMsgType]> {
-  const msg = {
-    siteId: (process.env.NEXT_PUBLIC_AUTHORITY as string).slice(0, 7),
-    gameId: gameId,
-    type: ActionType.Bet,
-    optionId: optionId,
-    stake: num_format(lamports_to_sol(lamports), 9),
-    referral: null,
-  };
-
-  const transaction = new Transaction(await connection.getLatestBlockhash());
-  transaction.feePayer = playerPublicKey;
-  // Initialize player's betting account if doesn't exist already
-  if (!playerBets) {
-    transaction.add(
-      await solanaProgram.methods
-        .initializePlayerBets()
-        .accounts({
-          player: playerPublicKey,
-          game: gamePDA,
-          playerBets: playerBetsPDA,
-        })
-        .instruction()
-    );
-  }
-
-  transaction.add(
-    await solanaProgram.methods
-      .placeSolBet(optionId, new BN(lamports + feeLamports))
-      .accounts({
-        player: playerPublicKey,
-        game: gamePDA,
-        playerBets: playerBetsPDA,
-        systemTreasury: systemTreasury,
-        systemConfig: systemConfigPDA,
-      })
-      .instruction()
-  );
-  transaction.add({
-    programId: MEMO_PROGRAM_ID,
-    keys: [],
-    data: Buffer.from(JSON.stringify(msg), "utf8"),
-  });
-  return [transaction, msg] as [Transaction, BetMsgType];
-}
 
 export interface MyBetType {
   date: Date;
@@ -206,7 +147,9 @@ export const fetch_my_bets = async (
   const limit = 1000;
   const currentGame = `"siteId":"${(
     process.env.NEXT_PUBLIC_AUTHORITY as string
-  ).slice(0, 7)}","gameId":${game.data.gameId},"type":"Bet"`;
+  ).slice(0, 7)}","gameId":${game.data.gameId}`;
+  let paidBets: { [key: number]: { payment: number; paySignature: string } } =
+    {};
   while (!completed) {
     let params: SignaturesForAddressOptions = { limit: limit };
     if (lastTx) {
@@ -225,24 +168,38 @@ export const fetch_my_bets = async (
           break;
         }
       }
-      if (signatures[i].memo) {
+      if (signatures[i].memo && !signatures[i].err) {
         if (signatures[i].memo?.indexOf(currentGame) != -1) {
           try {
             let data: any = JSON.parse(
               (signatures[i].memo as string).split(" ")[1]
             );
-            bets.push({
-              gameId: data.gameId,
-              date: txTime,
-              referral: data.referral,
-              optionId: data.optionId,
-              stake: data.stake,
-              title: optionMap[data.optionId].title,
-              color: optionMap[data.optionId].color,
-              signature: signatures[i].signature,
-              payment: null,
-              paySignature: null,
-            });
+            if (data.type === "Bet") {
+              bets.push({
+                gameId: data.gameId,
+                date: txTime,
+                referral: data.referral,
+                optionId: data.optionId,
+                stake: data.stake,
+                title: optionMap[data.optionId].title,
+                color: optionMap[data.optionId].color,
+                signature: signatures[i].signature,
+                payment: paidBets.hasOwnProperty(data.betId)
+                  ? paidBets[data.betId].payment
+                  : null,
+                paySignature: paidBets.hasOwnProperty(data.betId)
+                  ? paidBets[data.betId].paySignature
+                  : null,
+              });
+            } else if ("Payment" === data.type || "Refund" === data.type) {
+              // Populate paid bets
+              data.bets.map((b: RefundSolBetType | ClaimSolBetType) => {
+                paidBets[b[0]] = {
+                  payment: b[b.length - 1],
+                  paySignature: signatures[i].signature,
+                };
+              });
+            }
           } catch (error) {
             console.error(error);
           }
@@ -278,27 +235,17 @@ export const fetch_my_bets = async (
   // return verifiedBets;
 };
 
-export function final_fee(
-  totalStake: number,
-  loserStake: number,
-  fee: number
-): number {
-  let fee_amount = (fee / MAX_PERCENTAGE) * totalStake;
-  if (fee_amount > loserStake) {
-    fee_amount = loserStake / 2.0;
-  }
-  return Math.floor(fee_amount);
-}
-
-export function calculate_payment(
-  stake: number,
-  totalStake: number,
-  winnerStake: number,
-  fee: number
-) {
-  let loserStake = totalStake - winnerStake;
-  return Math.floor(
-    ((totalStake - final_fee(totalStake, loserStake, fee)) / winnerStake) *
-      stake
-  );
-}
+export const calculate_stakes = (
+  result: number,
+  options: OptionInputType[]
+) => {
+  let winnerStake = 0; // Amount in SOL
+  let totalStake = 0; // Amount in SOL
+  options.map((option: OptionInputType) => {
+    if (option.id == result) {
+      winnerStake += option.totalStake;
+    }
+    totalStake += option.totalStake;
+  });
+  return [sol_to_lamports(totalStake), sol_to_lamports(winnerStake)];
+};

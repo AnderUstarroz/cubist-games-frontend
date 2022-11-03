@@ -1,12 +1,7 @@
-import {
-  GameTermsType,
-  GameType,
-  PrevGameType,
-} from "../../../pages/types/game";
+import { GameTermsType, GameType } from "../../../pages/types/game";
 
 export interface DefaultDefinitionPropsType {
   game: GameType;
-  prevGame: PrevGameType;
   terms: GameTermsType;
   setTerms: Function;
   setMainModal: Function;

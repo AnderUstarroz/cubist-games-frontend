@@ -144,8 +144,8 @@ export default function GeneralSettings({
                   <div>
                     <h3>Fee</h3>
                     <p>
-                      Defines the percentage of benefits collected on each game.
-                      This fee is taken from all placed bets (pot).
+                      Defines the percentage of benefits collected. This fee
+                      will be extracted from all placed bets (total pot).
                     </p>
                   </div>
                 )

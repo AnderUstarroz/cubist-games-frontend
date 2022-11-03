@@ -54,9 +54,9 @@ const Games: NextPage = () => {
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
-          [system_config_pda, SYSTEM_AUTHORITY],
-          [config_pda, authority],
-          [stats_pda, authority],
+          ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
+          ["config", config_pda, authority],
+          ["stats", stats_pda, authority],
         ])
       );
       setSolanaProgram(

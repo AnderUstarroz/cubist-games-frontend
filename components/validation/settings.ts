@@ -7,6 +7,7 @@ import {
 import { SettingsError } from "./errors";
 import {
   isBase58,
+  short_key,
   SystemConfigType,
   TermsType,
 } from "@cubist-collective/cubist-games-lib";
@@ -146,11 +147,9 @@ export function ProfitSharingValidator(
     ) {
       throw new SettingsError(
         "profitSharing",
-        `The program share for ${systemConfig.treasury
-          .toBase58()
-          .slice(0, 4)}..${systemConfig.treasury
-          .toBase58()
-          .slice(-4)} must be at least ${((profitFee * 100) / fee).toFixed(2)}%`
+        `The program share for ${short_key(
+          systemConfig.treasury
+        )} must be at least ${((profitFee * 100) / fee).toFixed(2)}%`
       );
     }
   });

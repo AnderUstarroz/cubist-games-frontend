@@ -1,4 +1,3 @@
-import { useTheme } from "next-themes";
 import styles from "./Switch.module.scss";
 import { SwitchPropsType } from "./types";
 

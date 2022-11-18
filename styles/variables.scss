@@ -26,76 +26,38 @@ html {
 
   // Mobile
   --mFontSize1: 14px;
-  --mfontSize2: 14px;
-  --mfontSizeH1: 30px;
-  --mfontSizeH2: 20px;
-  --mfontSizeH3: 16px;
 
-  &[data-theme="light"] {
-    --colorFont1: #000;
-    --colorFont2: #7e7e7e;
-    --colorFont3: #fff;
-    --colorFont4: #8abbe3;
-    --colorFont5: #df7960;
-    --colorFont6: #000;
-    --colorFont7: #ddd;
+  &[data-theme="default"] {
+    --bodyBg: radial-gradient(
+        192.85% 192.85% at 50% 0%,
+        rgba(4, 11, 14, 0) 0%,
+        rgba(4, 11, 14, 0.5) 100%
+      ),
+      linear-gradient(180deg, rgba(8, 12, 23, 0) 0%, #080c17 100%),
+      url(../public/images/planet-earth-seen-from-space-scifi-illustration.jpg),
+      linear-gradient(228.5deg, #245274 0%, #43356b 100%), #000000;
+    --footerBg: linear-gradient(180deg, #0e1a25 0%, #10222f 100%);
+    --navBg: linear-gradient(180deg, #0d191e 0%, #152a3d 100%);
+    --color0: white;
+    --color1: #0b1b27;
+    --color2: #35b7af;
+    --color3: #288a84;
+    --color4: #1d635f;
+    --color5: #f3fcfb;
+    --color6: #fafafa;
+    --color7: #c4eeeb;
+    --color8: #bd2742;
+    --color9: #d8415c;
+    --color10: #fafafa;
+    --color11: #941f34;
+    --color12: #668fa3;
 
-    --colorInput1: #646464;
-
-    --colorBg1: #fff;
-    --colorBg2: #262626;
-    --colorBg3: #6e6e6e;
-    --colorBg4: #df976f;
-    --colorBg5: #5a6261;
-    --colorBg6: #d9d8d3;
-    --colorBg7: #f8f9fa;
-    --colorBg8: #fff;
-    --colorBg10: #fff;
-    --colorBg11: #262626;
-    --colorBg12: #151515;
-
-    --colorBtn1: #4e44ce;
-
-    --iconsColor: #000;
-
-    --colorMoon: #ffe000;
-
-    --filterBg: none;
+    --inputBg0: var(--color1);
+    --inputColor0: var(--color12);
+    --inputBorder0: 1px solid rgba(255, 255, 255, 0.06);
+    --iconBg0: var(--color0);
   }
 
-  &[data-theme="dark"] {
-    // --background: black;
-    // --foreground: white;
-    --colorFont1: white;
-    --colorFont2: rgb(185, 187, 190);
-    --colorFont3: white;
-    --colorFont4: rgb(163, 166, 170);
-    --colorFont5: #df7960;
-    --colorFont6: #fff;
-    --colorFont7: #151515;
-
-    --colorBg1: #2e3136;
-    --colorBg2: #32353a;
-    --colorBg3: #18191c;
-    --colorBg4: #2e3136;
-    --colorBg5: #1f2225;
-    --colorBg6: #282b2f;
-    --colorBg7: #36393e;
-    --colorBg8: #444444;
-    --colorBg9: #2e2e2e;
-    --colorBg10: #040405e6;
-    --colorBg11: #282b2f;
-    --colorBg12: #ddd;
-    // Background1 = #36393e → BackgroundHover = rgba(4,4,5,0.07);
-    --colorBtn1: #b8bbbe;
-
-    --iconsColor: #b8bbbe;
-
-    --colorInput1: white;
-    --colorBtn1: #4e44ce;
-
-    --colorMoon: #ffe000;
-
-    --filterBg: invert(1);
+  &[data-theme="another"] {
   }
 }

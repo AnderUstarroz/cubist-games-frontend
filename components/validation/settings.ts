@@ -7,6 +7,7 @@ import {
 import { SettingsError } from "./errors";
 import {
   isBase58,
+  MAX_GAME_OPTIONS,
   short_key,
   SystemConfigType,
   TermsType,
@@ -204,6 +205,12 @@ export function descriptionDefinitionValidator(value: string) {
 export function optionsDefinitionValidator(options: OptionType[]) {
   if (options.length < 2) {
     throw new SettingsError("options", "There should be at least 2 options");
+  }
+  if (options.length > MAX_GAME_OPTIONS) {
+    throw new SettingsError(
+      "options",
+      `The maximum allowed options are ${MAX_GAME_OPTIONS}`
+    );
   }
   options.map((o: OptionType, k: number) => {
     if (!o.title) {

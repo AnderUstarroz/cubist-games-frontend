@@ -2,6 +2,7 @@ import {
   bet_tx,
   ClaimSolBetType,
   lamports_to_sol,
+  MAX_BETS_LIMIT,
   PDATypes,
   PlayerBetsType,
   RefundSolBetType,
@@ -62,7 +63,7 @@ export const place_bet = async (
     systemConfig.treasury,
     game.data.gameId
   );
-  if (playerBets && (playerBets.bets as []).length >= 10) {
+  if (playerBets && (playerBets.bets as []).length >= MAX_BETS_LIMIT) {
     return flashMsg("Maximum 10 bets per game");
   }
   const [balance, accountCost, txFee] = (

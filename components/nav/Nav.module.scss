@@ -1,6 +1,6 @@
 .nav {
   ul {
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--navBg);
     display: flex;
     justify-content: flex-end;
     padding: 10px;

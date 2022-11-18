@@ -1,7 +1,4 @@
 .default {
-  padding: 5px 15px;
-  border: 1px solid #b5b6b7;
-  color: var(--colorInput1);
   &:global {
     &.error {
       border: 1px solid red;

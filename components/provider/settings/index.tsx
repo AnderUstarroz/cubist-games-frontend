@@ -10,9 +10,7 @@ export default function useSettings() {
 export const SettingsProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [settings, setSettings] = useState({
-    theme: "light",
-  });
+  const [settings, setSettings] = useState({});
 
   return (
     <SettingsContext.Provider value={[settings, setSettings] as any}>

@@ -73,7 +73,6 @@ export const fetch_games = async (
       };
       return data;
     });
-
   // Fetch cached games:
   let cachedGames = await Promise.allSettled(
     gamesData.map(async (game: any) => get_cached_game(game.gameId))

@@ -25,6 +25,7 @@
     "react-hot-toast": "^2.3.0",
     "react-modal": "^3.15.1",
     "react-select": "^5.5.0",
+    "react-tooltip": "^4.5.0",
     "sass": "^1.54.9",
     "slugify": "^1.6.5",
     "swiper": "^8.4.4",

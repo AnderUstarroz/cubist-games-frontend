@@ -58,12 +58,12 @@ function DefaultStakeButtons({
       </Swiper>
       {game.cached.definition?.options.map(
         (o: OptionType, optionId: number) => (
-          <div key={`betOpt${optionId}`} className="aligned">
+          <div key={`betOpt${optionId}`} className="v-aligned">
             <div>
               <h4>{o.title}</h4>
               {o.description ? <p>{o.description}</p> : ""}
             </div>
-            <ul className="aligned">
+            <ul className="v-aligned">
               {game.data.stakeButtons.map((stakeAmount: number, k: number) => (
                 <li key={`stakeBtn${optionId}-${k}`}>
                   <Button
@@ -120,13 +120,13 @@ function DefaultStakeButtons({
               setIsOpen={setModals}
             >
               <div>
-                <h3 style={{ color: customStake.color }}>
+                <h4 style={{ color: customStake.color }}>
                   {customStake.title}
-                </h3>
+                </h4>
                 {!!customStake.description && (
                   <Markdown>{customStake.description as string}</Markdown>
                 )}
-                <div className="aligned">
+                <div className="v-aligned">
                   <Input
                     type="number"
                     autoComplete="off"
@@ -134,7 +134,9 @@ function DefaultStakeButtons({
                     placeholder={`Enter SOL amount`}
                     style={{
                       width: 110,
-                      borderColor: customStake.error ? "red" : "gray",
+                      borderColor: customStake.error
+                        ? "var(--errorBg)"
+                        : "gray",
                     }}
                     onClick={(e: any) => e.target.select()}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

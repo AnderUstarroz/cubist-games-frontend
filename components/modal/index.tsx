@@ -27,11 +27,8 @@ const Modal = (props: any) => {
       {...props}
     >
       <div className={`cubHeader ${styles.modHead}`}>
-        <h3 className="brand-title">
-          <span>Cubist</span> Collective
-        </h3>
         <Button cType="transparent" onClick={() => props.setIsOpen(false)}>
-          <Icon cType="close" width={20} height={20} />
+          <Icon cType="close" className="icon3" />
         </Button>
       </div>
       <div className={styles.modBody}>{props.children}</div>

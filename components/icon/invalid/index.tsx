@@ -1,5 +1,5 @@
-import * as React from "react"
-import { IconType } from "../types"
+import * as React from "react";
+import { IconType } from "../types";
 
 export default function Close(props: IconType) {
   return (
@@ -15,7 +15,7 @@ export default function Close(props: IconType) {
       //style="enable-background:new 0 0 240 240;"
     >
       <path
-        fill={props.color ? props.color : "var(--iconsColor)"}
+        fill={props.color ? props.color : "var(--iconFill0)"}
         d="M120,240c66.168,0,120-53.831,120-120S186.168,0,120,0S0,53.832,0,120S53.832,240,120,240z M120,30  c49.626,0,90,40.374,90,90s-40.374,90-90,90s-90-40.374-90-90S70.374,30,120,30z M69.144,149.644L98.787,120L69.144,90.356  l21.213-21.213L120,98.787l29.644-29.644l21.213,21.213L141.213,120l29.643,29.644l-21.213,21.213L120,141.213l-29.644,29.643  L69.144,149.644z"
       />
       <g></g>
@@ -34,5 +34,5 @@ export default function Close(props: IconType) {
       <g></g>
       <g></g>
     </svg>
-  )
+  );
 }

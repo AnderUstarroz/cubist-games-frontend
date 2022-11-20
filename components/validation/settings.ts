@@ -8,6 +8,7 @@ import { SettingsError } from "./errors";
 import {
   isBase58,
   MAX_GAME_OPTIONS,
+  MAX_STAKE_BUTTONS,
   short_key,
   SystemConfigType,
   TermsType,
@@ -264,10 +265,10 @@ export function stakeButtonsValidator(
   minStake: number,
   minStep: number
 ) {
-  if (btns.length > 5) {
+  if (btns.length > MAX_STAKE_BUTTONS) {
     throw new SettingsError(
       "stakeButtons",
-      "Too many stake buttons! Cannot create more than 10"
+      `Too many stake buttons! Cannot create more than ${MAX_STAKE_BUTTONS}`
     );
   }
   btns.map((stake: number, k: number) => {

@@ -37,7 +37,7 @@ export function profitSharingCompleted(profitSharing: ProfitShareInputType[]) {
   if (profitSharing.length >= 10) {
     return true;
   }
-  return profitSharing.reduce((prev, curr) => prev + curr.share, 0) == 100;
+  return profitSharing.reduce((prev, curr) => prev + curr.share, 0) >= 100;
 }
 
 export function feeTrans(

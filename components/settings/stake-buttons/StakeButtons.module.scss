@@ -1,0 +1,20 @@
+.stakeButtons {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  flex-flow: wrap;
+  gap: 20px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    input {
+      text-align: center;
+      color: var(--color0);
+      background: var(--opt0);
+      border-radius: 4px;
+      padding: 6px 0px;
+    }
+  }
+}

@@ -98,9 +98,7 @@ const GeneralSettings = dynamic(
 const StakeButtons = dynamic(
   () => import("../../components/settings/stake-buttons")
 );
-const ProfitSharing = dynamic(
-  () => import("../../components/settings/profit-sharing")
-);
+const Profits = dynamic(() => import("../../components/settings/profits"));
 const RechargeArweave = dynamic(
   () => import("../../components/recharge-arweave")
 );
@@ -610,8 +608,8 @@ const Game: NextPage = () => {
                   config={config}
                 />
               )}
-              {!gameSettings.settledAt ? (
-                <div className="aligned">
+              {gameSettings.createdAt && !gameSettings.settledAt && (
+                <div className="v-aligned">
                   <Switch
                     onChange={handleToggleGame}
                     value={gameSettings.isActive}
@@ -622,7 +620,7 @@ const Game: NextPage = () => {
                     onClick={() =>
                       showModal(
                         <div>
-                          <h3>Activate/Deactivate games</h3>
+                          <h4>Activate/Deactivate games</h4>
                           <p>
                             Only active games can accept bets. Disabled games
                             won&apos;t be displayed in the games list.
@@ -632,8 +630,6 @@ const Game: NextPage = () => {
                     }
                   />
                 </div>
-              ) : (
-                ""
               )}
               <div>
                 <h2>Dates</h2>
@@ -697,7 +693,7 @@ const Game: NextPage = () => {
                 maxDecimals={maxDecimals}
               />
               {!!systemConfig && (
-                <ProfitSharing
+                <Profits
                   systemConfig={systemConfig}
                   settings={gameSettings}
                   errors={errors}
@@ -773,7 +769,7 @@ const Game: NextPage = () => {
                       if (!option) return;
                       showModal(
                         <div>
-                          <h3>Game outcome</h3>
+                          <h4>Game outcome</h4>
                           <p>You have selected the following outcome:</p>
                           <ul>
                             <li>
@@ -797,7 +793,7 @@ const Game: NextPage = () => {
                             . Are you completly sure you want to select this
                             option as the outcome of the game?
                           </p>
-                          <div className="aligned">
+                          <div className="v-aligned">
                             <Button
                               onClick={() => handleSetOutcome(option.value)}
                             >
@@ -843,7 +839,7 @@ const Game: NextPage = () => {
           )}
           <Modal modalId={"definition"} modals={modals} setIsOpen={setModals}>
             <div>
-              <h3>Warning message</h3>
+              <h4>Warning message</h4>
               <div>
                 <p>Used to inform users about unexpected events or delays.</p>
                 <MDEditor
@@ -885,7 +881,7 @@ const Game: NextPage = () => {
                   {...mkEditorDefaults}
                 />
               </label>
-              <h3>Options</h3>
+              <h4>Options</h4>
               {definitionErrors.hasOwnProperty("options") ? (
                 <p>{definitionErrors.options}</p>
               ) : (
@@ -968,7 +964,7 @@ const Game: NextPage = () => {
                   </li>
                 ))}
               </ul>
-              <div className="aligned">
+              <div className="v-aligned">
                 <Button onClick={() => handleSaveDefinition()}>Save</Button>{" "}
                 <Button
                   onClick={() => setModals({ ...modals, definition: false })}

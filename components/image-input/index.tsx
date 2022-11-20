@@ -9,9 +9,9 @@ export default function ImageInput({
   ...props
 }: ImageInputType) {
   return (
-    <div className={`${styles.imageInput} aligned`}>
+    <div className={`${styles.imageInput} v-aligned`}>
       {file?.base64 ? <motion.img src={file?.base64} /> : ""}
-      <label className="aligned">
+      <label className="v-aligned">
         <span>{file === null ? "Upload" : "Change"} Image</span>
         <motion.input type={"file"} name={name} accept="*" {...props} />
       </label>

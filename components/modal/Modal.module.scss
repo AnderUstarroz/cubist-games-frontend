@@ -4,33 +4,17 @@
   margin: 50px auto;
   width: 400px;
   max-width: 80%;
-  background: var(--colorBg1);
+  background: rgba(56, 96, 136, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
   overflow: auto;
-  border-radius: 4px;
   outline: none;
 }
 .modHead {
-  padding: 20px 15px;
-  background-color: var(--colorBg5);
-  opacity: 0.75;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-
-  h3 {
-    opacity: 1;
-    font-size: 30px;
-    margin: 0;
-    line-height: 20px;
-    text-shadow: 2px 2px 3px #7e7e7e;
-
-    span {
-      text-shadow: 2px 2px #636c39;
-      color: var(--colorFont3);
-    }
-  }
+  padding: 20px 20px 0 0;
   button {
+    display: block;
+    margin-left: auto;
     padding: 0;
     background: none;
     height: fit-content;
@@ -40,8 +24,7 @@
 .modBody {
   max-height: 80vh;
   overflow-y: auto;
-  padding: 15px 32px 32px 32px;
-  font-size: 16px;
+  padding: 0 20px 20px 20px;
   h3 {
     margin: 0 0 10px 0;
   }

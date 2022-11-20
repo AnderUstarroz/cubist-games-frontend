@@ -1,0 +1,39 @@
+.container {
+  max-width: 928px;
+  padding-top: 144px;
+  margin: 0 auto;
+  section {
+    margin: 0 0 40px 0;
+    p {
+      color: var(--color12);
+    }
+  }
+  fieldset {
+    padding: 48px;
+    background: rgba(56, 96, 136, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+.title {
+  margin: 0 0 40px 0;
+  h1 {
+    margin: 0 0 10px 0;
+  }
+  p {
+    color: var(--color12);
+  }
+}
+
+.MDEditorError {
+  border: 1px solid red;
+}
+@media (max-width: 768px) {
+  .title {
+    margin: 0 48px 40px 48px;
+  }
+  .container {
+    section h2 {
+      margin-left: 48px;
+    }
+  }
+}

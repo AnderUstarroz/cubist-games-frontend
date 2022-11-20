@@ -1,7 +1,7 @@
 import { MouseEventHandler, ChangeEventHandler } from "react";
 
 export interface CheckboxType {
-  onClick: MouseEventHandler<SVGSVGElement>;
+  onClick?: MouseEventHandler<SVGSVGElement>;
   onChange?: ChangeEventHandler<SVGSVGElement>;
   className?: string;
   value: boolean;

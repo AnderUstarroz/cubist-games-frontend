@@ -1,0 +1,33 @@
+// Markdown editor
+
+.w-md-editor {
+  box-shadow: 0 0 0 1px var(--inputBorder0), 0 0 0 var(--inputBorder0),
+    0 1px 1px var(--inputBorder0) !important;
+}
+.wmde-markdown,
+.wmde-markdown-var {
+  background-color: var(--inputBg0) !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--inputBg0) !important;
+  border-bottom: 1px solid var(--iconFill1) !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: var(--iconFill1) !important;
+  &:hover {
+    color: var(--iconFill0) !important;
+  }
+}
+
+.w-md-editor-text-pre > code {
+  color: var(--inputColor0);
+}
+
+.w-md-editor-content .w-md-editor-text-pre {
+  .token.url,
+  .token.content {
+    color: var(--iconFill1) !important;
+  }
+}

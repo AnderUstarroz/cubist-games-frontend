@@ -2,14 +2,16 @@ export const DEFAULT_DECIMALS = 9;
 
 export function parse_float_input(
   input: string,
-  defaultValue: number = 0
+  min: number = 0,
+  max: number | null = null
 ): number {
   try {
     if (input) {
-      return parseFloat(input);
+      let n = parseFloat(input);
+      return max !== null && n > max ? max : n;
     }
   } catch (error) {}
-  return defaultValue;
+  return min;
 }
 
 export function human_number(n: number, decimals: number) {

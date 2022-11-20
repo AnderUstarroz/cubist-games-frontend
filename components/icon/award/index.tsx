@@ -1,5 +1,5 @@
-import * as React from "react"
-import { IconType } from "../types"
+import * as React from "react";
+import { IconType } from "../types";
 
 export default function Award(props: IconType) {
   return (
@@ -17,7 +17,7 @@ export default function Award(props: IconType) {
       <g id="_x33_8-Award_symbol">
         <g>
           <path
-            fill={props.color ? props.color : "var(--iconsColor)"}
+            fill={props.color ? props.color : "var(--iconFill0)"}
             d="M398.611,207.091c-0.252-0.208-0.618-0.274-0.903-0.178c-0.348,0.107-0.667,0.2-0.968,0.288l-0.147,0.043
           c-0.742,0.217-1.383,0.403-2.018,0.658c-10.032,3.986-17.93,10.815-24.146,20.876c-1.535,2.486-2.724,5.07-3.671,7.647
           c1.553-8.668,1.913-12.045,2.188-21.744c0.013-0.407,0.013-0.821,0.013-1.232c0-1.122,0-2.182,0.245-3.149
@@ -101,7 +101,7 @@ export default function Award(props: IconType) {
           c0.046-0.65,0.097-1.32,0.171-2.012C398.991,207.615,398.861,207.298,398.611,207.091z"
           />
           <path
-            fill={props.color ? props.color : "var(--iconsColor)"}
+            fill={props.color ? props.color : "var(--iconFill0)"}
             d="M134.608,352.396c-6.471-1.429-12.907-3.512-19.679-6.367c-0.081-0.038-0.282-0.265-0.345-0.469
           c-0.675-2.301-0.901-4.619-0.693-7.087c1.326-15.757-8.057-32.36-22.308-39.478c-0.303-0.154-0.619-0.287-0.983-0.436l-0.338-0.14
           c-0.321-0.137-0.712-0.08-0.971,0.128c-0.28,0.216-0.419,0.568-0.362,0.921l0.39,2.416c0.346,2.138,0.685,4.23,1.01,6.324
@@ -186,7 +186,7 @@ export default function Award(props: IconType) {
           />
         </g>
         <path
-          fill={props.color ? props.color : "var(--iconsColor)"}
+          fill={props.color ? props.color : "var(--iconFill0)"}
           d="M246.915,223.342l40.18-39.166c1.362-1.328,1.854-3.316,1.265-5.125c-0.588-1.811-2.152-3.131-4.036-3.404l-55.523-8.063
         l-24.835-50.313c-0.842-1.707-2.58-2.787-4.483-2.787c-1.903,0-3.642,1.082-4.483,2.787l-24.826,50.313l-55.532,8.063
         c-1.883,0.273-3.448,1.594-4.036,3.404c-0.589,1.809-0.098,3.797,1.265,5.125l40.18,39.166l-9.48,55.299
@@ -210,5 +210,5 @@ export default function Award(props: IconType) {
       <g></g>
       <g></g>
     </svg>
-  )
+  );
 }

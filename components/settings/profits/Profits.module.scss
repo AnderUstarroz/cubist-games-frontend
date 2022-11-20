@@ -1,0 +1,66 @@
+.fieldset {
+  display: flex;
+  gap: 20px;
+  > div {
+    margin: 0;
+  }
+  ul {
+    margin-bottom: 10px;
+    li {
+      > div {
+        gap: 8px;
+      }
+      em {
+        gap: 5px;
+      }
+      span {
+        cursor: pointer;
+      }
+    }
+  }
+}
+.fee {
+  margin-top: 20px !important;
+}
+
+.editShare {
+  > div:first-of-type {
+    padding: 7px 0;
+    display: flex;
+    label {
+      &:first-of-type input {
+        width: 95px;
+      }
+      &:last-of-type input {
+        padding: 12px;
+      }
+    }
+  }
+  > button {
+    margin: 15px auto;
+  }
+}
+@media (max-width: 768px) {
+  .fieldset {
+    flex-direction: column;
+  }
+  .fee {
+    margin: 0 !important;
+  }
+  .editShare {
+    > div:first-of-type {
+      flex-direction: column;
+    }
+    svg {
+      transform: rotate(90deg);
+    }
+    label {
+      &:last-of-type {
+        width: 100%;
+        input {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

@@ -1,11 +1,14 @@
 import { parse_float_input } from "../../utils/number";
 import dynamic from "next/dynamic";
 import { StakeButtonsType } from "./types";
+import { DEFAULT_ANIMATION } from "../../utils/animation";
+import { AnimatePresence, motion } from "framer-motion";
+import { MAX_STAKE_BUTTONS } from "@cubist-collective/cubist-games-lib";
+import styles from "./StakeButtons.module.scss";
 
 const Input = dynamic(() => import("../../input"));
 const Checkbox = dynamic(() => import("../../checkbox"));
 const Icon = dynamic(() => import("../../icon"));
-const Button = dynamic(() => import("../../button"));
 
 export default function StakeButtons({
   settings,
@@ -15,110 +18,116 @@ export default function StakeButtons({
   showModal,
 }: StakeButtonsType) {
   return (
-    <div>
-      <h2>Stake buttons</h2>
-      <fieldset>
-        <label>
-          <span>
-            Minimum stake{" "}
+    <AnimatePresence>
+      <motion.section {...DEFAULT_ANIMATION}>
+        <h2>Stake buttons</h2>
+        <fieldset>
+          <div className="v-aligned mobileCol">
+            <div className="v-aligned gap5 mb-med">
+              <label
+                className="v-aligned gap5"
+                onClick={() =>
+                  handleUpdateSettings(
+                    "customStakeButton",
+                    !settings.customStakeButton
+                  )
+                }
+              >
+                <Checkbox
+                  name="customStakeButton"
+                  value={settings.customStakeButton}
+                />
+                <span>Allow custom stake </span>
+              </label>
+              <Icon
+                cType="info"
+                className="icon1"
+                onClick={() =>
+                  showModal(
+                    <div>
+                      <h4>Allow custom stake</h4>
+                      <p>
+                        Displays the stake input, so users can freely type the
+                        amount to bet.
+                      </p>
+                    </div>
+                  )
+                }
+              />
+            </div>
+            <div className="v-aligned  mb-med">
+              <label className="overlap">
+                <Input
+                  name="minStake"
+                  type="number"
+                  className={errors.hasOwnProperty("minStake") ? "error" : null}
+                  value={settings.minStake}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleUpdateSettings(
+                      "minStake",
+                      parse_float_input(e.target.value, settings.minStake)
+                    )
+                  }
+                  min={1 / Math.pow(10, maxDecimals)}
+                  max={100}
+                />
+                <span>Minimum stake </span>
+                <Icon
+                  cType="info"
+                  className="icon1"
+                  onClick={() =>
+                    showModal(
+                      <div>
+                        <h4>Minimum stake</h4>
+                        <p>The minimum amount allowed to place a bet.</p>
+                      </div>
+                    )
+                  }
+                />
+              </label>
+              <label className="overlap">
+                <Input
+                  name="minStep"
+                  type="number"
+                  className={errors.hasOwnProperty("minStep") ? "error" : null}
+                  value={settings.minStep}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleUpdateSettings(
+                      "minStep",
+                      parse_float_input(e.target.value, settings.minStep)
+                    )
+                  }
+                  min={1 / Math.pow(10, maxDecimals)}
+                  max={100}
+                />
+                <span>Min step </span>
+                <Icon
+                  cType="info"
+                  className="icon1"
+                  onClick={() =>
+                    showModal(
+                      <div>
+                        <h4>Min step</h4>
+                        <p>
+                          The minimum amount in which a bet can be
+                          increased/decreased.
+                        </p>
+                      </div>
+                    )
+                  }
+                />
+              </label>
+            </div>
+          </div>
+          <h3 className="v-aligned gap5">
+            Default stake buttons{" "}
             <Icon
               cType="info"
+              className="icon1"
               onClick={() =>
                 showModal(
                   <div>
-                    <h3>Minimum stake</h3>
-                    <p>The minimum amount allowed to place a bet.</p>
-                  </div>
-                )
-              }
-            />
-          </span>
-          <Input
-            name="minStake"
-            type="number"
-            className={errors.hasOwnProperty("minStake") ? "error" : null}
-            value={settings.minStake}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleUpdateSettings(
-                "minStake",
-                parse_float_input(e.target.value, settings.minStake)
-              )
-            }
-            min={1 / Math.pow(10, maxDecimals)}
-            max={100}
-          />
-        </label>
-        <label>
-          <span>
-            Min step{" "}
-            <Icon
-              cType="info"
-              onClick={() =>
-                showModal(
-                  <div>
-                    <h3>Min step</h3>
-                    <p>
-                      The minimum amount in which a bet can be
-                      increased/decreased.
-                    </p>
-                  </div>
-                )
-              }
-            />
-          </span>
-          <Input
-            name="minStep"
-            type="number"
-            className={errors.hasOwnProperty("minStep") ? "error" : null}
-            value={settings.minStep}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleUpdateSettings(
-                "minStep",
-                parse_float_input(e.target.value, settings.minStep)
-              )
-            }
-            min={1 / Math.pow(10, maxDecimals)}
-            max={100}
-          />
-        </label>
-        <label>
-          <span>
-            Display custom stake button{" "}
-            <Icon
-              cType="info"
-              onClick={() =>
-                showModal(
-                  <div>
-                    <h3>Display custom stake button</h3>
-                    <p>
-                      Displays a button which allows to define a customized
-                      amount to bet.
-                    </p>
-                  </div>
-                )
-              }
-            />
-          </span>
-          <Checkbox
-            name="customStakeButton"
-            value={settings.customStakeButton}
-            onClick={() =>
-              handleUpdateSettings(
-                "customStakeButton",
-                !settings.customStakeButton
-              )
-            }
-          />
-        </label>
-        <div>
-          <span>
-            Default stake buttons
-            <Icon
-              cType="info"
-              onClick={() =>
-                showModal(
-                  <div>
-                    <h3>Default stake buttons</h3>
+                    <h4>Default stake buttons</h4>
                     <p>
                       Shows buttons with predefined amounts for each game
                       option. This allows users to place bets quicker.
@@ -127,8 +136,9 @@ export default function StakeButtons({
                 )
               }
             />
-            {settings.stakeButtons.length < 10 ? (
-              <Button
+            {settings.stakeButtons.length < MAX_STAKE_BUTTONS && (
+              <span
+                className="icon1"
                 onClick={() =>
                   handleUpdateSettings("stakeButtons", [
                     ...settings.stakeButtons,
@@ -137,12 +147,10 @@ export default function StakeButtons({
                 }
               >
                 +
-              </Button>
-            ) : (
-              ""
+              </span>
             )}
-          </span>
-          <ul>
+          </h3>
+          <ul className={styles.stakeButtons}>
             {settings.stakeButtons.map((v: number, k: number) => (
               <li key={`stake-btn${k}`}>
                 <Input
@@ -162,8 +170,9 @@ export default function StakeButtons({
                   step={settings.minStep}
                   max={100000}
                 />{" "}
-                <Button
-                  cType="transparent"
+                <span
+                  title="Remove share"
+                  className="icon2"
                   onClick={() =>
                     handleUpdateSettings(
                       "stakeButtons",
@@ -173,18 +182,16 @@ export default function StakeButtons({
                     )
                   }
                 >
-                  -
-                </Button>
+                  —
+                </span>
               </li>
             ))}
           </ul>
-          {errors.hasOwnProperty("stakeButtons") ? (
-            <div>{errors["stakeButtons"]}</div>
-          ) : (
-            ""
+          {!!errors.hasOwnProperty("stakeButtons") && (
+            <div className="errorMsg">{errors["stakeButtons"]}</div>
           )}
-        </div>
-      </fieldset>
-    </div>
+        </fieldset>
+      </motion.section>
+    </AnimatePresence>
   );
 }

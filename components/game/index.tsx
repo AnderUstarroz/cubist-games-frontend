@@ -16,7 +16,7 @@ const CTA = dynamic(() => import("./cta"));
 function DefaultGame({ template, ...props }: DefaultGamePropsType) {
   return (
     <>
-      <motion.ul className="aligned">
+      <motion.ul className="v-aligned">
         <li>
           Open<div>{format_time(props.game.data.openTime)}</div>
         </li>

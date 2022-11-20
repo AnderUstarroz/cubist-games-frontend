@@ -5,6 +5,7 @@ export interface InputType {
   onClick?: MouseEventHandler<HTMLInputElement>;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   className?: string;
+  width?: number;
   placeholder?: string;
   name?: string;
   accept?: string;

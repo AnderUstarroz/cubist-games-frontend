@@ -1,7 +1,6 @@
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import styles from "./Checkbox.module.scss";
-import { CheckboxType, CheckboxesTypes } from "./types";
-import { useState } from "react";
+import { CheckboxType } from "./types";
 
 const tickVariants = {
   pressed: (isChecked: boolean) => ({ pathLength: isChecked ? 0.85 : 0.2 }),
@@ -10,10 +9,10 @@ const tickVariants = {
 };
 
 const boxVariants = {
-  hover: { scale: 1.05, strokeWidth: 60 },
-  pressed: { scale: 0.95, strokeWidth: 35 },
-  checked: { stroke: "#b5b6b7" },
-  unchecked: { stroke: "#ddd", strokeWidth: 50 },
+  hover: { scale: 1.05, strokeWidth: 4 },
+  pressed: { scale: 0.95, strokeWidth: 4 },
+  checked: { stroke: "var(--color16)" },
+  unchecked: { stroke: "var(--color16)", strokeWidth: 4 },
 };
 
 export default function Checkbox(props: CheckboxType) {
@@ -34,29 +33,17 @@ export default function Checkbox(props: CheckboxType) {
     >
       <motion.path
         d="M 72 136 C 72 100.654 100.654 72 136 72 L 304 72 C 339.346 72 368 100.654 368 136 L 368 304 C 368 339.346 339.346 368 304 368 L 136 368 C 100.654 368 72 339.346 72 304 Z"
-        fill="transparent"
-        strokeWidth={50}
+        fill="var(--errorBg)"
+        strokeWidth={3}
         stroke="#FF008C"
         variants={boxVariants}
       />
       <motion.path
-        d="M 0 128.666 L 128.658 257.373 L 341.808 0"
-        transform="translate(54.917 88.332) rotate(-4 170.904 128.687)"
+        d="M 90 110 L 128 240 L 341.808 0"
+        transform="translate(54.917 68.947) rotate(-4 170.904 18.687)"
         fill="transparent"
-        strokeWidth={65}
-        stroke="hsl(0, 0%, 100%)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        variants={tickVariants}
-        style={{ pathLength, opacity }}
-        custom={props.value}
-      />
-      <motion.path
-        d="M 0 128.666 L 128.658 257.373 L 341.808 0"
-        transform="translate(54.917 68.947) rotate(-4 170.904 128.687)"
-        fill="transparent"
-        strokeWidth={65}
-        stroke="#009688"
+        strokeWidth={30}
+        stroke="var(--color0)"
         strokeLinecap="round"
         strokeLinejoin="round"
         variants={tickVariants}

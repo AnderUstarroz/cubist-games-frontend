@@ -6,6 +6,7 @@ import { human_number } from "../utils/number";
 
 const Input = dynamic(() => import("../../components/input"));
 const Button = dynamic(() => import("../../components/button"));
+const Spinner = dynamic(() => import("../../components/spinner"));
 
 export default function RechargeArweave({
   value,
@@ -23,45 +24,76 @@ export default function RechargeArweave({
   ...props
 }: RechargeArweavePropsType) {
   return (
-    <motion.div className={styles.default} {...props}>
-      <h3>Not enought balance in Arweave</h3>
+    <motion.div className={styles.default} {...props} key="arweave-mod">
+      <h4>Not enought balance in Arweave</h4>
       <p>
         Game data and images are stored permanently in the blockchain using{" "}
-        <a href="https://www.arweave.org/" rel="noreferrer" target="_blank">
+        <a
+          className="icon1"
+          href="https://www.arweave.org/"
+          rel="noreferrer"
+          target="_blank"
+        >
           Arweave storage
         </a>
         .
       </p>
-      <ul>
-        <li>Arweave balance: {human_number(solBalance, decimals)} SOL</li>
-        <li>Required balance: {human_number(requiredSol, decimals)} SOL</li>
+      <ul className="mb-med">
+        <li>
+          Arweave balance:{" "}
+          <span className="icon1">
+            {human_number(solBalance, decimals)} SOL
+          </span>
+        </li>
+        <li>
+          Required balance:{" "}
+          <span className="icon1">
+            {human_number(requiredSol, decimals)} SOL{" "}
+          </span>
+        </li>
       </ul>
-      <p>
+      <p className="mb-big">
         You need to top up at least{" "}
-        <strong>{human_number(requiredSol, decimals)} SOL</strong> (
-        {human_number(requiredUsd, decimals)} USD) into your Arweave account to
-        be able to upload your data, but we recommend you to top up at least{" "}
-        <strong>{human_number(recommendedSol, decimals)}</strong> (1 USD), so
-        you don&apos;t need to repeat this step every single time you change
-        some data.
+        <strong className="icon1">
+          {human_number(requiredSol, decimals)} SOL
+        </strong>{" "}
+        ({human_number(requiredUsd, decimals)} USD) into your Arweave account to
+        be able to upload your data, but we recommend you to recharge{" "}
+        <strong className="icon1">
+          {human_number(recommendedSol, decimals)} SOL
+        </strong>{" "}
+        (1 USD), so you don&apos;t need to repeat this step every single time
+        you change some data.
       </p>
-      <div>
-        <Input
-          type="number"
-          name="rechargeArweave"
-          className={error ? "error" : null}
-          value={human_number(value, decimals)}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleUpdate(e.target.value)
-          }
-          min={solBalance - requiredSol}
-          max={100}
-        />{" "}
-        SOL ({human_number(value * (requiredUsd / requiredSol), 2)} USD)
+      <div className="mb-med">
         {loading ? (
-          <div>Loading..</div>
+          <Spinner />
         ) : (
-          <Button onClick={() => handleRechargeArweave()}>Recharge</Button>
+          <div className="v-aligned">
+            <label className="overlap">
+              <Input
+                type="number"
+                name="rechargeArweave"
+                className={error ? "error" : null}
+                value={human_number(value, decimals)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleUpdate(e.target.value)
+                }
+                min={solBalance - requiredSol}
+                max={100}
+              />
+              <span>
+                SOL{" "}
+                {requiredSol > 0
+                  ? `(${human_number(
+                      value * (requiredUsd / requiredSol),
+                      2
+                    )} USD)`
+                  : ""}
+              </span>
+            </label>
+            <Button onClick={() => handleRechargeArweave()}>Recharge</Button>{" "}
+          </div>
         )}
       </div>
     </motion.div>

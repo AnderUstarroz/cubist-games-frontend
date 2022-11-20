@@ -1,41 +1,27 @@
 html {
   // COMMON STYLES:
-  --fontFamily1: "Neue Haas Grotesk Display Pro", sans-serif;
-  --fontFamilyTitle: "Neue Haas Grotesk Display Pro", sans-serif;
+  --fontFamily: "Rubik", sans-serif;
 
+  --h1Size: 33px;
+  --h2Size: 20px;
+  --h3Size: 16px;
+  --h4Size: 24px;
+
+  // Desktop
+  --fontSizeXBig: 20px;
+  --fontSizeBig: 17px;
   --fontSizeMedium: 14px;
   --fontSizeSmall: 12px;
   --fontSizeXS: 10px;
-  --fontSize1: 18px;
-  --fontSize2: 16px;
-  --fontSize3: 20px;
-  --fontSize4: 30px;
-  --fontSizeH1: 55px;
-  --fontSizeH2: 35px;
-  --fontSizeH3: 20px;
-
-  --lightRed: #f34b27;
-  --darkRed: #b90404;
-  --lightOrange: #fbc832;
-  --darkOrange: #f6741e;
-  --lightGreen: #8fc61c;
-  --darkGreen: #378309;
-  --lightBlue: #2579c4;
-  --darkBlue: #0e317d;
-  --lightGray: #ddd;
 
   // Mobile
-  --mFontSize1: 14px;
+  --mFontSizeBig: 17px;
+  --mFontSizeMedium: 14px;
+  --mFontSizeSmall: 12px;
+  --mFontSizeXS: 10px;
 
   &[data-theme="default"] {
-    --bodyBg: radial-gradient(
-        192.85% 192.85% at 50% 0%,
-        rgba(4, 11, 14, 0) 0%,
-        rgba(4, 11, 14, 0.5) 100%
-      ),
-      linear-gradient(180deg, rgba(8, 12, 23, 0) 0%, #080c17 100%),
-      url(../public/images/planet-earth-seen-from-space-scifi-illustration.jpg),
-      linear-gradient(228.5deg, #245274 0%, #43356b 100%), #000000;
+    --bodyImage: url(../public/images/galaxy.webp);
     --footerBg: linear-gradient(180deg, #0e1a25 0%, #10222f 100%);
     --navBg: linear-gradient(180deg, #0d191e 0%, #152a3d 100%);
     --color0: white;
@@ -51,11 +37,55 @@ html {
     --color10: #fafafa;
     --color11: #941f34;
     --color12: #668fa3;
+    --color13: #aeaeae;
+    --color14: #20354f;
+    --color15: #2c4666;
+    --color16: #b4b2e6;
+
+    --errorBg: var(--color8);
 
     --inputBg0: var(--color1);
     --inputColor0: var(--color12);
-    --inputBorder0: 1px solid rgba(255, 255, 255, 0.06);
-    --iconBg0: var(--color0);
+    --inputBorder0: rgba(255, 255, 255, 0.06);
+
+    --btnBg0: var(--color2);
+    --btnBgHover0: var(--color3);
+    --btnBg1: var(--color14);
+    --btnBgHover1: var(--color15);
+    --btnBg2: var(--color8);
+    --btnBgHover2: var(--color9);
+    --disabledBtnBg: var(--color10);
+
+    --iconFill0: var(--color0);
+    --iconFill1: var(--color2);
+    --iconFill2: var(--errorBg);
+    --iconFill3: var(--color12);
+
+    --opt0: var(--color2);
+    --opt1: var(--errorBg);
+    --opt2: #b7a235;
+    --opt3: #57bd27;
+    --opt4: #3579b7;
+    --opt5: #2748bd;
+    --opt6: #5735b7;
+    --opt7: #b127bd;
+    --opt8: #b73573;
+    --opt9: #b73573;
+    --opt10: #b76c35;
+    --opt11: #7cbeba;
+    --opt12: #c27c89;
+    --opt13: #b9af7a;
+    --opt14: #8dc075;
+    --opt15: #7a9dbe;
+    --opt16: #7788c1;
+    --opt17: #8876bb;
+    --opt18: #bb7bc0;
+    --opt19: #bc7195;
+    --opt20: #ba9478;
+    --opt21: #527a78;
+    --opt22: #8c404e;
+    --opt23: #857b47;
+    --opt24: #588c40;
   }
 
   &[data-theme="another"] {

@@ -18,6 +18,6 @@
 }
 
 .error {
-  background: rgba(235, 55, 66, 0.7);
+  background: var(--errorBg);
   color: white;
 }

@@ -28,7 +28,7 @@ export default function Terms({
         onClick={() =>
           setMainModal(
             <div className={styles.termsModal}>
-              <h3>{terms.title}</h3>
+              <h4>{terms.title}</h4>
               <ReactMarkdown>{terms.description as string}</ReactMarkdown>
               {display ? (
                 <div className={styles.terms}>

@@ -1,6 +1,6 @@
-import * as React from "react"
-import dynamic from "next/dynamic"
-import { IconType, IconTypes } from "./types"
+import * as React from "react";
+import dynamic from "next/dynamic";
+import { IconType, IconTypes } from "./types";
 
 const Icons: IconTypes = {
   info: dynamic(() => import("./info")),
@@ -22,13 +22,14 @@ const Icons: IconTypes = {
   treasure: dynamic(() => import("./treasure")),
   share: dynamic(() => import("./share")),
   vs: dynamic(() => import("./vs")),
-}
+  arrow: dynamic(() => import("./arrow")),
+};
 
 function Icon(props: IconType) {
   const IconWrapper = Icons.hasOwnProperty(props.cType)
     ? Icons[props.cType]
-    : React.Fragment
-  return <IconWrapper {...props} />
+    : React.Fragment;
+  return <IconWrapper {...props} />;
 }
 
-export default Icon
+export default Icon;

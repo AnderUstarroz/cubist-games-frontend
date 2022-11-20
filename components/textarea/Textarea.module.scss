@@ -4,7 +4,7 @@
   color: var(--colorInput1);
   &:global {
     &.error {
-      border: 1px solid red;
+      border: 1px solid var(--errorBg);
     }
   }
 }

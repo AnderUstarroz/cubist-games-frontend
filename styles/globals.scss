@@ -1,41 +1,195 @@
+@import "./fonts.scss";
+@import "./markdown-editor.scss";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  background: var(--bodyBg);
-  background-blend-mode: multiply, multiply, multiply, normal, normal;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  background-image: var(--bodyImage);
+  background-size: cover;
   background-attachment: fixed;
   background-repeat: no-repeat;
   color: var(--color0);
 }
-
+h1 {
+  font-size: var(--h1Size);
+  margin: 0 0 25px 0;
+}
+h2 {
+  font-size: var(--h2Size);
+  margin: 0 0 25px 0;
+}
+h3 {
+  font-size: var(--h3Size);
+  margin: 0 0 7px 0;
+}
+h4 {
+  font-size: var(--h4Size);
+  margin: 0 0 15px 0;
+}
 ul {
   padding: 0;
   margin: 0;
   list-style: none;
   list-style-position: inside;
 }
-
+p {
+  margin: 0 0 15px 0;
+}
 a {
   color: inherit;
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+.v-aligned {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.centered {
+  justify-content: center;
+}
+.gap5 {
+  gap: 5px;
 }
 
-.aligned {
-  display: flex;
-  gap: 15px;
-  align-items: center;
+input,
+textarea {
+  padding: 12px 40px 12px 16px;
+  background-color: var(--inputBg0);
+  color: var(--inputColor0);
+  border: 1px solid var(--inputBorder0);
+  border-radius: 2px;
+}
+/* Hide arrow number: Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Hide arrow number: Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+label {
+  cursor: pointer;
+}
+.overlap {
+  position: relative;
+  display: inline-block;
+
+  > span {
+    position: absolute;
+    top: -8px;
+    left: 8px;
+    padding: 0px 4px;
+    font-size: var(--fontSizeSmall);
+    background: rgba(56, 96, 136, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  > svg,
+  em {
+    position: absolute;
+    top: 50%;
+    -ms-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    right: 15px;
+  }
+  > input {
+    position: relative;
+  }
+}
+svg {
+  cursor: pointer;
+}
+
+.icon0,
+.icon1,
+.icon2,
+.icon3 {
+  cursor: pointer;
+  -webkit-transition: color 1s ease-out;
+  -moz-transition: color 1s ease-out;
+  -o-transition: color 1s ease-out;
+  transition: color 1s ease-out;
+  path {
+    -webkit-transition: fill 1s ease-out;
+    -moz-transition: fill 1s ease-out;
+    -o-transition: fill 1s ease-out;
+    transition: fill 1s ease-out;
+  }
+}
+.icon0 {
+  color: var(--iconFill0);
+  path {
+    fill: var(--iconFill0);
+  }
+  &:hover {
+    color: var(--iconFill1);
+    path {
+      fill: var(--iconFill1);
+    }
+  }
+}
+.icon1 {
+  color: var(--iconFill1);
+  path {
+    fill: var(--iconFill1);
+  }
+  &:hover {
+    color: var(--iconFill0);
+    path {
+      fill: var(--iconFill0);
+    }
+  }
+}
+.icon2 {
+  color: var(--iconFill2);
+  path {
+    fill: var(--iconFill2);
+  }
+  &:hover {
+    color: var(--iconFill0);
+    path {
+      fill: var(--iconFill0);
+    }
+  }
+}
+.icon3 {
+  color: var(--iconFill3);
+  path {
+    fill: var(--iconFill3);
+  }
+  &:hover {
+    color: var(--iconFill0);
+    path {
+      fill: var(--iconFill0);
+    }
+  }
 }
 
 button {
   // Medium Button
   padding: 12px 24px;
+  -webkit-transition: background-color 1s ease-out;
+  -moz-transition: background-color 1s ease-out;
+  -o-transition: background-color 1s ease-out;
+  transition: background-color 1s ease-out;
+  color: var(--color0);
+  background-color: var(--btnBg0);
 
   &.sm {
     padding: 4px 16px;
@@ -43,22 +197,60 @@ button {
   &.big {
     padding: 20px 24px;
   }
-}
-
-input {
-  padding: 12px 16px;
-  background-color: var(--inputBg0);
-  color: var(--inputColor0);
-  border: var(--inputBorder0);
-  border-radius: 2px;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+  &[disabled] {
+    background-color: var(--disabledBtnBg);
+    color: var(--color13);
   }
-  body {
-    color: white;
-    background: black;
+  &:hover {
+    background-color: var(--btnBgHover0);
+  }
+}
+
+.button1 {
+  background-color: var(--btnBg1);
+  &:hover {
+    background-color: var(--btnBgHover1);
+  }
+}
+.button2 {
+  background-color: var(--btnBg2);
+  &:hover {
+    background-color: var(--btnBgHover2);
+  }
+}
+.errorMsg {
+  padding: 10px 20px;
+  background-color: var(--errorBg);
+  border-radius: 3px;
+}
+
+.fullCol {
+  flex: 1;
+}
+
+.fullWidth {
+  width: 100%;
+}
+.mb-med {
+  margin-bottom: 15px;
+}
+.mb-big {
+  margin-bottom: 30px;
+}
+
+// Generate option colors
+@for $i from 0 through 25 {
+  .opt#{$i} {
+    background-color: var(--opt#{$i});
+  }
+}
+
+@media (max-width: 768px) {
+  .mWrap {
+    flex-flow: wrap;
+  }
+  .mobileCol {
+    align-items: baseline;
+    flex-direction: column;
   }
 }

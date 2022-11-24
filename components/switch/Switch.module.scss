@@ -33,7 +33,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--errorBg);
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
@@ -51,7 +51,7 @@
 }
 
 input:checked + .slider {
-  background-color: black;
+  background-color: var(--btnBg0);
 }
 
 input:focus + .slider {
@@ -78,7 +78,6 @@ input:checked + .slider:before {
     display: flex;
     justify-content: left;
     align-items: center;
-    margin-bottom: 10px;
 
     div {
       p {

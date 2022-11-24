@@ -1,1 +1,120 @@
 @import "./common-settings.scss";
+
+.preview {
+  cursor: pointer;
+
+  & :global {
+    .overlap {
+      width: 100%;
+      margin: 0 0 20px 0;
+      background-color: rgba(1, 1, 1, 0.1);
+      -webkit-transition: background-color 1s ease-out;
+      -moz-transition: background-color 1s ease-out;
+      -o-transition: background-color 1s ease-out;
+      transition: background-color 1s ease-out;
+      &:hover {
+        background-color: rgba(1, 1, 1, 0.2);
+      }
+      padding: 15px 10px;
+
+      > h3 {
+        margin: 0;
+        p {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  ul {
+    margin-top: 15px;
+    li {
+      margin: 0 0 10px 0;
+      display: flex;
+      gap: 5px;
+      h6 {
+        font-size: var(--fontSizeBig);
+        * {
+          color: unset;
+          margin: 0;
+        }
+      }
+      > div {
+        border: 1px solid var(--inputBorder0);
+        background-color: rgba(1, 1, 1, 0.1);
+        -webkit-transition: background-color 0.5s ease-out;
+        -moz-transition: background-color 0.5s ease-out;
+        -o-transition: background-color 0.5s ease-out;
+        transition: background-color 0.5s ease-out;
+        border-radius: 2px;
+        padding: 5px 20px;
+
+        &:hover {
+          background-color: rgba(1, 1, 1, 0.2);
+        }
+
+        &:first-of-type {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 19px 10px;
+
+          div {
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+          }
+        }
+      }
+    }
+  }
+}
+.opDesc {
+  font-size: var(--fontSizeSmall);
+  * {
+    margin: 0;
+  }
+}
+.outcome {
+  margin-bottom: 15px;
+  li {
+    display: flex;
+    gap: 5px;
+    > div {
+      display: flex;
+      align-items: center;
+    }
+    span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    > div,
+    > strong {
+      padding: 5px 12px;
+      background-color: rgba(1, 1, 1, 0.1);
+    }
+  }
+}
+.options {
+  margin: 15px 0;
+  li {
+    margin-bottom: 10px;
+
+    > div {
+      height: 100%;
+      padding: 14px 12px;
+      background-color: var(--inputBg0);
+      border: 1px solid var(--inputBorder0);
+      border-radius: 2px;
+      div {
+        border-radius: 50%;
+        padding: 5px;
+      }
+    }
+    input {
+      width: 120px;
+      padding: 12px;
+    }
+  }
+}

@@ -58,12 +58,12 @@ function DefaultStakeButtons({
       </Swiper>
       {game.cached.definition?.options.map(
         (o: OptionType, optionId: number) => (
-          <div key={`betOpt${optionId}`} className="v-aligned">
+          <div key={`betOpt${optionId}`} className="vAligned">
             <div>
               <h4>{o.title}</h4>
               {o.description ? <p>{o.description}</p> : ""}
             </div>
-            <ul className="v-aligned">
+            <ul className="vAligned">
               {game.data.stakeButtons.map((stakeAmount: number, k: number) => (
                 <li key={`stakeBtn${optionId}-${k}`}>
                   <Button
@@ -126,7 +126,7 @@ function DefaultStakeButtons({
                 {!!customStake.description && (
                   <Markdown>{customStake.description as string}</Markdown>
                 )}
-                <div className="v-aligned">
+                <div className="vAligned">
                   <Input
                     type="number"
                     autoComplete="off"

@@ -78,6 +78,7 @@ export interface GameSettingsInputType
   definitionHash: string;
   category: string | null;
   useToken: boolean;
+  infoHash: string | null;
   image1Hash: string | null;
   hasBets: boolean;
   totalBetsClaimed: number;

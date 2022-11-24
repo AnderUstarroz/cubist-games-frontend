@@ -20,6 +20,7 @@ import {
 } from "../types/game-settings";
 import { BN } from "@project-serum/anchor";
 import { addHours } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 
 import {
   Bundlr,
@@ -65,7 +66,11 @@ import {
 import { RechargeArweaveType } from "../../components/recharge-arweave/types";
 import Link from "next/link";
 import { process_image } from "../../components/utils/image";
-import { DefinitionInputsType, OptionType } from "../types/game";
+import {
+  DefinitionInputsType,
+  OptionType,
+  WarningMsgInputsType,
+} from "../types/game";
 import { MDEditorProps } from "@uiw/react-md-editor";
 import {
   bold,
@@ -82,6 +87,7 @@ import {
 } from "@uiw/react-md-editor/lib/commands";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+import { DEFAULT_SELECT_STYLES } from "../../components/utils/game";
 
 const Input = dynamic(() => import("../../components/input"));
 const ImageInput = dynamic(() => import("../../components/image-input"));
@@ -91,7 +97,10 @@ const Modal = dynamic(() => import("../../components/modal"));
 const Info = dynamic(() => import("../../components/settings/info"));
 const Button = dynamic(() => import("../../components/button"));
 const Markdown = dynamic(() => import("../../components/markdown"));
+const Spinner = dynamic(() => import("../../components/spinner"));
+const Checkbox = dynamic(() => import("../../components/checkbox"));
 
+const DatesSettings = dynamic(() => import("../../components/settings/dates"));
 const GeneralSettings = dynamic(
   () => import("../../components/settings/general")
 );
@@ -186,6 +195,7 @@ const Game: NextPage = () => {
     designTemplate: null,
     termsId: "",
     termsHash: "",
+    infoHash: null,
     image1Hash: null,
     definitionHash: "",
     category: null,
@@ -198,19 +208,25 @@ const Game: NextPage = () => {
     loading: false,
     title: "",
     description: "",
-    warning: "",
     options: [
-      { title: "TypeOption1", description: "", color: "#53BC46" },
-      { title: "TypeOption2", description: "", color: "#CF4E4E" },
+      { title: "", description: "", color: "#53BC46" },
+      { title: "", description: "", color: "#CF4E4E" },
     ],
   });
   const [definitionErrors, setDefinitionErrors] = useState<{
     [key: string]: string;
   }>({});
+  const [warningMsg, setWarningMsg] = useState<WarningMsgInputsType>({
+    loading: false,
+    title: "",
+    description: "",
+  });
+
   const [modals, setModals] = useState({
     main: false,
     terms: false,
     definition: false,
+    warningMsg: false,
     rechargeArweave: false,
   });
   const [mainModalContent, setMainModalContent] = useState<ReactNode>(null);
@@ -374,7 +390,6 @@ const Game: NextPage = () => {
     setDefinition({ ...definition, loading: true });
     const arweaveHash = await bundlr?.uploadJSON(jsonContent);
     if (arweaveHash) {
-      setDefinition({ ...definition, loading: false });
       setGameSettings({
         ...gameSettings,
         definitionHash: arweaveHash,
@@ -385,11 +400,63 @@ const Game: NextPage = () => {
       flashMsg("Uploaded game definition to Arweave", "success");
       setModals({ ...modals, definition: false });
     }
+    setDefinition({ ...definition, loading: false });
+  };
+
+  const handleSaveWarningMsg = async () => {
+    if (!bundlr || !solanaProgram) return;
+    const jsonContent = JSON.stringify((({ loading, ...t }) => t)(warningMsg));
+    const [balance, price] = await multi_request([
+      [bundlr.balance, []],
+      [bundlr.getPrice, [Buffer.byteLength(jsonContent, "utf8")]],
+    ]);
+    // Reacharge Arweave when there is not enough balance
+    if (
+      displayRechargeArweave(
+        price,
+        balance,
+        {
+          ...rechargeArweave,
+          closeModals: { rechargeArweave: false, warningMsg: true },
+        },
+        setRechargeArweave,
+        solFiatPrice as number,
+        maxDecimals
+      )
+    ) {
+      setModals({ ...modals, rechargeArweave: true });
+      return;
+    }
+    setWarningMsg({ ...warningMsg, loading: true });
+    try {
+      const arweaveHash = await bundlr?.uploadJSON(jsonContent);
+      if (arweaveHash) {
+        await updateInfoHash(arweaveHash);
+        flashMsg("Uploaded warning message to Arweave", "success");
+        setModals({ ...modals, warningMsg: false });
+      }
+    } catch (e) {
+      console.error(e);
+      flashMsg("Failed to save warning message");
+    }
+    setWarningMsg({ ...warningMsg, loading: false });
+  };
+
+  const updateInfoHash = async (arweaveHash: string | null) => {
+    await solanaProgram?.methods
+      .updateGameInfo(arweaveHash)
+      .accounts({
+        authority: authority,
+        game: (pdas as PDATypes).game.pda,
+      })
+      .rpc();
+    setGameSettings({ ...gameSettings, infoHash: arweaveHash });
   };
 
   const handleUpdateArweaveInput = (value: string) => {
     setRechargeArweave({ ...rechargeArweave, value: parseFloat(value) });
   };
+
   const handleRechargeArweave = async () => {
     try {
       setRechargeArweave({ ...rechargeArweave, loading: true });
@@ -490,6 +557,13 @@ const Game: NextPage = () => {
               arweaveHash: existingGame.image1Hash,
             },
           });
+        }
+        // Show Info message when games cannot be edited
+        if (existingGame.hasBets && !existingGame.settledAt) {
+          flashMsg(
+            "The game cannot be edited because it already has bets",
+            "info"
+          );
         }
       } catch (error) {
         // If game doesn't exist, populate settings using fetched config settings
@@ -596,11 +670,46 @@ const Game: NextPage = () => {
       ) : (
         <main className={styles.main}>
           {!gameSettings.gameId || loading ? (
-            <div>LOADING..</div>
+            <Spinner />
           ) : (
             <>
-              <h1 className={styles.title}>Game</h1>
-              <p>Game definition</p>
+              <AnimatePresence>
+                <motion.div className={`${styles.title}`}>
+                  <div className="vAligned jCSB mobileCol">
+                    <h1>{`${
+                      gameSettings.createdAt ? "Edit Game" : "New Game"
+                    }`}</h1>
+                    {gameSettings.createdAt && !gameSettings.settledAt && (
+                      <div className="vAligned">
+                        <Switch
+                          onChange={handleToggleGame}
+                          value={gameSettings.isActive}
+                        />
+                        <div className="vAligned gap5">
+                          {gameSettings.isActive ? "Activated" : "Disabled"}{" "}
+                          <Icon
+                            cType="info"
+                            className="icon1"
+                            onClick={() =>
+                              showModal(
+                                <div>
+                                  <h4>Activate/Deactivate games</h4>
+                                  <p>
+                                    Only active games can accept bets. Disabled
+                                    games won&apos;t be displayed in the games
+                                    list.
+                                  </p>
+                                </div>
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
               {!!gameSettings.createdAt && !!config && (
                 <Info
                   gameSettings={gameSettings}
@@ -608,77 +717,23 @@ const Game: NextPage = () => {
                   config={config}
                 />
               )}
-              {gameSettings.createdAt && !gameSettings.settledAt && (
-                <div className="v-aligned">
-                  <Switch
-                    onChange={handleToggleGame}
-                    value={gameSettings.isActive}
-                  />
-                  {gameSettings.isActive ? "Active" : "Disabled"}{" "}
-                  <Icon
-                    cType="info"
-                    onClick={() =>
-                      showModal(
-                        <div>
-                          <h4>Activate/Deactivate games</h4>
-                          <p>
-                            Only active games can accept bets. Disabled games
-                            won&apos;t be displayed in the games list.
-                          </p>
-                        </div>
-                      )
-                    }
-                  />
-                </div>
+              <DatesSettings
+                settings={gameSettings}
+                errors={errors}
+                showModal={showModal}
+                handleUpdateSettings={handleUpdateGameSettings}
+              />
+              {!!systemConfig && (
+                <Profits
+                  systemConfig={systemConfig}
+                  settings={gameSettings}
+                  errors={errors}
+                  showModal={showModal}
+                  handleUpdateSettings={handleUpdateGameSettings}
+                  modals={modals}
+                  setModals={setModals}
+                />
               )}
-              <div>
-                <h2>Dates</h2>
-
-                <fieldset>
-                  <label>
-                    <span>Terms & Conditions</span>
-                    <Select
-                      placeholder="Select one option..."
-                      name="termsId"
-                      options={config?.terms.map((t: TermsType) => {
-                        return { value: t.id, label: t.id };
-                      })}
-                      value={
-                        gameSettings.termsId
-                          ? {
-                              value: gameSettings.termsId,
-                              label: gameSettings.termsId,
-                            }
-                          : null
-                      }
-                      styles={
-                        errors?.termsId
-                          ? {
-                              container: (styles) => ({
-                                ...styles,
-                                border: "1px solid red",
-                              }),
-                            }
-                          : {}
-                      }
-                      onChange={(option, _actionMeta) => {
-                        handleUpdateGameSettings("termsId", option?.value);
-                      }}
-                    />
-                    {!gameSettings.termsId ? (
-                      <p>
-                        You need to{" "}
-                        <Link href="/admin/global-settings">
-                          <a title="Settings">create Terms & Conditions</a>
-                        </Link>{" "}
-                        first
-                      </p>
-                    ) : (
-                      ""
-                    )}
-                  </label>
-                </fieldset>
-              </div>
               <GeneralSettings
                 settings={gameSettings}
                 errors={errors}
@@ -692,131 +747,326 @@ const Game: NextPage = () => {
                 handleUpdateSettings={handleUpdateGameSettings}
                 maxDecimals={maxDecimals}
               />
-              {!!systemConfig && (
-                <Profits
-                  systemConfig={systemConfig}
-                  settings={gameSettings}
-                  errors={errors}
-                  showModal={showModal}
-                  handleUpdateSettings={handleUpdateGameSettings}
-                  modals={modals}
-                  setModals={setModals}
-                />
-              )}
-              <div>
-                <ImageInput
-                  name="image1"
-                  file={files.image1 ? files.image1 : null}
-                  onChange={async (e: any) =>
-                    process_image(
-                      e.target.name,
-                      e.target.files,
-                      handleUploadImage
-                    )
-                  }
-                />
-              </div>
-              <div>
-                <h3>
-                  Definition{" "}
-                  <Button
-                    onClick={() => setModals({ ...modals, definition: true })}
-                  >
-                    Edit
-                  </Button>
-                </h3>
-                <h4>Title</h4>
-                <Markdown>{definition.title}</Markdown>
-                <h4>Description</h4>
-                <Markdown>{definition.description}</Markdown>
-                <h4>Options </h4>
-                <ul>
-                  {definition.options.map((o: OptionType, k: number) => (
-                    <li key={`descOpt-${k}`}>
-                      <Markdown>{o.title}</Markdown>
-                      <Markdown>{o.description}</Markdown>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {gameSettings.createdAt &&
-              gameSettings.isActive &&
-              !gameSettings.totalBetsClaimed ? (
-                <div>
-                  Game result:
-                  <Select
-                    placeholder="Select game outcome..."
-                    name="result"
-                    options={[
-                      ...definition.options.map((o: OptionType, k: number) => {
-                        return {
-                          value: k,
-                          label: o.title,
-                        };
-                      }),
-                      { value: definition.options.length, label: "Void game" },
-                    ]}
-                    value={
-                      gameSettings.result !== null
-                        ? {
-                            value: gameSettings.result,
-                            label:
-                              definition.options[gameSettings.result].title,
+              <div className={styles.flexCols}>
+                <motion.section>
+                  <h2>Terms & Conditions</h2>
+                  <fieldset>
+                    <p className="mb-big">
+                      Define the T&C which should be applied to the game. T&Cs
+                      can be created at the{" "}
+                      <Link href="/admin/global-settings">
+                        <a title="Settings" className="icon1">
+                          Global settings page
+                        </a>
+                      </Link>
+                      .
+                    </p>
+                    <div className="flex mb-med">
+                      <label className="overlap fullCol">
+                        <Select
+                          className="fullWidth"
+                          placeholder="Select one option..."
+                          name="termsId"
+                          options={config?.terms.map((t: TermsType) => {
+                            return { value: t.id, label: t.id };
+                          })}
+                          value={
+                            gameSettings.termsId
+                              ? {
+                                  value: gameSettings.termsId,
+                                  label: gameSettings.termsId,
+                                }
+                              : null
                           }
-                        : null
-                    }
-                    onChange={(option, _actionMeta) => {
-                      if (!option) return;
-                      showModal(
+                          styles={
+                            errors?.termsId
+                              ? {
+                                  container: (styles) => ({
+                                    ...styles,
+                                    border: "1px solid var(--errorBg)",
+                                  }),
+                                }
+                              : DEFAULT_SELECT_STYLES
+                          }
+                          onChange={(option, _actionMeta) => {
+                            handleUpdateGameSettings("termsId", option?.value);
+                          }}
+                        />
+                        <span>Terms & Conditions</span>
+                      </label>
+                    </div>
+                    {!gameSettings.termsId && (
+                      <div className="errorMsg">
+                        You need to{" "}
+                        <Link href="/admin/global-settings">
+                          <a title="Settings">
+                            <strong>create Terms & Conditions</strong>
+                          </a>
+                        </Link>{" "}
+                        first
+                      </div>
+                    )}
+                  </fieldset>
+                </motion.section>
+                <motion.section>
+                  <h2 className="vAligned gap5">
+                    Image{" "}
+                    <Icon
+                      cType="info"
+                      className="icon1"
+                      onClick={() =>
+                        showModal(
+                          <div>
+                            <h4>Game image</h4>
+                            <p>
+                              Upload and image to enrich the game interface.
+                            </p>
+                          </div>
+                        )
+                      }
+                    />
+                  </h2>
+                  <fieldset className={styles.imageField}>
+                    <ImageInput
+                      name="image1"
+                      file={files.image1 ? files.image1 : null}
+                      onChange={async (e: any) =>
+                        process_image(
+                          e.target.name,
+                          e.target.files,
+                          handleUploadImage
+                        )
+                      }
+                    />
+                  </fieldset>
+                </motion.section>
+                {!!gameSettings.createdAt && (
+                  <motion.section>
+                    <h2>Warning message</h2>
+                    <fieldset>
+                      <p>
+                        Use it to inform users about unexpected events, delays
+                        or any important update related to the game.
+                      </p>
+                      <div className="vAligned">
+                        <label
+                          className="vAligned gap5"
+                          onClick={() => {
+                            if (!gameSettings.infoHash) {
+                              return setModals({ ...modals, warningMsg: true });
+                            }
+                            updateInfoHash(null);
+                          }}
+                        >
+                          <Checkbox
+                            name="showPot"
+                            value={!!gameSettings.infoHash}
+                          />
+                          <span>
+                            <em>Show warning</em>
+                          </span>
+                        </label>
+                        {!!gameSettings.infoHash && (
+                          <span
+                            title="Edit warning message"
+                            onClick={() =>
+                              setModals({ ...modals, warningMsg: true })
+                            }
+                          >
+                            <Icon cType="edit" className="icon1" />
+                          </span>
+                        )}
+                      </div>
+                    </fieldset>
+                  </motion.section>
+                )}
+              </div>
+              <section>
+                <h2 className="vAligned">
+                  <span>Definition</span>{" "}
+                  {!gameSettings.hasBets && (
+                    <span
+                      title="Edit definition"
+                      onClick={() => setModals({ ...modals, definition: true })}
+                    >
+                      <Icon cType="edit" className="icon1" />
+                    </span>
+                  )}
+                </h2>
+                <fieldset
+                  title="Edit definition"
+                  className={styles.preview}
+                  onClick={() => {
+                    if (gameSettings.hasBets) return;
+                    setModals({ ...modals, definition: true });
+                  }}
+                >
+                  <div className="overlap">
+                    <h3>
+                      <Markdown>
+                        {definition.title
+                          ? definition.title
+                          : "Define a game title.."}
+                      </Markdown>
+                    </h3>
+                    <span>Game title</span>
+                  </div>
+                  <div className="overlap mb-big">
+                    <Markdown>
+                      {definition.description
+                        ? definition.description
+                        : "Define a game description.."}
+                    </Markdown>
+                    <span>Game description</span>
+                  </div>
+                  <h3>Options </h3>
+                  <ul>
+                    {definition.options.map((o: OptionType, k: number) => (
+                      <li key={`descOpt-${k}`}>
                         <div>
-                          <h4>Game outcome</h4>
-                          <p>You have selected the following outcome:</p>
-                          <ul>
-                            <li>
-                              <strong
-                                style={{
-                                  color:
-                                    option.value < definition.options.length
-                                      ? definition.options[option.value].color
-                                      : "black",
-                                }}
-                              >
-                                {option.label}
-                              </strong>
-                            </li>
-                          </ul>
-                          <p>
-                            <strong>
-                              Note that the outcome cannot be changed if some
-                              participant has claimed a prize already
-                            </strong>
-                            . Are you completly sure you want to select this
-                            option as the outcome of the game?
-                          </p>
-                          <div className="v-aligned">
-                            <Button
-                              onClick={() => handleSetOutcome(option.value)}
-                            >
-                              Set outcome
-                            </Button>
-                            <Button
-                              onClick={() =>
-                                setModals({ ...modals, main: false })
-                              }
-                            >
-                              Cancel
-                            </Button>
+                          <div className={`optBg${k}`}></div>
+                        </div>
+                        <div>
+                          <h6 className={`optColor${k}`}>
+                            <Markdown>{o.title}</Markdown>
+                          </h6>
+                          <div className={styles.opDesc}>
+                            <Markdown>{o.description}</Markdown>
                           </div>
                         </div>
-                      );
-                    }}
-                  />
-                </div>
-              ) : (
-                ""
-              )}
-              <div>
-                {!gameSettings.hasBets ? (
+                      </li>
+                    ))}
+                  </ul>
+                </fieldset>
+              </section>
+              {gameSettings.createdAt &&
+                gameSettings.isActive &&
+                !gameSettings.totalBetsClaimed && (
+                  <section>
+                    <h2>Game result</h2>
+                    <fieldset>
+                      <p>
+                        Once you define the game outcome the winners will be
+                        able to claim their prizes:
+                      </p>
+                      <Select
+                        placeholder="Select game outcome..."
+                        name="result"
+                        options={[
+                          ...definition.options.map(
+                            (o: OptionType, k: number) => {
+                              return {
+                                value: k,
+                                label: o.title,
+                              };
+                            }
+                          ),
+                          {
+                            value: definition.options.length,
+                            label: "Void game",
+                          },
+                        ]}
+                        value={
+                          gameSettings.result !== null
+                            ? {
+                                value: gameSettings.result,
+                                label:
+                                  definition.options[gameSettings.result].title,
+                              }
+                            : null
+                        }
+                        styles={{
+                          ...DEFAULT_SELECT_STYLES,
+                          option: (baseStyles: any, state: any) => {
+                            return {
+                              ...baseStyles,
+                              color:
+                                state.data.value < definition.options.length
+                                  ? `var(--opt${state.data.value})`
+                                  : "var(--color0)",
+                              backgroundColor: "var(--inputBg0)",
+                              ":hover": {
+                                ...baseStyles[":hover"],
+                                backgroundColor: state.isFocused
+                                  ? "var(--color17)"
+                                  : "var(--inputBg0)",
+                              },
+                              ":active": {
+                                ...baseStyles[":active"],
+                                backgroundColor: state.isSelected
+                                  ? "var(--color17)"
+                                  : "var(--inputBg0)",
+                              },
+                            };
+                          },
+                        }}
+                        onChange={(option, _actionMeta) => {
+                          if (!option) return;
+                          showModal(
+                            <div>
+                              <h4>Game outcome</h4>
+                              <p>
+                                The following option will be selected as the
+                                outcome of the game:
+                              </p>
+                              <ul className={styles.outcome}>
+                                <li>
+                                  <div>
+                                    <span
+                                      className={
+                                        option.value < definition.options.length
+                                          ? `optBg${option.value}`
+                                          : "voidBg"
+                                      }
+                                    ></span>
+                                  </div>
+                                  <strong
+                                    className={
+                                      option.value < definition.options.length
+                                        ? `optColor${option.value}`
+                                        : "colorVoid"
+                                    }
+                                  >
+                                    {option.label}
+                                  </strong>
+                                </li>
+                              </ul>
+                              <div className="errorMsg mb-med">
+                                If the outcome is set and a prize is claimed by
+                                any player, you won&apos;t be able to change the
+                                outcome anymore.
+                              </div>
+                              <p>
+                                <strong>
+                                  Are you completly sure this is the correct
+                                  outcome of the game?{" "}
+                                </strong>
+                              </p>
+
+                              <div className="vAligned">
+                                <Button
+                                  onClick={() => handleSetOutcome(option.value)}
+                                >
+                                  Yes, set outcome
+                                </Button>
+                                <Button
+                                  className="button1"
+                                  onClick={() =>
+                                    setModals({ ...modals, main: false })
+                                  }
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        }}
+                      />
+                    </fieldset>
+                  </section>
+                )}
+              <div className="vAligned centered mb-big">
+                {!gameSettings.hasBets && (
                   <Button
                     onClick={() => handleSave()}
                     disabled={
@@ -826,12 +1076,10 @@ const Game: NextPage = () => {
                   >
                     Save
                   </Button>
-                ) : (
-                  ""
                 )}
-                <Button>
+                <Button className="button1">
                   <Link href={`/admin`}>
-                    <a>Go Back</a>
+                    <a>Cancel</a>
                   </Link>
                 </Button>
               </div>
@@ -839,139 +1087,205 @@ const Game: NextPage = () => {
           )}
           <Modal modalId={"definition"} modals={modals} setIsOpen={setModals}>
             <div>
-              <h4>Warning message</h4>
-              <div>
-                <p>Used to inform users about unexpected events or delays.</p>
-                <MDEditor
-                  value={definition.warning}
-                  onChange={(text: any) =>
-                    setDefinition({ ...definition, warning: text })
-                  }
-                  {...mkEditorDefaults}
-                />
-              </div>
-              <label>
-                <span>Game title</span>
-                <Input
-                  name="title"
-                  type="text"
-                  maxLength={64}
-                  placeholder="Game title"
-                  className={
-                    definitionErrors.hasOwnProperty("title") ? "error" : null
-                  }
-                  value={definition.title}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleUpdateDefinition("title", e.target.value)
-                  }
-                />
-              </label>
-              <label>
-                <span>Description</span>
-                <MDEditor
-                  value={definition.description}
-                  className={
-                    definitionErrors.hasOwnProperty("description")
-                      ? styles.MDEditorError
-                      : null
-                  }
-                  onChange={(text: any) =>
-                    handleUpdateDefinition("description", text.slice(0, 1000))
-                  }
-                  {...mkEditorDefaults}
-                />
-              </label>
-              <h4>Options</h4>
-              {definitionErrors.hasOwnProperty("options") ? (
-                <p>{definitionErrors.options}</p>
+              <h4 className="mb-big">Definition</h4>
+              {definition.loading ? (
+                <Spinner />
               ) : (
-                ""
-              )}
-              <ul>
-                {definition.options.map((o: OptionType, k: number) => (
-                  <li key={`descOpt-${k}`}>
-                    <label>
-                      <span>
-                        Option{" "}
-                        <Button
-                          onClick={() =>
-                            setDefinition({
-                              ...definition,
-                              options: [
-                                ...definition.options,
-                                {
-                                  title: `TypeOption${
-                                    definition.options.length + 1
-                                  }`,
-                                  description: "",
-                                  color: "#000000",
-                                },
-                              ],
-                            })
-                          }
-                        >
-                          +
-                        </Button>
-                      </span>
+                <>
+                  <div className="mb-med">
+                    <label className="overlap fullWidth">
                       <Input
                         name="title"
                         type="text"
-                        maxLength={32}
-                        placeholder="Option name"
-                        value={o.title}
+                        maxLength={64}
+                        placeholder="Type a game title.."
+                        className={`fullWidth ${
+                          definitionErrors.hasOwnProperty("title")
+                            ? "error"
+                            : ""
+                        }`}
+                        value={definition.title}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleUpdateOption("title", k, e.target.value)
+                          handleUpdateDefinition("title", e.target.value)
                         }
                       />
+                      <span>Game title</span>
                     </label>
-                    <label>
-                      <span>color</span>
-                      <Input
-                        type="color"
-                        value={o.color}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleUpdateOption("color", k, e.target.value)
-                        }
-                      />
-                    </label>
-                    <label>
-                      <span>Description</span>
+                  </div>
+                  <div className="mb-med">
+                    <div className="overlap fullWidth">
                       <MDEditor
-                        value={o.description}
-                        height={85}
+                        value={definition.description}
+                        className={`fullWidth ${
+                          definitionErrors.hasOwnProperty("description")
+                            ? styles.MDEditorError
+                            : ""
+                        }`}
                         onChange={(text: any) =>
-                          handleUpdateOption(
+                          handleUpdateDefinition(
                             "description",
-                            k,
-                            text.slice(0, 64)
+                            text.slice(0, 1000)
                           )
                         }
                         {...mkEditorDefaults}
                       />
-                    </label>
-                    <Button
+                      <span>Description</span>
+                    </div>
+                  </div>
+                  <h3 className="vAligned">
+                    Options
+                    <span
+                      className="icon1"
                       onClick={() =>
                         setDefinition({
                           ...definition,
-                          options: definition.options.filter(
-                            (_: OptionType, index: number) => index !== k
-                          ),
+                          options: [
+                            ...definition.options,
+                            {
+                              title: ``,
+                              description: "",
+                              color: "#000000",
+                            },
+                          ],
                         })
                       }
                     >
-                      -
+                      +
+                    </span>
+                  </h3>
+                  {definitionErrors.hasOwnProperty("options") && (
+                    <div className="errorMsg mb-med">
+                      {definitionErrors.options}
+                    </div>
+                  )}
+                  <ul className={styles.options}>
+                    {definition.options.map((o: OptionType, k: number) => (
+                      <li key={`descOpt-${k}`} className="vAligned gap5">
+                        <div className="">
+                          <div className={`optBg${k}`}></div>
+                        </div>
+                        <label className="overlap">
+                          <Input
+                            name="title"
+                            type="text"
+                            maxLength={32}
+                            placeholder="Type option.."
+                            value={o.title}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => handleUpdateOption("title", k, e.target.value)}
+                          />
+                          <span>Title</span>
+                        </label>
+                        <label className="overlap">
+                          <Input
+                            name="description"
+                            type="text"
+                            maxLength={64}
+                            placeholder=""
+                            value={o.description}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) =>
+                              handleUpdateOption(
+                                "description",
+                                k,
+                                e.target.value.slice(0, 64)
+                              )
+                            }
+                          />
+                          <span>Description</span>
+                        </label>
+                        <span
+                          title="Remove option"
+                          className="icon2"
+                          onClick={() =>
+                            setDefinition({
+                              ...definition,
+                              options: definition.options.filter(
+                                (_: OptionType, index: number) => index !== k
+                              ),
+                            })
+                          }
+                        >
+                          —
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="vAligned centered">
+                    <Button onClick={() => handleSaveDefinition()}>Save</Button>{" "}
+                    <Button
+                      className="button1"
+                      onClick={() =>
+                        setModals({ ...modals, definition: false })
+                      }
+                    >
+                      Cancel
                     </Button>
-                  </li>
-                ))}
-              </ul>
-              <div className="v-aligned">
-                <Button onClick={() => handleSaveDefinition()}>Save</Button>{" "}
-                <Button
-                  onClick={() => setModals({ ...modals, definition: false })}
-                >
-                  Cancel
-                </Button>
-              </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </Modal>
+          <Modal modalId={"warningMsg"} modals={modals} setIsOpen={setModals}>
+            <div>
+              <h4>Warning message</h4>
+              <p className="mb-big">
+                Use it to inform users about unexpected events, delays or any
+                important update related to the game.
+              </p>
+              {warningMsg.loading ? (
+                <Spinner />
+              ) : (
+                <>
+                  <div className="mb-med">
+                    <label className="overlap fullWidth">
+                      <Input
+                        name="title"
+                        type="text"
+                        maxLength={64}
+                        placeholder="Type a title.."
+                        className="fullWidth"
+                        value={warningMsg.title}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setWarningMsg({
+                            ...warningMsg,
+                            title: e.target.value.slice(0, 64),
+                          })
+                        }
+                      />
+                      <span>Warning title</span>
+                    </label>
+                  </div>
+                  <div className="mb-med">
+                    <div className="overlap fullWidth">
+                      <MDEditor
+                        value={warningMsg.description}
+                        onChange={(text: any) =>
+                          setWarningMsg({
+                            ...warningMsg,
+                            description: text.slice(0, 500),
+                          })
+                        }
+                        {...mkEditorDefaults}
+                      />
+                      <span>Warning message</span>
+                    </div>
+                  </div>
+                  <div className="vAligned centered">
+                    <Button onClick={() => handleSaveWarningMsg()}>Save</Button>{" "}
+                    <Button
+                      className="button1"
+                      onClick={() =>
+                        setModals({ ...modals, warningMsg: false })
+                      }
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </Modal>
           <Modal

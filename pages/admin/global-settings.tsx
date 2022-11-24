@@ -459,7 +459,7 @@ const GameSettings: NextPage = () => {
       ) : (
         <>
           <AnimatePresence>
-            <motion.div className={styles.title} key="title">
+            <motion.div className={styles.title}>
               <h1>GLOBAL SETTINGS</h1>
               <p>
                 New games will be created with the following settings by default
@@ -533,7 +533,7 @@ const GameSettings: NextPage = () => {
                           title={`Edit ${t.id}`}
                           onClick={() => handleEditTerms(t.id)}
                         >
-                          <label className={`opt${k % 25}`}>{t.id}</label>
+                          <label className={`optBg${k % 25}`}>{t.id}</label>
                           <Icon cType="edit" className="icon1" />
                         </li>
                       ))}
@@ -643,7 +643,7 @@ const GameSettings: NextPage = () => {
                                       <span>Description:</span>
                                     </div>
                                   </div>
-                                  <div className="v-aligned centered">
+                                  <div className="vAligned centered">
                                     <Button
                                       onClick={() => handleSaveTerms()}
                                       disabled={Boolean(
@@ -674,7 +674,7 @@ const GameSettings: NextPage = () => {
             </AnimatePresence>
           </div>
           <AnimatePresence>
-            <motion.div className="v-aligned centered mb-big">
+            <motion.div className="vAligned centered mb-big">
               <Button
                 className="big"
                 onClick={() => handleSave()}

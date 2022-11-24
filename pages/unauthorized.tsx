@@ -32,7 +32,7 @@ const Unauthorized: NextPage = () => {
             <h1>Unauthorized</h1>
             <p>You are not allowed to access this content.</p>
 
-            <div className="v-aligned">
+            <div className="vAligned">
               <Link href="/" passHref>
                 <Button>Back to games</Button>
               </Link>

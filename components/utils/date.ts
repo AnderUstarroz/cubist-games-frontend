@@ -1,8 +1,11 @@
-import { format, addDays } from "date-fns";
+import { format, addDays, subDays } from "date-fns";
 
 export const format_time = (date: Date) => {
   const today = new Date();
   const day = format(date, "yyyy-MM-dd");
+  if (format(subDays(today, 1), "yyyy-MM-dd") === day) {
+    return format(date, "'Yesterday', hh:mm aa");
+  }
   if (format(today, "yyyy-MM-dd") === day) {
     return format(date, "'Today', hh:mm aa");
   }

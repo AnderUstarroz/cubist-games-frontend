@@ -45,7 +45,7 @@ export default function Profits({
           {systemConfig ? (
             <>
               <div>
-                <h3 className="v-aligned">
+                <h3 className="vAligned">
                   Profit Sharing{" "}
                   {!profitSharingCompleted(settings.profitSharing) && (
                     <span
@@ -71,7 +71,7 @@ export default function Profits({
                   {settings.profitSharing.map(
                     (item: ProfitShareInputType, k: number) => (
                       <li key={`share-${k}`}>
-                        <div className="v-aligned">
+                        <div className="vAligned">
                           <em
                             title="Remove share"
                             className="icon2"
@@ -88,18 +88,18 @@ export default function Profits({
                             —
                           </em>
                           <span
-                            className="v-aligned"
+                            className="vAligned"
                             onClick={() =>
                               setModals({ ...modals, [`mps-${k}`]: true })
                             }
                             title="Edit share"
                           >
-                            <em className="v-aligned icon0">
+                            <em className="vAligned icon0">
                               <Icon cType="coins" width={14} />
                               {human_number(item.share, 2)}%
                             </em>
                             <Icon cType="arrow" color={"var(--color12)"} />
-                            <em className="v-aligned icon0">
+                            <em className="vAligned icon0">
                               {item.treasury
                                 ? `${short_key(item.treasury)}`
                                 : "________"}
@@ -142,7 +142,7 @@ export default function Profits({
                         >
                           <div className={styles.editShare}>
                             <h4>Edit share</h4>
-                            <div className="v-aligned">
+                            <div className="vAligned">
                               <label className="overlap">
                                 <Input
                                   type="number"

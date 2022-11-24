@@ -1,0 +1,43 @@
+.infoColumns {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  > div {
+    > div {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 5px;
+      > label {
+        width: 130px;
+        text-align: right;
+      }
+      > span {
+        flex: 1;
+        font-weight: bold;
+        color: var(--color12);
+      }
+    }
+  }
+  a {
+    transition: color 1s ease-in-out;
+    &:hover {
+      color: var(--color2);
+    }
+  }
+}
+
+.title {
+  font-size: var(--fontSizeBig);
+  margin-bottom: 10px;
+  > span {
+    text-transform: uppercase;
+    color: var(--color2) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .infoColumns {
+    flex-direction: column;
+  }
+}

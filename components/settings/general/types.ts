@@ -1,5 +1,3 @@
-import { ConfigInputType } from "../../../pages/types/game-settings";
-
 export interface GeneralSettingsType {
   settings: {
     fee: number;
@@ -7,6 +5,8 @@ export interface GeneralSettingsType {
     allowReferral: boolean;
     fireThreshold: number;
     openTime?: Date;
+    closeTime?: Date;
+    settleTime?: Date;
     [key: string]: any;
   };
   errors: { [key: string]: string };

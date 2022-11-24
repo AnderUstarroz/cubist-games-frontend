@@ -9,8 +9,12 @@ export interface DefinitionInputsType {
   loading: boolean;
   title: string;
   description: string;
-  warning: string;
   options: OptionType[];
+}
+export interface WarningMsgInputsType {
+  loading: boolean;
+  title: string;
+  description: string;
 }
 
 export interface GameDefinitionType {

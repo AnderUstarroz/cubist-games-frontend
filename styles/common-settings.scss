@@ -27,6 +27,18 @@
 .MDEditorError {
   border: 1px solid red;
 }
+.flexCols {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 40px;
+  > section {
+    flex: 1;
+    fieldset {
+      height: 100%;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .title {
     margin: 0 48px 40px 48px;
@@ -35,5 +47,10 @@
     section h2 {
       margin-left: 48px;
     }
+  }
+  .flexCols {
+    flex-direction: column;
+    margin-bottom: 0;
+    gap: 0;
   }
 }

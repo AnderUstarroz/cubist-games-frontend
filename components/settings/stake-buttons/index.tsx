@@ -22,10 +22,10 @@ export default function StakeButtons({
       <motion.section {...DEFAULT_ANIMATION}>
         <h2>Stake buttons</h2>
         <fieldset>
-          <div className="v-aligned mobileCol">
-            <div className="v-aligned gap5 mb-med">
+          <div className="vAligned mobileCol">
+            <div className="vAligned gap5 mb-med">
               <label
-                className="v-aligned gap5"
+                className="vAligned gap5"
                 onClick={() =>
                   handleUpdateSettings(
                     "customStakeButton",
@@ -55,7 +55,7 @@ export default function StakeButtons({
                 }
               />
             </div>
-            <div className="v-aligned  mb-med">
+            <div className="vAligned  mb-med">
               <label className="overlap">
                 <Input
                   name="minStake"
@@ -119,7 +119,7 @@ export default function StakeButtons({
               </label>
             </div>
           </div>
-          <h3 className="v-aligned gap5">
+          <h3 className="vAligned gap5">
             Default stake buttons{" "}
             <Icon
               cType="info"

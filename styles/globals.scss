@@ -8,6 +8,7 @@
 }
 html,
 body {
+  height: 100%;
   padding: 0;
   margin: 0;
   font-family: var(--fontFamily);
@@ -17,6 +18,12 @@ body {
   background-attachment: fixed;
   background-repeat: no-repeat;
   color: var(--color0);
+}
+#__next {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 100%;
 }
 h1 {
   font-size: var(--h1Size);
@@ -48,10 +55,13 @@ a {
   text-decoration: none;
 }
 
-.v-aligned {
+.vAligned {
   display: flex;
   gap: 12px;
   align-items: center;
+}
+.jCSB {
+  justify-content: space-between;
 }
 .centered {
   justify-content: center;
@@ -67,6 +77,10 @@ textarea {
   color: var(--inputColor0);
   border: 1px solid var(--inputBorder0);
   border-radius: 2px;
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(100%);
+    cursor: pointer;
+  }
 }
 /* Hide arrow number: Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
@@ -228,6 +242,10 @@ button {
   flex: 1;
 }
 
+.flex {
+  display: flex;
+}
+
 .fullWidth {
   width: 100%;
 }
@@ -240,9 +258,19 @@ button {
 
 // Generate option colors
 @for $i from 0 through 25 {
-  .opt#{$i} {
+  .optBg#{$i} {
     background-color: var(--opt#{$i});
   }
+  .optColor#{$i} {
+    color: var(--opt#{$i});
+  }
+}
+
+.voidBg {
+  background-color: var(--color0);
+}
+.colorVoid {
+  color: var(--color0);
 }
 
 @media (max-width: 768px) {

@@ -69,7 +69,7 @@ export default function RechargeArweave({
         {loading ? (
           <Spinner />
         ) : (
-          <div className="v-aligned">
+          <div className="vAligned">
             <label className="overlap">
               <Input
                 type="number"

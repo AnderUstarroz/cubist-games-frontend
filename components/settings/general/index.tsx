@@ -1,7 +1,6 @@
 import { parse_float_input } from "../../utils/number";
 import dynamic from "next/dynamic";
 import { GeneralSettingsType } from "./types";
-import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
 
@@ -15,128 +14,15 @@ export default function GeneralSettings({
   handleUpdateSettings,
   showModal,
 }: GeneralSettingsType) {
-  const TZ = `Time zone: ${
-    Intl.DateTimeFormat().resolvedOptions().timeZone
-  } (${format(new Date(), "OOOO")})`;
   return (
     <AnimatePresence>
       <motion.section {...DEFAULT_ANIMATION}>
         <h2>General</h2>
         <fieldset>
-          {settings.openTime ? (
-            <label>
-              <span>
-                Open time{" "}
-                <Icon
-                  cType="info"
-                  onClick={() =>
-                    showModal(
-                      <div>
-                        <h4>Open time</h4>
-                        <p>
-                          Defines the time at which the game will start being
-                          displayed and accepting bets.
-                        </p>
-                      </div>
-                    )
-                  }
-                />
-              </span>
-              <Input
-                type="datetime-local"
-                name="openTime"
-                className={errors.hasOwnProperty("openTime") ? "error" : null}
-                value={settings.openTime.toISOString().slice(0, 16)}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleUpdateSettings(
-                    "openTime",
-                    new Date(e.target.valueAsNumber)
-                  )
-                }
-              />
-              <div>{TZ}</div>
-            </label>
-          ) : (
-            ""
-          )}{" "}
-          {settings.closeTime ? (
-            <label className="overlap">
-              <Input
-                type="datetime-local"
-                name="closeTime"
-                className={errors.hasOwnProperty("closeTime") ? "error" : null}
-                value={settings.closeTime.toISOString().slice(0, 16)}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleUpdateSettings(
-                    "closeTime",
-                    new Date(e.target.valueAsNumber)
-                  )
-                }
-              />
-              <span>Close time</span>
-              <Icon
-                cType="info"
-                onClick={() =>
-                  showModal(
-                    <div>
-                      <h4>Close time</h4>
-                      <p>
-                        Defines the time at which the game will stop accepting
-                        bets.
-                      </p>
-                    </div>
-                  )
-                }
-              />
-              <div>{TZ}</div>
-            </label>
-          ) : (
-            ""
-          )}
-          {settings.settleTime ? (
-            <label className="overlap">
-              <Input
-                type="datetime-local"
-                name="settleTime"
-                className={errors.hasOwnProperty("settleTime") ? "error" : null}
-                value={settings.settleTime.toISOString().slice(0, 16)}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleUpdateSettings(
-                    "settleTime",
-                    new Date(e.target.valueAsNumber)
-                  )
-                }
-              />
-              <span>Settle time</span>
-              <Icon
-                cType="info"
-                onClick={() =>
-                  showModal(
-                    <div>
-                      <h4>Settle time</h4>
-                      <p>
-                        Defines the approximated time at which the game should
-                        be settled.{" "}
-                      </p>
-                      <p>
-                        <strong>
-                          Remember that you must settle the game manually by
-                          selecting the result/outcome of the game.
-                        </strong>
-                      </p>
-                    </div>
-                  )
-                }
-              />
-              <div>{TZ}</div>
-            </label>
-          ) : (
-            ""
-          )}{" "}
-          <div className="v-aligned mWrap">
-            <div className="v-aligned gap5 mb-med">
+          <div className="vAligned mWrap">
+            <div className="vAligned gap5 mb-med">
               <label
-                className="v-aligned gap5"
+                className="vAligned gap5"
                 onClick={() =>
                   handleUpdateSettings("showPot", !settings.showPot)
                 }
@@ -161,9 +47,9 @@ export default function GeneralSettings({
                 }
               />
             </div>
-            <div className="v-aligned gap5 mb-med">
+            <div className="vAligned gap5 mb-med">
               <label
-                className="v-aligned gap5"
+                className="vAligned gap5"
                 onClick={() =>
                   handleUpdateSettings("allowReferral", !settings.allowReferral)
                 }
@@ -191,7 +77,6 @@ export default function GeneralSettings({
                 }
               />
             </div>
-
             <label className="overlap fullCol   mb-med">
               <Input
                 name="fireThreshold"

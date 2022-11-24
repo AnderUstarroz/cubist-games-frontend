@@ -60,3 +60,37 @@ export const tx_link = (signature: string): string => {
     process.env.NEXT_PUBLIC_SOLANA_NETWORK === "devnet" ? "?cluster=devnet" : ""
   }`;
 };
+
+export const DEFAULT_SELECT_STYLES = {
+  control: (baseStyles: any, state: any) => ({
+    ...baseStyles,
+    backgroundColor: "var(--inputBg0)",
+    borderColor: "var(--inputBorder0)",
+  }),
+  singleValue: (baseStyles: any, state: any) => ({
+    ...baseStyles,
+    color: "var(--inputColor0)",
+  }),
+  menu: (baseStyles: any, state: any) => ({
+    ...baseStyles,
+    color: "var(--inputColor0)",
+    backgroundColor: "var(--inputBg0)",
+  }),
+  option: (baseStyles: any, state: any) => {
+    return {
+      ...baseStyles,
+      color: "var(--inputColor0)",
+      backgroundColor: "var(--inputBg0)",
+      ":hover": {
+        ...baseStyles[":hover"],
+        backgroundColor: state.isFocused ? "var(--color17)" : "var(--inputBg0)",
+      },
+      ":active": {
+        ...baseStyles[":active"],
+        backgroundColor: state.isSelected
+          ? "var(--color17)"
+          : "var(--inputBg0)",
+      },
+    };
+  },
+};

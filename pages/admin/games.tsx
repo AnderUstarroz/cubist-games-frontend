@@ -28,6 +28,9 @@ import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
 import { GameType } from "../types/game";
 import { game_batch } from "../../components/utils/game";
+import dynamic from "next/dynamic";
+
+const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 
 const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
@@ -51,6 +54,12 @@ const Games: NextPage = () => {
   useEffect(() => {
     if (!is_authorized(publicKey) || !wallet || solanaProgram || !data || pdas)
       return;
+
+    if (!is_authorized(publicKey)) {
+      Router.push("/unauthorized");
+      return;
+    }
+
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -81,7 +90,7 @@ const Games: NextPage = () => {
         ))
       ) {
         flashMsg("You need to define the default game settings first");
-        Router.push("/admin");
+        Router.push("/admin/global-settings");
       }
     })();
   }, [solanaProgram, pdas]);
@@ -101,16 +110,16 @@ const Games: NextPage = () => {
   }, [stats]);
 
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>Manage games</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={process.env.NEXT_PUBLIC_FAVICON} />
       </Head>
 
-      {!is_authorized(publicKey) ? (
-        <main className={styles.main}>Not authorized</main>
+      {!publicKey ? (
+        <AdminWelcome />
       ) : (
-        <main className={styles.main}>
+        <div className={styles.content}>
           <h1 className={styles.title}>Manage games</h1>
           <ul>
             {games.map((g: GameType, k: number) => (
@@ -121,9 +130,9 @@ const Games: NextPage = () => {
               </li>
             ))}
           </ul>
-        </main>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

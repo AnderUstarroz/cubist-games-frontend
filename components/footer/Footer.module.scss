@@ -2,14 +2,20 @@
   margin-top: auto;
   color: white;
   background: var(--footerBg);
+  font-size: var(--fontSizeSmall);
   padding: 20px;
+  > div {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
 }
-.pow {
-  text-align: center;
-}
-.social {
-  margin: 10px 0 0 0;
+
+.icons {
   display: flex;
-  gap: 15px;
-  justify-content: center;
+  gap: 5px;
+  > a {
+    display: flex;
+  }
 }

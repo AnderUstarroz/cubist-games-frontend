@@ -3,7 +3,7 @@
     background: var(--navBg);
     display: flex;
     justify-content: flex-end;
-    padding: 10px;
+    padding: 15px;
     li {
       display: flex;
       align-items: center;
@@ -13,7 +13,7 @@
   button,
   a {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 18px;
+    font-size: var(--fontSizeSmall);
     color: var(--colorFont3);
     font-weight: bold;
     > span {

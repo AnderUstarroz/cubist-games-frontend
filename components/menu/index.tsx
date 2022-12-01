@@ -3,14 +3,14 @@ import { MenuTypes, MenuType } from "./types";
 import dynamic from "next/dynamic";
 
 const Menus: MenuTypes = {
-  "/": dynamic(() => import("./home")),
-  "/admin": dynamic(() => import("./home")),
-  "/admin/global-settings": dynamic(() => import("./home")),
-  "/admin/game": dynamic(() => import("./home")),
-  "/admin/games": dynamic(() => import("./home")),
-  "/unauthorized": dynamic(() => import("./home")),
-  "/game/[title]": dynamic(() => import("./home")),
-  "/404": dynamic(() => import("./home")),
+  "/": dynamic(() => import("./admin")),
+  "/admin": dynamic(() => import("./admin")),
+  "/admin/global-settings": dynamic(() => import("./admin")),
+  "/admin/game": dynamic(() => import("./admin")),
+  "/admin/games": dynamic(() => import("./admin")),
+  "/unauthorized": dynamic(() => import("./admin")),
+  "/game/[title]": dynamic(() => import("./admin")),
+  "/404": dynamic(() => import("./admin")),
 };
 const DefaultMenu = ({ toggle }: MenuType) => {
   return <></>;

@@ -1,6 +1,18 @@
 .default {
-  background: var(--colorBtn1);
+  background: var(--color18);
   border: none;
-  border-radius: 6px;
-  padding: 6px 20px;
+  border-radius: 74px;
+  font-size: var(--fontSizeSmall) !important;
+  padding: 0 15px;
+  height: 35px;
+  > i {
+    margin-right: 5px;
+    > img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  &:hover {
+    background-color: transparent !important;
+  }
 }

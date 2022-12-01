@@ -1,15 +1,16 @@
-import { scrollToElement } from "../../../components/utils/navigation";
+import { scrollToElement } from "../../utils/navigation";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { HomeMenuType } from "./types";
 import Link from "next/link";
+import SiteLinks from "../menu_item/site_links";
 
-const SocialLinks = dynamic(() => import("../menu_item/social_links"));
+const SocialLinks = dynamic(() => import("../menu_item/site_links"));
 const Button = dynamic(() => import("../../button"));
 const MenuItem = dynamic(() => import("../menu_item"));
 const Icon = dynamic(() => import("../../icon"));
 
-export default function HomeMenu({ toggle }: HomeMenuType) {
+export default function PlayerMenu({ toggle }: HomeMenuType) {
   const ScrollSection = (section: string) => {
     if (toggle) {
       toggle();
@@ -29,19 +30,12 @@ export default function HomeMenu({ toggle }: HomeMenuType) {
       }}
     >
       <MenuItem className="social" whileHover={{}}>
-        <SocialLinks />
-      </MenuItem>
-      <MenuItem>
-        <Link href="/" passHref>
-          <Button cType="transparent" onClick={toggle}>
-            Home
-          </Button>
-        </Link>
+        <SiteLinks toggle={toggle} />
       </MenuItem>
       <MenuItem>
         <Link href="/admin">
           <a title="Settings" onClick={toggle}>
-            <Icon cType="gear" />
+            Admin
           </a>
         </Link>
       </MenuItem>

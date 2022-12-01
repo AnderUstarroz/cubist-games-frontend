@@ -25,6 +25,10 @@ body {
   grid-template-rows: auto 1fr auto;
   grid-template-columns: 100%;
 }
+main {
+  height: 100%;
+  grid-row: 1/3;
+}
 h1 {
   font-size: var(--h1Size);
   margin: 0 0 25px 0;
@@ -55,16 +59,25 @@ a {
   text-decoration: none;
 }
 
+.vhAligned {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .vAligned {
   display: flex;
   gap: 12px;
   align-items: center;
 }
-.jCSB {
-  justify-content: space-between;
-}
 .centered {
   justify-content: center;
+}
+.textCenter {
+  text-align: center;
+}
+.jCSB {
+  justify-content: space-between;
 }
 .gap5 {
   gap: 5px;

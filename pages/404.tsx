@@ -2,18 +2,14 @@ import styles from "../styles/NotFound.module.scss";
 import { motion, AnimatePresence } from "framer-motion";
 import type { NextPage } from "next";
 import React from "react";
+import { DEFAULT_ANIMATION } from "../components/utils/animation";
 
 const NotFound: NextPage = () => {
   return (
     <>
-      <div className={styles.container}>
+      <div className="vhAligned textCenter">
         <AnimatePresence>
-          <motion.div
-            className={styles.notFound}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-          >
+          <motion.div className={styles.notFound} {...DEFAULT_ANIMATION}>
             <h1>404 Page not found</h1>
             <p>Whoops we couldn&apos;t find the page.</p>
           </motion.div>

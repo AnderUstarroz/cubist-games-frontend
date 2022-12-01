@@ -23,6 +23,7 @@ const Icons: IconTypes = {
   share: dynamic(() => import("./share")),
   vs: dynamic(() => import("./vs")),
   arrow: dynamic(() => import("./arrow")),
+  web: dynamic(() => import("./web")),
 };
 
 function Icon(props: IconType) {

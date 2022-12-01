@@ -1,7 +1,6 @@
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useWallet } from "@solana/wallet-adapter-react";
 import styles from "./Wallet.module.scss";
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import { motion } from "framer-motion";
 import { DisconnectButtonType } from "./types";
 
@@ -18,7 +17,7 @@ export const DisconnectButton = ({ onClick }: DisconnectButtonType) => {
 };
 
 const Wallet: FC = () => {
-  return <WalletMultiButton />;
+  return <WalletMultiButton className={styles.default} />;
 };
 
 export default Wallet;

@@ -24,6 +24,7 @@ const Icons: IconTypes = {
   vs: dynamic(() => import("./vs")),
   arrow: dynamic(() => import("./arrow")),
   web: dynamic(() => import("./web")),
+  time: dynamic(() => import("./time")),
 };
 
 function Icon(props: IconType) {

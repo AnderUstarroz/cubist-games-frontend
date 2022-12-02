@@ -21,17 +21,48 @@ import {
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
-import { ConfigInputType } from "../types/game-settings";
+import { ConfigInputType, GameStateOutputType } from "../types/game-settings";
 import useSWR from "swr";
 import { fetcher, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
 import { GameType } from "../types/game";
-import { game_batch } from "../../components/utils/game";
+import { game_batch, game_state } from "../../components/utils/game";
 import dynamic from "next/dynamic";
+import { motion, AnimatePresence } from "framer-motion";
+import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
+const Button = dynamic(() => import("../../components/button"));
+const Icon = dynamic(() => import("../../components/icon"));
+const ImageBlob = dynamic(() => import("../../components/image-blob"));
 
+const showState = (state: GameStateOutputType) => {
+  switch (state) {
+    case "Pending":
+      return (
+        <span className={`vAligned gap5 ${styles.pending}`}>
+          <Icon cType="time" width={12} height={12} /> Pending
+        </span>
+      );
+    case "Open":
+      return <span className={styles.open}>Open</span>;
+    case "Closed":
+      return <span className={styles.closed}>Closed</span>;
+    case "Settled":
+      return (
+        <span className="vAligned gap5">
+          <Icon cType="coins" width={12} height={12} /> Settled
+        </span>
+      );
+    case "Voided":
+      return (
+        <span className="vAligned gap5">
+          <Icon cType="coins" width={12} height={12} /> Voided
+        </span>
+      );
+  }
+};
 const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
@@ -121,15 +152,49 @@ const Games: NextPage = () => {
       ) : (
         <div className={styles.content}>
           <h1 className={styles.title}>Manage games</h1>
-          <ul>
-            {games.map((g: GameType, k: number) => (
-              <li key={`game-${k}`}>
-                <a href={`/admin/game?id=${g.data.gameId}`}>
-                  Game {g.data.gameId} - {g.cached.definition?.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <section>
+            <fieldset>
+              <p>Showing games from 1 to 5</p>
+              <table className={styles.gamesTable}>
+                <thead>
+                  <tr>
+                    <th>Game</th>
+                    <th className="textCenter">State</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {games.map((g: GameType, k: number) => (
+                      <motion.tr key={`game-${k}`} {...DEFAULT_ANIMATION}>
+                        <td
+                          title="Edit game"
+                          onClick={() =>
+                            Router.push(`/admin/game?id=${g.data.gameId}`)
+                          }
+                        >
+                          <div className={styles.details}>
+                            <div className="img">
+                              <ImageBlob blob={g.cached.thumb1} />
+                            </div>
+                            <div className="terms">
+                              GAME {g.data.gameId}
+                              <span>{g.data.termsId}</span>
+                            </div>
+                            <span>{g.cached.definition?.title}</span>
+                          </div>
+                        </td>
+                        <td>{showState(game_state(g.data))}</td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+              <div className={`vAligned ${styles.btns}`}>
+                <Button className="button1 sm rounded">Previous</Button>{" "}
+                <Button className="button1 sm rounded">Next</Button>
+              </div>
+            </fieldset>
+          </section>
         </div>
       )}
     </>

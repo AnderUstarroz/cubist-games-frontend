@@ -10,8 +10,8 @@
   }
   fieldset {
     padding: 48px;
-    background: rgba(56, 96, 136, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--boxBg1);
+    border: 1px solid var(--inputBorder0);
   }
 }
 .title {

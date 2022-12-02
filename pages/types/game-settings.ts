@@ -85,3 +85,10 @@ export interface GameSettingsInputType
   options: OptionInputType[];
   result: number | null;
 }
+
+export type GameStateOutputType =
+  | "Pending"
+  | "Open"
+  | "Closed"
+  | "Settled"
+  | "Voided";

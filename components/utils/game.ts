@@ -2,6 +2,7 @@ import { PrevGameType } from "../../pages/types/game";
 import {
   GameSettingsInputType,
   OptionInputType,
+  GameStateOutputType,
 } from "../../pages/types/game-settings";
 
 export const game_batch = (maxGameId: number, max = 10): number[] => {
@@ -16,7 +17,9 @@ export const game_batch = (maxGameId: number, max = 10): number[] => {
   return batch;
 };
 
-export const game_state = (game: GameSettingsInputType) => {
+export const game_state = (
+  game: GameSettingsInputType
+): GameStateOutputType => {
   const now = new Date();
   if (game.settledAt) {
     return game.state.hasOwnProperty("Voided") ? "Voided" : "Settled";

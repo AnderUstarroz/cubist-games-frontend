@@ -14,7 +14,7 @@ export default function AdminWelcome() {
       >
         <div>
           <h1>Welcome</h1>
-          <p>Connect your wallet to access admin dashboard.</p>
+          <p>Connect your wallet to access the admin dashboard.</p>
           <Button cType="wallet" />
         </div>
       </motion.div>

@@ -1,8 +1,54 @@
-.container {
+@import "./common-settings.scss";
+@import "./games-table.scss";
+
+.content {
+  fieldset {
+    > p {
+      padding: 12px 15px;
+    }
+    padding: 10px 0 0 0;
+  }
+}
+.details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  & :global {
+    .img {
+      border-radius: 8px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--color14);
+      img {
+        border-radius: 8px;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    .terms {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+}
+.btns {
+  padding: 28px 15px;
+  justify-content: flex-end;
 }
 
-.main {
+.open,
+.closed,
+.pending {
+  border-radius: 24px;
+  padding: 2px 8px;
+  background-color: var(--colorClosed);
 }
-
-.title {
+.open {
+  background-color: var(--colorOpen);
+}
+.pending {
+  background-color: var(--colorPending);
 }

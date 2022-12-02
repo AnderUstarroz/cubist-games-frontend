@@ -46,7 +46,9 @@ html {
 
     --siteNameColor: linear-gradient(270deg, #bd2742 0.02%, #eb5973 149.72%);
 
-    --boxBg: rgba(56, 96, 136, 0.2);
+    --boxBg0: rgba(56, 96, 136, 0.2);
+    --boxBg1: rgba(56, 96, 136, 0.3);
+    --boxBg0Hover: rgba(56, 96, 136, 0.6);
     --errorBg: var(--color8);
 
     --inputBg0: var(--color1);
@@ -91,6 +93,10 @@ html {
     --opt22: #8c404e;
     --opt23: #857b47;
     --opt24: #588c40;
+
+    --colorPending: var(--color2);
+    --colorOpen: var(--opt3);
+    --colorClosed: var(--color8);
   }
 
   &[data-theme="another"] {

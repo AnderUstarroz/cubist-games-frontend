@@ -1,0 +1,36 @@
+.gamesTable {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: var(--fontSizeXS);
+
+  th {
+    color: var(--inputColor0);
+  }
+  tr {
+    -webkit-transition: background-color 1s ease-out;
+    -moz-transition: background-color 1s ease-out;
+    -o-transition: background-color 1s ease-out;
+    transition: background-color 1s ease-out;
+    background-color: var(--boxBg0);
+    > td {
+      &:first-of-type {
+        width: 100%;
+        cursor: pointer;
+      }
+    }
+  }
+  tbody {
+    tr {
+      &:hover {
+        background-color: var(--boxBg0Hover);
+      }
+    }
+  }
+  th,
+  td {
+    border-top: 1px solid var(--inputBorder0);
+    border-bottom: 1px solid var(--inputBorder0);
+    padding: 15px;
+  }
+}

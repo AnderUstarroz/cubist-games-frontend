@@ -8,7 +8,6 @@ export default function ImageBlob({ blob }: ImageBlobPropsType) {
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log(blob);
     if (!blob) return;
     (async () => {
       setSrc(await blob_to_base64(blob));

@@ -10,6 +10,7 @@ export interface IconType {
   title?: string;
   style?: { [key: string]: any };
   onClick?: MouseEventHandler<SVGSVGElement>;
+  direction?: string;
 }
 
 export interface IconTypes {

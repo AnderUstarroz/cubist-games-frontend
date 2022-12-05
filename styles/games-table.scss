@@ -1,6 +1,6 @@
 .gamesTable {
   width: 100%;
-  text-align: left;
+  text-align: center;
   border-collapse: collapse;
   font-size: var(--fontSizeXS);
 
@@ -13,8 +13,11 @@
     -o-transition: background-color 1s ease-out;
     transition: background-color 1s ease-out;
     background-color: var(--boxBg0);
-    > td {
+    > td,
+    > th {
       &:first-of-type {
+        white-space: unset;
+        text-align: left;
         width: 100%;
         cursor: pointer;
       }
@@ -29,8 +32,46 @@
   }
   th,
   td {
+    height: 80px;
+    white-space: nowrap;
     border-top: 1px solid var(--inputBorder0);
     border-bottom: 1px solid var(--inputBorder0);
     padding: 15px;
+  }
+}
+
+.gameCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .img {
+    border-radius: 8px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--color14);
+    img {
+      border-radius: 8px;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  .terms {
+    border-radius: 20px;
+    padding: 5px 8px;
+  }
+  h4 {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    font-size: var(--fontsizeXS);
+    font-weight: normal;
+    margin: 0;
+    strong {
+      color: var(--color12);
+      margin-right: 10px;
+    }
   }
 }

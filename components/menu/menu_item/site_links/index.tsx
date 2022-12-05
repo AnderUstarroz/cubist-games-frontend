@@ -27,7 +27,7 @@ export default function SiteLinks({
               <motion.img
                 src={process.env.NEXT_PUBLIC_LOGO}
                 alt="Discord"
-                title="Home page"
+                title="Homepage"
               />
             ) : (
               <span>
@@ -44,7 +44,7 @@ export default function SiteLinks({
       </Button>
       <Button cType="transparent">
         <Link href="/">
-          <a className={styles.siteName} title="Home page" onClick={toggle}>
+          <a className={styles.siteName} title="Homepage" onClick={toggle}>
             {siteName ? siteName : "Your site's name"}
           </a>
         </Link>

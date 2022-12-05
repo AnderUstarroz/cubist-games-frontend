@@ -4,7 +4,7 @@
   margin: 50px auto;
   width: 400px;
   max-width: 80%;
-  background: --boxBg0Hover;
+  background: var(--boxBg0Hover);
   border: 1px solid var(--inputBorder0);
   border-radius: 8px;
   overflow: auto;

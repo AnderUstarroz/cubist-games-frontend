@@ -22,7 +22,7 @@ const Icons: IconTypes = {
   treasure: dynamic(() => import("./treasure")),
   share: dynamic(() => import("./share")),
   vs: dynamic(() => import("./vs")),
-  arrow: dynamic(() => import("./arrow")),
+  chevron: dynamic(() => import("./chevron")),
   web: dynamic(() => import("./web")),
   time: dynamic(() => import("./time")),
 };

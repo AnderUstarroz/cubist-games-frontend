@@ -1,5 +1,6 @@
 @import "./fonts.scss";
 @import "./markdown-editor.scss";
+@import "./games-table.scss";
 
 * {
   box-sizing: border-box;
@@ -16,6 +17,7 @@ body {
   background-image: var(--bodyImage);
   background-size: cover;
   background-attachment: fixed;
+  background-position: center;
   background-repeat: no-repeat;
   color: var(--color0);
 }

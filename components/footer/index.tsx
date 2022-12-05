@@ -20,7 +20,7 @@ export default function Footer() {
       <div>
         {!!process.env.NEXT_PUBLIC_SITE_NAME && (
           <Link href="/">
-            <motion.a href="/" {...animation}>
+            <motion.a href="/" {...animation} title="Homepage">
               {process.env.NEXT_PUBLIC_SITE_NAME}
             </motion.a>
           </Link>

@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../../styles/AdminGames.module.scss";
+import ReactTooltip from "react-tooltip";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import {
   flashError,
@@ -15,13 +16,20 @@ import {
   initSolanaProgram,
   PDATypes,
   SolanaProgramType,
+  solana_fiat_price,
+  solana_to_usd,
   StatsType,
   stats_pda,
   SystemConfigType,
   SYSTEM_AUTHORITY,
   system_config_pda,
+  TermsType,
 } from "@cubist-collective/cubist-games-lib";
-import { ConfigInputType, GameStateOutputType } from "../types/game-settings";
+import {
+  ConfigInputType,
+  GameStateOutputType,
+  OptionInputType,
+} from "../types/game-settings";
 import useSWR from "swr";
 import { fetcher, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
@@ -31,11 +39,13 @@ import { game_batch, game_state } from "../../components/utils/game";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
+import { human_number } from "../../components/utils/number";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Button = dynamic(() => import("../../components/button"));
 const Icon = dynamic(() => import("../../components/icon"));
 const ImageBlob = dynamic(() => import("../../components/image-blob"));
+const Spinner = dynamic(() => import("../../components/spinner"));
 
 const showState = (state: GameStateOutputType) => {
   switch (state) {
@@ -63,11 +73,16 @@ const showState = (state: GameStateOutputType) => {
       );
   }
 };
+
+const MAX_GAMES = 10;
+
 const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
+  const [loading, setLoading] = useState<boolean>(false);
   const [pdas, setPdas] = useState<PDATypes | null>(null);
+  const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
@@ -81,6 +96,26 @@ const Games: NextPage = () => {
   const [stats, setStats] = useState<StatsType | null>(null);
   const [games, setGames] = useState<GameType[]>([]);
 
+  const fetchGames = async (lastGameId: number) => {
+    try {
+      setLoading(true);
+      setGames(
+        await fetch_games(
+          solanaProgram as SolanaProgramType,
+          authority,
+          game_batch(lastGameId)
+        )
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    setLoading(false);
+  };
+
+  const lastGameId = () => {
+    return games.length ? games[games.length - 1].data.gameId : 0;
+  };
+
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
     if (!is_authorized(publicKey) || !wallet || solanaProgram || !data || pdas)
@@ -92,6 +127,7 @@ const Games: NextPage = () => {
     }
 
     (async () => {
+      setSolFiatPrice(await solana_fiat_price());
       setPdas(
         await flashError(fetch_pdas, [
           ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
@@ -130,15 +166,20 @@ const Games: NextPage = () => {
   useEffect(() => {
     if (!stats || !solanaProgram || !config || !pdas) return;
     (async () => {
-      setGames(
-        await fetch_games(
-          solanaProgram,
-          authority,
-          game_batch(stats.totalGames.toNumber())
-        )
-      );
+      fetchGames(stats.totalGames.toNumber());
     })();
   }, [stats]);
+
+  useEffect(() => {
+    ReactTooltip.rebuild();
+  });
+
+  const termsHash = config
+    ? config.terms.reduce((acc: any, t: TermsType, k: number) => {
+        acc[t.id] = k;
+        return acc;
+      }, {})
+    : {};
 
   return (
     <>
@@ -151,50 +192,118 @@ const Games: NextPage = () => {
         <AdminWelcome />
       ) : (
         <div className={styles.content}>
-          <h1 className={styles.title}>Manage games</h1>
-          <section>
-            <fieldset>
-              <p>Showing games from 1 to 5</p>
-              <table className={styles.gamesTable}>
-                <thead>
-                  <tr>
-                    <th>Game</th>
-                    <th className="textCenter">State</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence>
-                    {games.map((g: GameType, k: number) => (
-                      <motion.tr key={`game-${k}`} {...DEFAULT_ANIMATION}>
-                        <td
-                          title="Edit game"
-                          onClick={() =>
-                            Router.push(`/admin/game?id=${g.data.gameId}`)
-                          }
+          {loading ? (
+            <Spinner />
+          ) : (
+            <>
+              <h1 className={styles.title}>Manage games</h1>
+              <section>
+                <fieldset>
+                  <p>
+                    {!!games.length &&
+                      `Showing games from ${Math.max(
+                        1,
+                        lastGameId() - MAX_GAMES
+                      )} to ${lastGameId()}`}
+                  </p>
+                  <table className="gamesTable">
+                    <thead>
+                      <tr>
+                        <th>Game</th>
+                        <th>Pot</th>
+                        <th>Prices claimed</th>
+                        <th className="textCenter">State</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <AnimatePresence>
+                        {games.map((g: GameType, k: number) => {
+                          const pot = g.data.options.reduce(
+                            (acc: number, opt: OptionInputType) =>
+                              acc + opt.totalStake,
+                            0
+                          );
+                          return (
+                            <motion.tr key={`game-${k}`} {...DEFAULT_ANIMATION}>
+                              <td
+                                title="Edit game"
+                                onClick={() =>
+                                  Router.push(`/admin/game?id=${g.data.gameId}`)
+                                }
+                              >
+                                <div className="gameCard">
+                                  <div className="img">
+                                    <ImageBlob blob={g.cached.thumb1} />
+                                  </div>
+                                  <div
+                                    className={`terms optBg${
+                                      termsHash[g.data.termsId] % 25
+                                    }`}
+                                  >
+                                    {g.data.termsId}
+                                  </div>
+                                  <h4>
+                                    <strong>GAME {g.data.gameId}</strong>
+                                    {g.cached.definition?.title}
+                                  </h4>
+                                </div>
+                              </td>
+                              <td>
+                                <span
+                                  className="vAligned gap5"
+                                  data-tip={
+                                    !!solFiatPrice &&
+                                    `${solana_to_usd(
+                                      pot,
+                                      solFiatPrice as number
+                                    )} USD`
+                                  }
+                                  data-for="tooltip"
+                                >
+                                  {human_number(pot, 2)} SOL
+                                  <Icon cType="info" className="icon1" />
+                                </span>
+                              </td>
+                              <td>
+                                {g.data.result
+                                  ? `${g.data.totalBetsClaimed}}/${
+                                      g.data.options[g.data.result].totalBets
+                                    }`
+                                  : "-"}
+                              </td>
+                              <td>{showState(game_state(g.data))}</td>
+                            </motion.tr>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </tbody>
+                  </table>
+                  {!!games.length && stats && (
+                    <div className={`vAligned ${styles.btns}`}>
+                      {lastGameId() - MAX_GAMES > 0 && (
+                        <Button
+                          className="button1 sm rounded"
+                          onClick={() => fetchGames(lastGameId() - MAX_GAMES)}
                         >
-                          <div className={styles.details}>
-                            <div className="img">
-                              <ImageBlob blob={g.cached.thumb1} />
-                            </div>
-                            <div className="terms">
-                              GAME {g.data.gameId}
-                              <span>{g.data.termsId}</span>
-                            </div>
-                            <span>{g.cached.definition?.title}</span>
-                          </div>
-                        </td>
-                        <td>{showState(game_state(g.data))}</td>
-                      </motion.tr>
-                    ))}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-              <div className={`vAligned ${styles.btns}`}>
-                <Button className="button1 sm rounded">Previous</Button>{" "}
-                <Button className="button1 sm rounded">Next</Button>
-              </div>
-            </fieldset>
-          </section>
+                          <Icon cType="chevron" /> Previous
+                        </Button>
+                      )}
+                      {lastGameId() + MAX_GAMES <=
+                        stats.totalGames.toNumber() && (
+                        <Button
+                          className="button1 sm rounded"
+                          onClick={() => fetchGames(lastGameId() + MAX_GAMES)}
+                        >
+                          Next <Icon cType="chevron" direction="right" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </fieldset>
+              </section>
+              <ReactTooltip id="tooltip" />
+            </>
+          )}
         </div>
       )}
     </>

@@ -129,15 +129,15 @@ const AdminHome: NextPage = () => {
                   </Button>
                 </li>
                 <li>
-                  <p>Create a new game</p>
-                  <Button>
-                    <a href="admin/game">New Game</a>
-                  </Button>
-                </li>
-                <li>
                   <p>Edit existing games</p>{" "}
                   <Button>
                     <a href="admin/games">Manage Games</a>
+                  </Button>
+                </li>
+                <li>
+                  <p>Create a new game</p>
+                  <Button>
+                    <a href="admin/game">New Game</a>
                   </Button>
                 </li>
               </ul>

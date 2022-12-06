@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import styles from "./DefaultGame.module.scss";
 import dynamic from "next/dynamic";
 import { GamePropsType, DefaultGamePropsType } from "./types";
@@ -14,17 +14,18 @@ const Results = dynamic(() => import("./results"));
 const CTA = dynamic(() => import("./cta"));
 
 function DefaultGame({ template, ...props }: DefaultGamePropsType) {
+  const gameState = game_state(props.game.data);
   return (
     <>
-      <motion.ul className="vAligned">
-        <li>
-          Open<div>{format_time(props.game.data.openTime)}</div>
+      <motion.ul className={styles.states}>
+        <li className={gameState === "Open" ? "active" : ""}>
+          Open<time>{format_time(props.game.data.openTime)}</time>
         </li>
-        <li>
-          Closed<div>{format_time(props.game.data.closeTime)}</div>
+        <li className={gameState === "Closed" ? "active" : ""}>
+          Closed<time>{format_time(props.game.data.closeTime)}</time>
         </li>
-        <li>
-          Settled<div>{format_time(props.game.data.settleTime)}</div>
+        <li className={gameState === "Settled" ? "active" : ""}>
+          Settled<time>{format_time(props.game.data.settleTime)}</time>
         </li>
       </motion.ul>
       <Definition
@@ -34,8 +35,13 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         setTerms={props.setTerms}
         setMainModal={props.setMainModal}
       />
-      <Stats template={template} game={props.game} />
-      {game_state(props.game.data) === "Open" && (
+      <Stats
+        template={template}
+        game={props.game}
+        prevGame={props.prevGame}
+        setMainModal={props.setMainModal}
+      />
+      {gameState === "Open" && (
         <StakeButtons
           template={template}
           solanaProgram={props.solanaProgram}
@@ -54,22 +60,26 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
           playerBets={props.playerBets}
         />
       )}
-      {!!props.game.data.settledAt && !!props.myBets.length && (
-        <Results
-          template={template}
-          game={props.game}
-          publickey={props.publickey}
-          myBets={props.myBets}
-          playerBets={props.playerBets}
-        />
-      )}
+      <AnimatePresence>
+        {!!props.game.data.settledAt && !!props.myBets.length && (
+          <Results
+            template={template}
+            game={props.game}
+            myBets={props.myBets}
+          />
+        )}
+      </AnimatePresence>
       <CTA
+        publickey={props.publickey}
         template={template}
         game={props.game}
         prevGame={props.prevGame}
         myBets={props.myBets}
         playerBets={props.playerBets}
         handleClaim={props.handleClaim}
+        solFiatPrice={props.solFiatPrice}
+        modals={props.modals}
+        setModals={props.setModals}
       />
     </>
   );

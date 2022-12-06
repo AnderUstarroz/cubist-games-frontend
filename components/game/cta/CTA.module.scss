@@ -1,11 +1,151 @@
 .CTA {
   position: fixed;
+  z-index: 1;
   left: 0;
   bottom: 0;
   width: 100%;
-  background-color: red;
+  background: var(--CTABg);
+}
+.btns,
+.leftCTA,
+.centerCTA,
+.rightCTA {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
 }
 
-.firstRow {
+.btns {
+  padding: 24px 24px 20px 24px;
+}
+
+.leftCTA {
+  flex: 1;
+}
+.centerCTA {
+  flex: 1;
+  justify-content: center;
+  gap: 35px;
+}
+.rightCTA {
+  flex: 1;
+  justify-content: flex-end;
+}
+.myBetsBtn {
+  svg {
+    transform: rotate(90deg);
+    transition-duration: 0.3s;
+    transition-property: transform;
+  }
+  &:global {
+    &.showBets {
+      svg {
+        transform: rotate(270deg);
+      }
+    }
+  }
+}
+.myBetsWrapper {
+  max-height: 0;
+  transition: max-height 0.25s ease-in-out;
+  &:global {
+    &.showBets {
+      max-height: 330px;
+    }
+  }
+}
+
+.claimBtn {
+  padding: 5px 20px;
+  border-radius: 50px;
   display: flex;
+  align-items: center;
+  gap: 10px;
+  strong {
+    font-size: var(--fontSizeXS);
+  }
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 8px;
+    &:last-of-type {
+      gap: 2px;
+      align-items: flex-start;
+    }
+  }
+  i {
+    font-style: unset;
+    font-size: 5px;
+  }
+}
+
+.pot,
+.pot i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pot {
+  gap: 5px;
+  > div {
+    display: flex;
+    flex-direction: column;
+    > label {
+      font-size: var(--fontSizeXS);
+    }
+  }
+  i {
+    border: 2px solid var(--color0);
+    border-radius: 50%;
+    padding: 5px;
+  }
+}
+.burning {
+  color: var(--color1);
+  animation: fadeText 2s infinite;
+  i {
+    border-color: var(--color1);
+  }
+}
+.sol {
+  display: flex;
+  background-color: var(--color0);
+  border-radius: 50%;
+  padding: 3px;
+}
+
+@keyframes fadeText {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .btns {
+    flex-wrap: wrap;
+    padding: 8px;
+  }
+  .leftCTA {
+    flex: 1 1 30%;
+  }
+  .centerCTA {
+    justify-content: space-between;
+    flex: 1 1 60%;
+  }
+  .rightCTA {
+    width: 100%;
+    justify-content: space-between;
+    > button {
+      flex: 1;
+      justify-content: center;
+    }
+  }
 }

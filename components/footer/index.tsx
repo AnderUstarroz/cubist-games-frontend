@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
+import { FooterPropsType } from "./types";
 
 const size = 12;
 
@@ -14,9 +15,11 @@ const animation = {
   whileTap: { scale: 0.95 },
 };
 
-export default function Footer() {
+export default function Footer({ className }: FooterPropsType) {
   return (
-    <motion.footer className={styles.footer}>
+    <motion.footer
+      className={`${styles.footer}${className ? ` ${className}` : ""}`}
+    >
       <div>
         {!!process.env.NEXT_PUBLIC_SITE_NAME && (
           <Link href="/">

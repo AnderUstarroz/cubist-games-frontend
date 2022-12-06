@@ -1,17 +1,67 @@
 .swiper {
-  background: blue;
-  width: 200px;
-  height: 200px;
+  width: 100%;
 
   & :global {
     .swiper-button-next,
     .swiper-button-prev {
-      background-color: yellow;
       top: 15px;
     }
-    .swiper-button-next:after,
-    .swiper-button-prev:after {
-      font-size: 10px;
+    .swiper-button-next,
+    .swiper-button-prev {
+      top: 50px;
+      &::after {
+        font-size: 10px;
+        color: var(--iconFill1);
+      }
+    }
+    .swiper-slide {
+      padding: 20px 20px 40px 20px;
+      h4 {
+        margin: 0 25px 8px 25px;
+        text-align: center;
+      }
+      .betOptDesc {
+        text-align: center;
+        margin: 0 25px 16px 25px;
+      }
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        grid-gap: 8px;
+        margin-bottom: 24px;
+
+        li {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          button {
+            width: 100%;
+            justify-content: center;
+          }
+          &:nth-child(2n + 1),
+          &:nth-child(2n + 2) {
+            flex: 0 0 calc(50% - 4px);
+          }
+        }
+      }
+      .customStake {
+        input {
+          width: 100%;
+        }
+      }
+    }
+    button:hover {
+      background-color: var(--inputColor0);
+    }
+
+    // Create dot colors
+    @for $i from 0 through 25 {
+      .swiper-pagination-bullet:nth-of-type(#{$i + 1}) {
+        background-color: var(--opt#{$i});
+      }
     }
   }
 }

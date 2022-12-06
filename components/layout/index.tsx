@@ -41,7 +41,13 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
         </Headroom>
       )}
       <main>{children}</main>
-      {!!showLayout && <Footer />}
+      {!!showLayout && (
+        <Footer
+          className={
+            router.pathname.slice(0, 6) === "/game/" ? "gameFooter" : ""
+          }
+        />
+      )}
     </>
   );
 }

@@ -1,0 +1,42 @@
+.timer {
+  position: relative;
+  top: -3px;
+
+  & :global {
+    // Themes
+    .theme-default {
+      --text-color: #2b365b;
+      --text-bottom-color: #2b365b;
+      --background-color: #bdcfdf;
+      --background-bottom-color: #bdcfdf;
+    }
+
+    .flip-countdown {
+      display: flex;
+      .flip-countdown-piece {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      &.size-extra-small .flip-countdown-piece .flip-countdown-title {
+        font-size: var(--fontSizeXS);
+      }
+    }
+  }
+
+  &:global.timerBlink {
+    text-decoration: blink;
+    animation-name: blinker;
+    animation-duration: 0.65s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+
+    .flip-countdown {
+      --text-color: var(--color0);
+      --text-bottom-color: var(--color0);
+      --background-color: var(--errorBg);
+      --background-bottom-color: var(--errorBg);
+    }
+  }
+}

@@ -55,7 +55,7 @@ export default function StakeButtons({
                 }
               />
             </div>
-            <div className="vAligned  mb-med">
+            <div className={`vAligned gap0 mb-med ${styles.stakeInputs}`}>
               <label className="overlap">
                 <Input
                   name="minStake"

@@ -47,7 +47,7 @@
         -o-transition: background-color 0.5s ease-out;
         transition: background-color 0.5s ease-out;
         border-radius: 2px;
-        padding: 5px 20px;
+        padding: 10px 20px 5px 20px;
 
         &:hover {
           background-color: rgba(1, 1, 1, 0.2);
@@ -65,14 +65,29 @@
             height: 10px;
           }
         }
+        &:nth-of-type(2) {
+          position: relative;
+        }
       }
     }
   }
 }
 .opDesc {
+  margin: 3px 0;
   font-size: var(--fontSizeSmall);
   * {
     margin: 0;
+  }
+}
+.opStats {
+  position: absolute;
+  top: -7px;
+  display: flex;
+  gap: 10px;
+  font-size: var(--fontSizeXS);
+  span {
+    background: var(--boxBg0);
+    border: 1px solid var(--inputBorder0);
   }
 }
 .outcome {

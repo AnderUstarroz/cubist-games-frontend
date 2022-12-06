@@ -1,0 +1,12 @@
+.terms {
+  cursor: pointer;
+  > div {
+    > span {
+      transition: color 1s ease-in-out;
+      color: var(--color12);
+      &:hover {
+        color: var(--color0);
+      }
+    }
+  }
+}

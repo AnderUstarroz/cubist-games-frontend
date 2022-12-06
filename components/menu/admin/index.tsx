@@ -54,7 +54,7 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
           </Button>
           <Button cType="transparent">
             <Link href="/admin/game">
-              <a title="Settings" onClick={toggle}>
+              <a rel="noopener" title="Settings" onClick={toggle}>
                 New Game
               </a>
             </Link>

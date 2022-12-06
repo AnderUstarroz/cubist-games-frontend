@@ -29,8 +29,12 @@ export default function GamesList({
             <tbody>
               <AnimatePresence>
                 {!games.length ? (
-                  <motion.tr key={`game-${state}-${0}`} {...DEFAULT_ANIMATION}>
-                    <td></td>
+                  <motion.tr
+                    className="empty"
+                    key={`game-${state}-${0}`}
+                    {...DEFAULT_ANIMATION}
+                  >
+                    <td title="No games" style={{ height: 80 }}></td>
                   </motion.tr>
                 ) : (
                   games.map((g: GameType, k: number) => {
@@ -54,22 +58,23 @@ export default function GamesList({
                           >
                             <div className="gameCard">
                               <div className="img">
-                                {/* {g.data.fireThreshold &&
-                                  g.data.fireThreshold >= pot && <Fire />} */}
-                                <Fire />
                                 <ImageBlob blob={g.cached.thumb1} />
+                                {!!g.data.fireThreshold &&
+                                  g.data.fireThreshold <= pot && (
+                                    <Fire partSize={40} />
+                                  )}
                               </div>
-                              <div
-                                className={`terms optBg${
-                                  termsIds[g.data.termsId] % 25
-                                }`}
-                              >
-                                {g.data.termsId}
-                              </div>
-                              <h4>
+                              <div className="terms">
                                 <strong>GAME {g.data.gameId}</strong>
-                                {g.cached.definition?.title}
-                              </h4>
+                                <span
+                                  className={`optBg${
+                                    termsIds[g.data.termsId] % 25
+                                  }`}
+                                >
+                                  {g.data.termsId}
+                                </span>
+                              </div>
+                              <h4>{g.cached.definition?.title}</h4>
                             </div>
                           </a>
                         </td>

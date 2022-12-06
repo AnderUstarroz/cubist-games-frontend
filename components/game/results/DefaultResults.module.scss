@@ -1,0 +1,36 @@
+.results {
+  margin: 0 0 100px 0;
+  h2 {
+  }
+  h4 {
+    margin: 12px 16px;
+    font-size: var(--fontSizeBig);
+  }
+  > div {
+    background-color: var(--boxBg1);
+    border: 1px solid var(--inputBorder0);
+    border-radius: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fontSizeXS);
+    background-color: var(--boxBg0);
+    border: 1px solid var(--inputBorder0);
+
+    th,
+    td {
+      padding: 16px;
+      text-align: left;
+    }
+    th {
+      color: var(--inputColor0);
+    }
+    td {
+      border-top: 1px solid var(--inputBorder0);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+}

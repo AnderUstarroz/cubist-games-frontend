@@ -1,4 +1,5 @@
 @import "./fonts.scss";
+@import "./animations.scss";
 @import "./markdown-editor.scss";
 @import "./games-table.scss";
 
@@ -75,11 +76,17 @@ a {
 .centered {
   justify-content: center;
 }
+.separated {
+  justify-content: space-between;
+}
 .textCenter {
   text-align: center;
 }
 .jCSB {
   justify-content: space-between;
+}
+.gap0 {
+  gap: 0;
 }
 .gap5 {
   gap: 5px;
@@ -139,6 +146,11 @@ label {
   }
   > input {
     position: relative;
+  }
+  > button {
+    position: absolute;
+    top: calc(50% - 10px);
+    right: 15px;
   }
 }
 svg {
@@ -264,7 +276,9 @@ button {
 .flex {
   display: flex;
 }
-
+.fEnd {
+  justify-content: flex-end;
+}
 .fullWidth {
   width: 100%;
 }
@@ -273,6 +287,20 @@ button {
 }
 .mb-big {
   margin-bottom: 30px;
+}
+
+.circleBg,
+.circleBorder {
+  display: flex;
+  padding: 3px;
+  border-radius: 50%;
+}
+.circleBg {
+  background-color: var(--color1);
+}
+.circleBorder {
+  border-width: 1px;
+  border-style: solid;
 }
 
 // Generate option colors
@@ -292,6 +320,10 @@ button {
   color: var(--color0);
 }
 
+.gameFooter {
+  padding: 20px 20px 100px 20px !important;
+}
+
 @media (max-width: 768px) {
   .mWrap {
     flex-flow: wrap;
@@ -299,5 +331,12 @@ button {
   .mobileCol {
     align-items: baseline;
     flex-direction: column;
+  }
+  .hiddenMobile {
+    display: none;
+  }
+  .fullCol {
+    flex: unset;
+    width: 100%;
   }
 }

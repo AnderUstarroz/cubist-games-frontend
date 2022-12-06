@@ -34,6 +34,7 @@ export interface GamePropsType {
   myBets: MyBetType[];
   playerBets: PlayerBetsType | null;
   handleClaim: Function;
+  solFiatPrice: number | null;
 }
 
 export interface DefaultGamePropsType extends GamePropsType {}

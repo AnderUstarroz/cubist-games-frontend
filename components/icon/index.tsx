@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { IconType, IconTypes } from "./types";
 
 const Icons: IconTypes = {
+  arrow: dynamic(() => import("./arrow")),
   info: dynamic(() => import("./info")),
   close: dynamic(() => import("./close")),
   dashboard: dynamic(() => import("./dashboard")),
@@ -25,12 +26,15 @@ const Icons: IconTypes = {
   chevron: dynamic(() => import("./chevron")),
   web: dynamic(() => import("./web")),
   time: dynamic(() => import("./time")),
+  notification: dynamic(() => import("./notification")),
+  forbidden: dynamic(() => import("./forbidden")),
 };
 
-function Icon(props: IconType) {
-  const IconWrapper = Icons.hasOwnProperty(props.cType)
-    ? Icons[props.cType]
-    : React.Fragment;
+function Icon({ cType, ...props }: IconType) {
+  if (!Icons.hasOwnProperty(cType)) {
+    throw Error(`The <Icon cType="${cType}"> does not exist`);
+  }
+  const IconWrapper = Icons[cType];
   return <IconWrapper {...props} />;
 }
 

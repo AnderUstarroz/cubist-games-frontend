@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@cubist-collective/cubist-games-lib": "link:../cubist-games-lib",
+    "@rumess/react-flip-countdown": "^1.2.6",
     "@uiw/react-md-editor": "^3.19.0",
     "date-fns": "^2.29.3",
     "framer-motion": "^7.3.2",
@@ -25,7 +26,7 @@
     "react-hot-toast": "^2.3.0",
     "react-modal": "^3.15.1",
     "react-select": "^5.5.0",
-    "react-tooltip": "^4.5.0",
+    "react-tooltip": "^4.5.1",
     "sass": "^1.54.9",
     "slugify": "^1.6.5",
     "swiper": "^8.4.4",

@@ -3,7 +3,6 @@ import { GameSettingsInputType } from "./game-settings";
 export interface OptionType {
   title: string;
   description: string;
-  color: string;
 }
 export interface DefinitionInputsType {
   loading: boolean;
@@ -51,17 +50,21 @@ export interface PrevGameType {
 
 export interface CustomStakeType {
   id: number;
-  title: string;
-  description: string;
-  color: string;
   stake: string;
   error: boolean;
+  loading: boolean;
 }
 
 export interface GameTermsType {
   agreed: boolean;
   id: string;
   hash: string;
+  title: string;
+  description: string;
+}
+
+export interface WarningMsgType {
+  show: boolean;
   title: string;
   description: string;
 }

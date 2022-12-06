@@ -1,0 +1,59 @@
+.stats {
+  margin-bottom: 40px;
+  h2 {
+    font-size: 24px;
+    margin: 0 32px 15px 0;
+  }
+  ul {
+    background-color: var(--boxBg0);
+    border: 1px solid var(--inputBorder0);
+    border-radius: 8px;
+    padding: 32px;
+
+    li {
+      margin: 0 0 20px 0;
+    }
+  }
+}
+.statsDef {
+  margin: 0 0 5px 0;
+  gap: 8px;
+  > div {
+    height: 2px;
+  }
+  span {
+    cursor: pointer;
+    font-size: var(--fontSizeXS);
+    transition: color 1s ease-in-out;
+    &:hover {
+      color: var(--color0);
+    }
+  }
+}
+
+.statsBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  > div {
+    height: 2px;
+  }
+}
+
+.award {
+  margin-left: 5px;
+  display: flex;
+  flex-direction: column;
+  p {
+    margin: 0;
+    font-size: var(--fontSizeXS);
+  }
+}
+
+@media (max-width: 768px) {
+  .stats {
+    h2 {
+      margin: 0 32px 15px 32px;
+    }
+  }
+}

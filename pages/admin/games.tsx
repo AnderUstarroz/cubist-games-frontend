@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../../styles/AdminGames.module.scss";
-import ReactTooltip from "react-tooltip";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import {
   flashError,
@@ -40,12 +39,14 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 import { human_number } from "../../components/utils/number";
+import Link from "next/link";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Button = dynamic(() => import("../../components/button"));
 const Icon = dynamic(() => import("../../components/icon"));
 const ImageBlob = dynamic(() => import("../../components/image-blob"));
 const Spinner = dynamic(() => import("../../components/spinner"));
+const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 
 const showState = (state: GameStateOutputType) => {
   switch (state) {
@@ -80,7 +81,7 @@ const Games: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
   const [authority, _setAuthority] = useState<PublicKey>(
@@ -170,10 +171,6 @@ const Games: NextPage = () => {
     })();
   }, [stats]);
 
-  useEffect(() => {
-    ReactTooltip.rebuild();
-  });
-
   const termsHash = config
     ? config.terms.reduce((acc: any, t: TermsType, k: number) => {
         acc[t.id] = k;
@@ -211,7 +208,7 @@ const Games: NextPage = () => {
                       <tr>
                         <th>Game</th>
                         <th>Pot</th>
-                        <th>Prices claimed</th>
+                        <th className="hiddenMobile">Prices claimed</th>
                         <th className="textCenter">State</th>
                       </tr>
                     </thead>
@@ -225,28 +222,27 @@ const Games: NextPage = () => {
                           );
                           return (
                             <motion.tr key={`game-${k}`} {...DEFAULT_ANIMATION}>
-                              <td
-                                title="Edit game"
-                                onClick={() =>
-                                  Router.push(`/admin/game?id=${g.data.gameId}`)
-                                }
-                              >
-                                <div className="gameCard">
-                                  <div className="img">
-                                    <ImageBlob blob={g.cached.thumb1} />
-                                  </div>
-                                  <div
-                                    className={`terms optBg${
-                                      termsHash[g.data.termsId] % 25
-                                    }`}
-                                  >
-                                    {g.data.termsId}
-                                  </div>
-                                  <h4>
-                                    <strong>GAME {g.data.gameId}</strong>
-                                    {g.cached.definition?.title}
-                                  </h4>
-                                </div>
+                              <td>
+                                <Link href={`/admin/game?id=${g.data.gameId}`}>
+                                  <a title="Edit game">
+                                    <div className="gameCard">
+                                      <div className="img">
+                                        <ImageBlob blob={g.cached.thumb1} />
+                                      </div>
+                                      <div className="terms">
+                                        <strong>GAME {g.data.gameId}</strong>
+                                        <span
+                                          className={`optBg${
+                                            termsHash[g.data.termsId] % 25
+                                          }`}
+                                        >
+                                          {g.data.termsId}
+                                        </span>
+                                      </div>
+                                      <h4>{g.cached.definition?.title}</h4>
+                                    </div>
+                                  </a>
+                                </Link>
                               </td>
                               <td>
                                 <span
@@ -258,13 +254,19 @@ const Games: NextPage = () => {
                                       solFiatPrice as number
                                     )} USD`
                                   }
-                                  data-for="tooltip"
+                                  data-for={`potTooltip${k}`}
                                 >
                                   {human_number(pot, 2)} SOL
-                                  <Icon cType="info" className="icon1" />
+                                  {!!solFiatPrice && (
+                                    <Icon cType="info" className="icon1" />
+                                  )}
                                 </span>
+                                <ReactTooltip
+                                  id={`potTooltip${k}`}
+                                  globalEventOff="click"
+                                />
                               </td>
-                              <td>
+                              <td className="hiddenMobile">
                                 {g.data.result
                                   ? `${g.data.totalBetsClaimed}}/${
                                       g.data.options[g.data.result].totalBets
@@ -301,7 +303,6 @@ const Games: NextPage = () => {
                   )}
                 </fieldset>
               </section>
-              <ReactTooltip id="tooltip" />
             </>
           )}
         </div>

@@ -24,6 +24,10 @@ html {
     --bodyImage: url(../public/images/galaxy.webp);
     --footerBg: linear-gradient(180deg, #0e1a25 0%, #10222f 100%);
     --navBg: linear-gradient(180deg, #0d191e 0%, #152a3d 100%);
+    --homeImg: url(../public/images/galaxyHomeDesktop.webp);
+    --homeImgMobile: url(../public/images/galaxyHomeMobile.webp);
+    --CTABg: linear-gradient(180deg, #152a3d 0%, #0d191e 100%);
+
     --color0: white;
     --color1: #0b1b27;
     --color2: #35b7af;
@@ -43,6 +47,7 @@ html {
     --color16: #b4b2e6;
     --color17: #1d3344fc;
     --color18: #3a46b0;
+    --color19: #15293a;
 
     --siteNameColor: linear-gradient(270deg, #bd2742 0.02%, #eb5973 149.72%);
 

@@ -5,6 +5,7 @@ import { TermsPropsType } from "./types";
 
 const Button = dynamic(() => import("../../button"));
 const Icon = dynamic(() => import("../../icon"));
+const Checkbox = dynamic(() => import("../../checkbox"));
 
 export default function Terms({
   display,
@@ -13,41 +14,37 @@ export default function Terms({
   setMainModal,
 }: TermsPropsType) {
   return (
-    <div className={styles.terms}>
-      {display ? (
-        <input
-          type="checkbox"
+    <div className={`vAligned gap5 ${styles.terms}`}>
+      {display && (
+        <Checkbox
           id="terms"
-          checked={terms.agreed}
-          onChange={() => setTerms({ ...terms, agreed: !terms.agreed })}
+          name="customStakeButton"
+          value={terms.agreed}
+          onClick={() => setTerms({ ...terms, agreed: !terms.agreed })}
         />
-      ) : (
-        ""
       )}
       <div
+        className="vAligned gap5"
         onClick={() =>
           setMainModal(
             <div className={styles.termsModal}>
               <h4>{terms.title}</h4>
               <ReactMarkdown>{terms.description as string}</ReactMarkdown>
-              {display ? (
+              {display && (
                 <div className={styles.terms}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      id="termsModal"
-                      defaultChecked={terms.agreed}
-                      onChange={() =>
-                        setTerms({ ...terms, agreed: !terms.agreed })
-                      }
-                    />
-                    I ACCEPT THESE TERMS &amp; CONDITIONS
+                  <label
+                    className="vAligned gap5 mb-med"
+                    onClick={() => {
+                      setTerms({ ...terms, agreed: !terms.agreed });
+                      setMainModal("", false);
+                    }}
+                  >
+                    <Checkbox id="termsModal" value={terms.agreed} />I accept
+                    these Terms &amp; Conditions
                   </label>
                 </div>
-              ) : (
-                ""
               )}
-              <div>
+              <div className="flex centered">
                 <Button onClick={() => setMainModal("", false)}>Close</Button>
               </div>
             </div>,
@@ -55,10 +52,8 @@ export default function Terms({
           )
         }
       >
-        <span className="subMsg">
-          {`${display ? "I accept the " : ""}Terms & Conditions`}
-        </span>{" "}
-        <Icon cType="info" width={15} height={15} />
+        <span>{`${display ? "I accept the " : ""}Terms & Conditions`}</span>{" "}
+        <Icon cType="info" className="icon3" />
       </div>
     </div>
   );

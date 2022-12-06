@@ -1,4 +1,4 @@
-import { FirePropsType } from "./types"
+import { FirePropsType } from "./types";
 
 export default function Fire(props: FirePropsType) {
   return (
@@ -13,8 +13,8 @@ export default function Fire(props: FirePropsType) {
           -webkit-filter: blur(${props.blur ? props.blur : 0.48}px);
           margin: 3em auto 0 auto;
           position: relative;
-          width: ${props.width ? props.width : 20}px;
-          height: ${props.height ? props.height : 20}px;
+          width: ${props.width ? props.width : 55}px;
+          height: ${props.height ? `${props.height}px` : "auto"};
         }
         .particle {
           animation: rise ${props.duration ? props.duration : 1}s ease-in
@@ -50,7 +50,7 @@ export default function Fire(props: FirePropsType) {
       <style jsx>{`
         ${[...Array(60).keys()]
           .map(
-            k =>
+            (k) =>
               `.particle:nth-of-type(${k + 1}){animation-delay: ${
                 Math.random() * (props.duration ? props.duration : 1)
               }s;left: calc((100% - ${
@@ -60,5 +60,5 @@ export default function Fire(props: FirePropsType) {
           .join("")}
       `}</style>
     </div>
-  )
+  );
 }

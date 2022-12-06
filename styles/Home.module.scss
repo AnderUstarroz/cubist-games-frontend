@@ -11,3 +11,61 @@
     padding: 0;
   }
 }
+
+.title {
+  font-size: 50px;
+  padding: 65px;
+  border-radius: 16px;
+  background-image: var(--homeImg);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  img {
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+  }
+  i {
+    flex: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(
+      180deg,
+      #7ebbf4 0%,
+      #94d0fd 44.27%,
+      #c6e5ff 100%
+    );
+  }
+  span {
+    background: -webkit-linear-gradient(#7ebbf4, #94d0fd, #c6e5ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: var(--h1Size);
+    background-image: var(--homeImgMobile);
+    padding: 25px;
+    margin: 0 8px 25px 8px;
+  }
+  .content {
+    section {
+      h2 {
+        margin-left: 24px;
+      }
+      fieldset {
+        margin: 0 8px;
+      }
+    }
+  }
+}

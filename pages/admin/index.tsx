@@ -8,7 +8,6 @@ import {
   is_authorized,
 } from "../../components/utils/helpers";
 import { useEffect, useState } from "react";
-import ReactTooltip from "react-tooltip";
 import Router from "next/router";
 import { PublicKey } from "@solana/web3.js";
 import {
@@ -39,6 +38,7 @@ import { human_number } from "../../components/utils/number";
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Button = dynamic(() => import("../../components/button"));
 const Icon = dynamic(() => import("../../components/icon"));
+const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 
 const AdminHome: NextPage = () => {
   const { data } = useSWR("/api/idl", fetcher);
@@ -57,10 +57,6 @@ const AdminHome: NextPage = () => {
   const [solanaProgram, setSolanaProgram] = useState<SolanaProgramType | null>(
     null
   );
-
-  useEffect(() => {
-    ReactTooltip.rebuild();
-  });
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
@@ -155,7 +151,7 @@ const AdminHome: NextPage = () => {
                       <h3>
                         Total profits:{" "}
                         <span
-                          data-for="tooltip"
+                          data-for="profitsTooltip"
                           data-tip={
                             !!solFiatPrice &&
                             `${solana_to_usd(
@@ -169,6 +165,10 @@ const AdminHome: NextPage = () => {
                           <Icon cType="info" className="icon1" />
                         </span>
                       </h3>
+                      <ReactTooltip
+                        id="profitsTooltip"
+                        globalEventOff="click"
+                      />
                     </div>
                     <div>
                       <h3>
@@ -182,7 +182,6 @@ const AdminHome: NextPage = () => {
           </section>
         </div>
       )}
-      <ReactTooltip id="tooltip" />
     </>
   );
 };

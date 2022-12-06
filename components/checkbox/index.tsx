@@ -21,6 +21,7 @@ export default function Checkbox(props: CheckboxType) {
 
   return (
     <motion.svg
+      id={props.id}
       initial={props.value}
       animate={props.value ? "checked" : "unchecked"}
       whileHover="hover"
@@ -29,6 +30,7 @@ export default function Checkbox(props: CheckboxType) {
       height={props.height ? props.height : 30}
       viewBox="0 0 440 440"
       onClick={props.onClick}
+      onChange={props.onChange}
       className={props.className ? props.className : styles.default}
     >
       <motion.path

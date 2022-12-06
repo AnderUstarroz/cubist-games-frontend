@@ -1,10 +1,15 @@
-import { GameType } from "../../../pages/types/game";
+import { GameType, PrevGameType } from "../../../pages/types/game";
 
 export interface DefaultStatsPropsType {
   game: GameType;
+  prevGame: PrevGameType;
+  setMainModal: Function;
 }
 
-export interface StatsPropsType {
+export interface StatsPropsType extends DefaultStatsPropsType {
   template: string | null;
-  game: GameType;
+}
+
+export interface StakesType {
+  [key: number]: string;
 }

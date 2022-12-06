@@ -77,7 +77,7 @@ export default function GeneralSettings({
                 }
               />
             </div>
-            <label className="overlap fullCol   mb-med">
+            <label className="overlap fullCol mb-med">
               <Input
                 name="fireThreshold"
                 type="number"

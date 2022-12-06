@@ -33,6 +33,7 @@ export const game_state = (
   return "Closed";
 };
 
+// Returns POT in SOL
 export const get_pot = (game: GameSettingsInputType): number => {
   return game.options.reduce(
     (acc: number, current: OptionInputType) => acc + current.totalStake,

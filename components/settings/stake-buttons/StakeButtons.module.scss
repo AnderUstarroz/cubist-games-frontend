@@ -4,7 +4,6 @@
   align-items: center;
   flex-flow: wrap;
   gap: 20px;
-
   li {
     display: flex;
     align-items: center;
@@ -15,6 +14,23 @@
       background: var(--opt0);
       border-radius: 4px;
       padding: 6px 0px;
+    }
+  }
+}
+
+.stakeInputs {
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .stakeInputs {
+    width: 100%;
+    justify-content: space-between;
+    label {
+      flex: 1;
+      input {
+        width: 100%;
+      }
     }
   }
 }

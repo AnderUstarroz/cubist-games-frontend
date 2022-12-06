@@ -1,10 +1,10 @@
-import styles from "./Flame.module.scss"
-import { FlamePropsType } from "./types"
+import styles from "./Flame.module.scss";
+import { FlamePropsType } from "./types";
 
-export default function Flame(props: FlamePropsType) {
+export default function Flame({ active, children, ...props }: FlamePropsType) {
   return (
-    <div className={styles.container}>
-      {props.active ? (
+    <div className={styles.container} {...props}>
+      {active ? (
         <>
           <div className={styles.flameWrapper}>
             <div className={styles.fire}>
@@ -49,9 +49,8 @@ export default function Flame(props: FlamePropsType) {
         ""
       )}
       <div className={styles.content}>
-        {props.active ? <div className={styles.contentBg}></div> : ""}
-        <div className={styles.children}>{props.children}</div>
+        <div className={styles.children}>{children}</div>
       </div>
     </div>
-  )
+  );
 }

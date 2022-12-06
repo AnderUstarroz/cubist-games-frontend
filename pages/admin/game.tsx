@@ -212,8 +212,8 @@ const Game: NextPage = () => {
     title: "",
     description: "",
     options: [
-      { title: "", description: "", color: "#53BC46" },
-      { title: "", description: "", color: "#CF4E4E" },
+      { title: "", description: "" },
+      { title: "", description: "" },
     ],
   });
   const [definitionErrors, setDefinitionErrors] = useState<{
@@ -563,7 +563,7 @@ const Game: NextPage = () => {
 
   // STEP 3 - Fetch Game
   useEffect(() => {
-    if (!stats || !solanaProgram || !config || !pdas) return;
+    if (!stats || !solanaProgram || !config || !pdas || pdas.game) return;
     (async () => {
       const gameId = new BN(
         router.query.id
@@ -601,7 +601,7 @@ const Game: NextPage = () => {
         // Show Info message when games cannot be edited
         if (existingGame.hasBets && !existingGame.settledAt) {
           flashMsg(
-            "The game cannot be edited because it already has bets",
+            "Ongoing games cannot be modified, but you can still activate/deactivate, set outcome and add warning messages.",
             "info"
           );
         }
@@ -735,9 +735,9 @@ const Game: NextPage = () => {
                                 <div>
                                   <h4>Activate/Deactivate games</h4>
                                   <p>
-                                    Only active games can accept bets. Disabled
-                                    games won&apos;t be displayed in the games
-                                    list.
+                                    Deactivated games won&apos;t be displayed in
+                                    the games list. Only active games can accept
+                                    bets.
                                   </p>
                                 </div>
                               )
@@ -966,12 +966,20 @@ const Game: NextPage = () => {
                         <div>
                           <div className={`optBg${k}`}></div>
                         </div>
-                        <div>
+                        <div className="fullCol">
                           <h6 className={`optColor${k}`}>
                             <Markdown>{o.title}</Markdown>
                           </h6>
                           <div className={styles.opDesc}>
                             <Markdown>{o.description}</Markdown>
+                          </div>
+                          <div className={styles.opStats}>
+                            <span>
+                              Bets: {gameSettings.options[k].totalBets}
+                            </span>{" "}
+                            <span>
+                              Stake: {gameSettings.options[k].totalStake} SOL
+                            </span>
                           </div>
                         </div>
                       </li>
@@ -1189,7 +1197,6 @@ const Game: NextPage = () => {
                             {
                               title: ``,
                               description: "",
-                              color: "#000000",
                             },
                           ],
                         })

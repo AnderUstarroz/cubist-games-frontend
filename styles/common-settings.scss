@@ -44,8 +44,12 @@
     margin: 0 48px 40px 48px;
   }
   .content {
+    padding-top: 100px;
     section h2 {
       margin-left: 48px;
+    }
+    fieldset {
+      padding: 32px 24px;
     }
   }
   .flexCols {

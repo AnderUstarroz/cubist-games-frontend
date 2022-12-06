@@ -1,6 +1,6 @@
 .container {
   position: relative;
-  padding: 50px 0 50px 0;
+  // padding: 50px 0 50px 0;
   > svg {
     position: absolute;
     z-index: -1;
@@ -26,14 +26,24 @@
 }
 .flameWrapper {
   position: absolute;
-  top: -105px;
+  top: -155px;
   z-index: 1;
-  left: 50%;
+  left: 70px;
   margin: 0 0 -30px -100px;
-  width: 200px;
+  width: 150px;
   height: 200px;
   overflow: hidden;
   border-radius: 100%;
+  &::before {
+    content: "";
+    width: 100px;
+    height: 60px;
+    bottom: 2px;
+    left: 25px;
+    position: absolute;
+    border-radius: 50%;
+    background-color: #ff9800;
+  }
   .fire {
     filter: url(#goo);
     position: absolute;
@@ -98,30 +108,8 @@
     transform: translateY(-175px) translateX(-50px) scale(1);
   }
 }
-.content {
-  position: absolute;
-  width: 130px;
-  left: 50%;
-  margin-left: -65px;
-}
-.contentBg {
-  position: absolute;
-  top: -15px;
-  overflow: hidden;
-  width: 130px;
-  height: 70px;
-  &:before {
-    content: "";
-    margin: auto;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: #ff9800;
-  }
-}
+
 .children {
   position: relative;
   z-index: 1;
-  top: -20px;
 }

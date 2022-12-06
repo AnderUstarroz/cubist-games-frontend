@@ -35,12 +35,12 @@ import {
   PrevGameType,
   CustomStakeType,
   GameTermsType,
+  WarningMsgType,
 } from "../types/game";
 import { flashError, flashMsg } from "../../components/utils/helpers";
-import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import { fetch_games, fetch_terms } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { update_prev_game } from "../../components/utils/game";
 import { useInterval } from "../../components/utils/helpers";
@@ -54,9 +54,14 @@ import "swiper/css";
 import "swiper/css/lazy";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 
 const Game = dynamic(() => import("../../components/game"));
+const Spinner = dynamic(() => import("../../components/spinner"));
 const Modal = dynamic(() => import("../../components/modal"));
+const Icon = dynamic(() => import("../../components/icon"));
+const Markdown = dynamic(() => import("../../components/markdown"));
+const Button = dynamic(() => import("../../components/button"));
 
 const GamePage: NextPage = ({ data, path }: any) => {
   const { publicKey, wallet, sendTransaction } = useWallet();
@@ -64,6 +69,11 @@ const GamePage: NextPage = ({ data, path }: any) => {
   const { connection } = useConnection();
   const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
+  const [warningMsg, setWarningMsg] = useState<WarningMsgType>({
+    show: false,
+    title: "",
+    description: "",
+  });
   const [terms, setTerms] = useState<GameTermsType>({
     agreed: false,
     id: "",
@@ -77,20 +87,17 @@ const GamePage: NextPage = ({ data, path }: any) => {
   );
   const [customStake, setCustomStake] = useState<CustomStakeType>({
     id: 0,
-    title: "",
-    description: "",
-    color: "",
     stake: "1.0",
     error: false,
+    loading: false,
   });
-  const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
   const [myBets, setMyBets] = useState<MyBetType[]>([]);
   const [playerBets, setPlayerBets] = useState<PlayerBetsType | null>(null);
   const [refreshGame, setRefreshGame] = useState<boolean>(false);
   const [prevGame, setPrevGame] = useState<PrevGameType | null>(null);
   const [modals, setModals] = useState({
     main: false,
-    customStake: false,
+    bet: false,
   });
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
@@ -191,13 +198,19 @@ const GamePage: NextPage = ({ data, path }: any) => {
     } catch (e) {}
   };
 
+  const fetchInfo = async (hash: string) => {
+    const r = await fetch(`https://arweave.net/${hash}`);
+    if (r.ok) {
+      const data = await r.json();
+      setWarningMsg({ ...data, show: true });
+    }
+  };
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
     if (!data || solanaProgram || pdas) return;
     (async () => {
       // Init
       setSolFiatPrice(await solana_fiat_price());
-      setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
           ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
@@ -217,7 +230,8 @@ const GamePage: NextPage = ({ data, path }: any) => {
 
   // STEP 2 - Fetch Game
   useEffect(() => {
-    if (!connection || !solanaProgram || !pdas || game || terms.id) return;
+    if (!connection || !solanaProgram || !pdas || prevGame || game || terms.id)
+      return;
     let websocket: null | number = null;
     (async () => {
       // Populate Settings using existing Game
@@ -229,6 +243,9 @@ const GamePage: NextPage = ({ data, path }: any) => {
       setSystemConfig(
         await solanaProgram.account.systemConfig.fetch(pdas.systemConfig.pda)
       );
+      if (fetchedGame.data.infoHash) {
+        fetchInfo(fetchedGame.data.infoHash);
+      }
       setTerms({
         ...terms,
         ...(await fetch_terms(
@@ -265,7 +282,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
 
   // Wallet connected/Disconnected
   useEffect(() => {
-    // Reset Mybets, playerBets, pdas when disconnedted
+    // Reset Mybets, playerBets, pdas when disconnected
     if (!wallet || !publicKey || !connection || !data.idl) {
       if (myBets) setMyBets([]);
       if (playerBets) setPlayerBets(null);
@@ -282,7 +299,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
   }, [publicKey, wallet, connection, data.idl]);
 
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>{data.title}</title>
         <meta charSet="utf-8" />
@@ -329,7 +346,33 @@ const GamePage: NextPage = ({ data, path }: any) => {
           </Fragment>
         ))}
       </Head>
-      <main className={styles.main}>
+      <div className={styles.navPlaceholder}></div>
+      <AnimatePresence>
+        {warningMsg.show && (
+          <motion.div className={styles.warningMsg} {...DEFAULT_ANIMATION}>
+            <div>
+              <div>
+                <Icon cType="notification" width={35} height={39} />
+                <div>
+                  <h5>{warningMsg.title}</h5>
+                  <div>
+                    <Markdown>{warningMsg.description}</Markdown>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Button
+                  className="button1 rounded"
+                  onClick={() => setWarningMsg({ ...warningMsg, show: false })}
+                >
+                  Accept
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className={styles.content}>
         <AnimatePresence>
           {solanaProgram && pdas && systemConfig && game && prevGame ? (
             <Game
@@ -353,16 +396,17 @@ const GamePage: NextPage = ({ data, path }: any) => {
               myBets={myBets}
               playerBets={playerBets}
               handleClaim={handleClaim}
+              solFiatPrice={solFiatPrice}
             />
           ) : (
-            <div>Loading...</div>
+            <Spinner />
           )}
         </AnimatePresence>
         <Modal modalId={"main"} modals={modals} setIsOpen={setModals}>
           {mainModalContent}
         </Modal>
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 

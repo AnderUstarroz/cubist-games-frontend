@@ -220,12 +220,6 @@ export function optionsDefinitionValidator(options: OptionType[]) {
         `The title of the ${ordinal(k + 1)} option cannot be empty`
       );
     }
-    if (!/^#[\da-f]{6}$/i.test(o.color)) {
-      throw new SettingsError(
-        "options",
-        `Invalid color on ${ordinal(k + 1)} option`
-      );
-    }
   });
   const maxChar = 1000;
 }

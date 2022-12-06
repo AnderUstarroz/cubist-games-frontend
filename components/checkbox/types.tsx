@@ -7,6 +7,7 @@ export interface CheckboxType {
   value: boolean;
   width?: number;
   height?: number;
+  id?: string;
   name?: string;
   accept?: string;
 }

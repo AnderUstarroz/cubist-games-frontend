@@ -58,7 +58,6 @@ import { RechargeArweaveType } from "../../components/recharge-arweave/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { AnchorError } from "@project-serum/anchor";
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
 import { MDEditorProps } from "@uiw/react-md-editor";
 import {
   bold,
@@ -83,6 +82,7 @@ const Modal = dynamic(() => import("../../components/modal"));
 const Profits = dynamic(() => import("../../components/settings/profits"));
 const Icon = dynamic(() => import("../../components/icon"));
 const Spinner = dynamic(() => import("../../components/spinner"));
+const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 const MDEditor = dynamic<MDEditorProps>(() => import("@uiw/react-md-editor"), {
   ssr: false,
 });
@@ -402,10 +402,6 @@ const GameSettings: NextPage = () => {
     });
   };
 
-  useEffect(() => {
-    ReactTooltip.rebuild();
-  });
-
   // Init Bundlr
   useEffect(() => {
     if (!publicKey || !wallet || bundlr) return;
@@ -606,7 +602,7 @@ const GameSettings: NextPage = () => {
                                           <span>ID</span>
                                           <em
                                             data-tip="Codename to identify your Terms & Conditions"
-                                            data-for="tooltip"
+                                            data-for="termsTooltip"
                                           >
                                             <Icon
                                               cType="info"
@@ -719,7 +715,7 @@ const GameSettings: NextPage = () => {
       <Modal modalId={"main"} modals={modals} setIsOpen={setModals}>
         {mainModalContent}
       </Modal>
-      <ReactTooltip id="tooltip" />
+      <ReactTooltip id="termsTooltip" globalEventOff="click" />
     </>
   );
 };

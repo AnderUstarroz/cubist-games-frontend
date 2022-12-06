@@ -14,6 +14,7 @@ function Chevron(props: IconType) {
       width={props.width ? props.width : 10}
       height={props.height ? props.height : 10}
       style={props.direction ? directions[props.direction] : undefined}
+      className={props.className ? props.className : undefined}
       viewBox="0 0 6 8"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

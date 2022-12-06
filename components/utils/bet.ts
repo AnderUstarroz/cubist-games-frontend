@@ -114,8 +114,8 @@ export const place_bet = async (
   }
   console.log("BET:", msg);
   //Finish
-  if (modals.customStake) {
-    setModals({ ...modals, customStake: false });
+  if (modals.bet) {
+    setModals({ ...modals, bet: false });
   }
 };
 
@@ -125,7 +125,6 @@ export interface MyBetType {
   optionId: number;
   stake: number;
   title: string;
-  color: string;
   referral: string;
   signature: string;
   payment: number | null;
@@ -138,9 +137,9 @@ export const fetch_my_bets = async (
   game: GameType
 ): Promise<MyBetType[]> => {
   if (!game.cached?.definition?.options) return [];
-  const optionMap: { [key: number]: { title: string; color: string } } =
+  const optionMap: { [key: number]: { title: string } } =
     game.cached.definition.options.reduce((newObj, option, k: number) => {
-      return { ...newObj, [k]: { title: option.title, color: option.color } };
+      return { ...newObj, [k]: { title: option.title } };
     }, {});
   let bets: MyBetType[] = [];
   let completed = false;
@@ -183,7 +182,6 @@ export const fetch_my_bets = async (
                 optionId: data.optionId,
                 stake: data.stake,
                 title: optionMap[data.optionId].title,
-                color: optionMap[data.optionId].color,
                 signature: signatures[i].signature,
                 payment: paidBets.hasOwnProperty(data.betId)
                   ? paidBets[data.betId].payment

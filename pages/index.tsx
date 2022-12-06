@@ -26,7 +26,8 @@ import { GamesByStateType, GameType } from "./types/game";
 import { game_batch, game_state } from "../components/utils/game";
 import { fetch_configs } from "../components/utils/game-settings";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-
+import { motion } from "framer-motion";
+const Icon = dynamic(() => import("../components/icon"));
 const GamesList = dynamic(() => import("../components/game/games-list"));
 
 const Home: NextPage = () => {
@@ -155,7 +156,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>{process.env.NEXT_PUBLIC_SITE_NAME} | Games</title>
+        <title>{`${process.env.NEXT_PUBLIC_SITE_NAME} | Games`}</title>
         <meta
           name="description"
           content={`${process.env.NEXT_PUBLIC_SITE_NAME}, list of games`}
@@ -166,7 +167,20 @@ const Home: NextPage = () => {
       </Head>
 
       <div className={styles.content}>
-        <h1 className={styles.title}>{process.env.NEXT_PUBLIC_SITE_NAME}</h1>
+        <h1 className={styles.title}>
+          {process.env.NEXT_PUBLIC_LOGO ? (
+            <motion.img
+              src={process.env.NEXT_PUBLIC_LOGO}
+              alt="Discord"
+              title="Homepage"
+            />
+          ) : (
+            <i>
+              <Icon cType="sol" width={35} height={35} color="#4076bb" />
+            </i>
+          )}
+          <span>{process.env.NEXT_PUBLIC_SITE_NAME}</span>
+        </h1>
         <GamesList
           games={openGames}
           state="Open"

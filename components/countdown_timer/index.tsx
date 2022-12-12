@@ -36,9 +36,10 @@ export default function CountdownTimer({
       {showCountDown && (
         <FlipCountdown
           theme={
-            process.env.NEXT_PUBLIC_THEME
-              ? process.env.NEXT_PUBLIC_THEME
-              : "default"
+            !process.env.NEXT_PUBLIC_THEME ||
+            process.env.NEXT_PUBLIC_THEME === "default"
+              ? "light"
+              : "dark"
           } // check https://github.com/rumess/react-flip-countdown/blob/master/src/styles.scss
           titlePosition="top" // Options (Default: top): top, bottom.
           hideYear

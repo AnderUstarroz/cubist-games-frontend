@@ -1,5 +1,5 @@
 {
-  "name": "cubist-games-frontend",
+  "name": "@cubist-collective/cubist-games-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {

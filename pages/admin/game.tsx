@@ -975,10 +975,17 @@ const Game: NextPage = () => {
                           </div>
                           <div className={styles.opStats}>
                             <span>
-                              Bets: {gameSettings.options[k].totalBets}
+                              Bets:{" "}
+                              {gameSettings.options[k]
+                                ? gameSettings.options[k].totalBets
+                                : 0}
                             </span>{" "}
                             <span>
-                              Stake: {gameSettings.options[k].totalStake} SOL
+                              Stake:{" "}
+                              {gameSettings.options[k]
+                                ? gameSettings.options[k].totalStake
+                                : 0}{" "}
+                              SOL
                             </span>
                           </div>
                         </div>

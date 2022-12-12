@@ -54,6 +54,21 @@ ul {
   list-style: none;
   list-style-position: inside;
 }
+.sqList {
+  li {
+    position: relative;
+    padding: 0 0 15px 15px;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 0;
+      width: 4px;
+      height: 4px;
+      background-color: var(--color2);
+    }
+  }
+}
 p {
   margin: 0 0 15px 0;
 }

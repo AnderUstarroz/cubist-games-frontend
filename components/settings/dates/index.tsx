@@ -29,12 +29,9 @@ export default function DatesSettings({
                   type="datetime-local"
                   name="openTime"
                   className={errors.hasOwnProperty("openTime") ? "error" : null}
-                  value={settings.openTime.toISOString().slice(0, 16)}
+                  value={format(settings.openTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleUpdateSettings(
-                      "openTime",
-                      new Date(e.target.valueAsNumber)
-                    )
+                    handleUpdateSettings("openTime", new Date(e.target.value))
                   }
                 />
                 <span>Open Time</span>
@@ -63,12 +60,9 @@ export default function DatesSettings({
                   className={
                     errors.hasOwnProperty("closeTime") ? "error" : null
                   }
-                  value={settings.closeTime.toISOString().slice(0, 16)}
+                  value={format(settings.closeTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleUpdateSettings(
-                      "closeTime",
-                      new Date(e.target.valueAsNumber)
-                    )
+                    handleUpdateSettings("closeTime", new Date(e.target.value))
                   }
                 />
                 <span>Close time</span>
@@ -97,12 +91,9 @@ export default function DatesSettings({
                   className={
                     errors.hasOwnProperty("settleTime") ? "error" : null
                   }
-                  value={settings.settleTime.toISOString().slice(0, 16)}
+                  value={format(settings.settleTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleUpdateSettings(
-                      "settleTime",
-                      new Date(e.target.valueAsNumber)
-                    )
+                    handleUpdateSettings("settleTime", new Date(e.target.value))
                   }
                 />
                 <span>Settle time</span>

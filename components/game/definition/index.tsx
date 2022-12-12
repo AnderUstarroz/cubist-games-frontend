@@ -5,6 +5,10 @@ import { DEFAULT_ANIMATION } from "../../utils/animation";
 import { DefaultDefinitionPropsType, DefinitionPropsType } from "./types";
 import { game_state } from "../../utils/game";
 import ImageBlob from "../../image-blob";
+import {
+  lamports_to_sol,
+  num_format,
+} from "@cubist-collective/cubist-games-lib";
 
 const Templates: any = {};
 
@@ -18,6 +22,7 @@ function DefaultDefinition({
   terms,
   setTerms,
   setMainModal,
+  systemConfig,
 }: DefaultDefinitionPropsType) {
   return (
     <motion.div {...DEFAULT_ANIMATION}>
@@ -26,11 +31,11 @@ function DefaultDefinition({
       </div>
       <div className={styles.desc}>
         {!!game.cached.image1 && (
-          <div>
+          <div className={styles.descImg}>
             <ImageBlob blob={game.cached.image1} />
           </div>
         )}
-        <div>
+        <div className={styles.descText}>
           <Markdown>{game.cached.definition?.description as string}</Markdown>
         </div>
       </div>
@@ -47,7 +52,23 @@ function DefaultDefinition({
             setMainModal(
               <div>
                 <h4>Fees</h4>
-                <p>Fees introduction</p>
+                <ul className="sqList">
+                  <li>
+                    <strong>{num_format(game.data.fee, 2)}% Game fee:</strong>{" "}
+                    The fee defined by the game host. Will be collected at the
+                    end of the game and deducted from the final pot.
+                  </li>
+                  {systemConfig.betFee.toNumber() && (
+                    <li>
+                      <strong>
+                        {lamports_to_sol(systemConfig.betFee.toNumber())} SOL
+                        Per bet:
+                      </strong>{" "}
+                      A service fee to help maintaining and improving Cubist
+                      Games.
+                    </li>
+                  )}
+                </ul>
               </div>
             )
           }

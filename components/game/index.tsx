@@ -34,6 +34,7 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         terms={props.terms}
         setTerms={props.setTerms}
         setMainModal={props.setMainModal}
+        systemConfig={props.systemConfig}
       />
       <Stats
         template={template}

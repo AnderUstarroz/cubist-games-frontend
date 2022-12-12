@@ -15,6 +15,12 @@
     width: 100%;
   }
 }
+.descImg {
+  max-width: 50%;
+}
+.descText {
+  flex: 1;
+}
 
 .info {
   display: flex;
@@ -54,5 +60,8 @@
   .desc {
     padding: 24px;
     flex-direction: column;
+  }
+  .descImg {
+    max-width: 100%;
   }
 }

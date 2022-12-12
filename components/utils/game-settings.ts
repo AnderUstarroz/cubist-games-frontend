@@ -130,15 +130,15 @@ export function gameIdTrans(
   return transform_num(value, toRust);
 }
 
-export function transform_date(value: number | Date | null, toRust: boolean) {
+export function transform_date(value: BN | Date | null, toRust: boolean) {
   if (!value) return null;
   return toRust
     ? new BN(Math.floor((value as Date).getTime() / 1000))
-    : new Date((value as number) * 1000);
+    : new Date((value as BN).toNumber() * 1000);
 }
 
 export function openTimeTrans(
-  value: Date | number,
+  value: Date | BN,
   _decimals: number,
   toRust: boolean = true
 ) {
@@ -146,28 +146,28 @@ export function openTimeTrans(
 }
 
 export function closeTimeTrans(
-  value: Date | number,
+  value: Date | BN,
   _decimals: number,
   toRust: boolean = true
 ) {
   return transform_date(value, toRust);
 }
 export function settleTimeTrans(
-  value: Date | number,
+  value: Date | BN,
   _decimals: number,
   toRust: boolean = true
 ) {
   return transform_date(value, toRust);
 }
 export function createdAtTrans(
-  value: Date | number | null,
+  value: Date | BN | null,
   _decimals: number,
   toRust: boolean = true
 ) {
   return transform_date(value, toRust);
 }
 export function updatedAtTrans(
-  value: Date | number | null,
+  value: Date | BN | null,
   _decimals: number,
   toRust: boolean = true
 ) {
@@ -175,14 +175,14 @@ export function updatedAtTrans(
 }
 
 export function cashedAtTrans(
-  value: Date | number | null,
+  value: Date | BN | null,
   _decimals: number,
   toRust: boolean = true
 ) {
   return transform_date(value, toRust);
 }
 export function settledAtTrans(
-  value: Date | number | null,
+  value: Date | BN | null,
   _decimals: number,
   toRust: boolean = true
 ) {

@@ -3,14 +3,6 @@
   top: -3px;
 
   & :global {
-    // Themes
-    .theme-default {
-      --text-color: #2b365b;
-      --text-bottom-color: #2b365b;
-      --background-color: #bdcfdf;
-      --background-bottom-color: #bdcfdf;
-    }
-
     .flip-countdown {
       display: flex;
       .flip-countdown-piece {
@@ -20,6 +12,13 @@
       }
       &.size-extra-small .flip-countdown-piece .flip-countdown-title {
         font-size: var(--fontSizeXS);
+      }
+      // Themes
+      &.theme-light {
+        --text-color: #2b365b;
+        --text-bottom-color: #2b365b;
+        --background-color: #bdcfdf;
+        --background-bottom-color: #bdcfdf;
       }
     }
   }

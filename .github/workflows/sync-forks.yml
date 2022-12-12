@@ -1,4 +1,4 @@
-# Syncs all Github Forks main branches to: https://github.com/AnderUstarroz/cubist-games-frontend
+# Syncs all Github Forks with Ander's main branch: https://github.com/AnderUstarroz/cubist-games-frontend
 name: Sync Forks
 
 on:

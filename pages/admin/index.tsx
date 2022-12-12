@@ -25,15 +25,14 @@ import {
   SYSTEM_AUTHORITY,
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
-import { fetcher } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
-import useSWR from "swr";
 import { ConfigInputType } from "../../types/game-settings";
 import { fetch_configs } from "../../components/utils/game-settings";
 import { AnimatePresence, motion } from "framer-motion";
 import Spinner from "../../components/spinner";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 import { human_number } from "../../components/utils/number";
+import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Button = dynamic(() => import("../../components/button"));
@@ -41,7 +40,6 @@ const Icon = dynamic(() => import("../../components/icon"));
 const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 
 const AdminHome: NextPage = () => {
-  const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
   const [pdas, setPdas] = useState<PDATypes | null>(null);
@@ -60,8 +58,7 @@ const AdminHome: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!is_authorized(publicKey) || !wallet || solanaProgram || !data || pdas)
-      return;
+    if (!is_authorized(publicKey) || !wallet || solanaProgram || pdas) return;
 
     if (!is_authorized(publicKey)) {
       Router.push("/unauthorized");
@@ -77,10 +74,10 @@ const AdminHome: NextPage = () => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(JSON.parse(data), connection, wallet.adapter)
+        await initSolanaProgram(IDL, connection, wallet.adapter)
       );
     })();
-  }, [publicKey, wallet, connection, data, solanaProgram, authority, pdas]);
+  }, [publicKey, wallet, connection, solanaProgram, authority, pdas]);
 
   // STEP 2 - Fetch Configs
   useEffect(() => {

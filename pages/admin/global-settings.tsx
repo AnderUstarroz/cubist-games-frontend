@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import useSWR from "swr";
 import styles from "../../styles/GlobalSettings.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
@@ -43,11 +42,7 @@ import {
   fetch_configs,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
-import {
-  fetcher,
-  multi_request,
-  new_domain,
-} from "../../components/utils/requests";
+import { multi_request, new_domain } from "../../components/utils/requests";
 import {
   flashError,
   flashMsg,
@@ -74,6 +69,7 @@ import {
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
+import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Input = dynamic(() => import("../../components/input"));
@@ -123,7 +119,6 @@ const mkEditorDefaults: any = {
 
 const GameSettings: NextPage = () => {
   const { connection } = useConnection();
-  const { data } = useSWR("/api/idl", fetcher);
   const { publicKey, wallet } = useWallet();
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
@@ -410,7 +405,7 @@ const GameSettings: NextPage = () => {
 
   // Step 1 - Init Program and PDAs
   useEffect(() => {
-    if (!publicKey || !wallet || !data || solanaProgram) return;
+    if (!publicKey || !wallet || solanaProgram) return;
     if (!is_authorized(publicKey)) {
       Router.push("/unauthorized");
       return;
@@ -427,10 +422,10 @@ const GameSettings: NextPage = () => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(JSON.parse(data), connection, wallet.adapter)
+        await initSolanaProgram(IDL, connection, wallet.adapter)
       );
     })();
-  }, [publicKey, wallet, connection, data, solanaProgram, authority]);
+  }, [publicKey, wallet, connection, solanaProgram, authority]);
 
   // Fetch Configs
   useEffect(() => {

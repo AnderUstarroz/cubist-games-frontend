@@ -19,8 +19,8 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { ConfigInputType } from "../types/game-settings";
 import { PublicKey } from "@solana/web3.js";
-import useSWR from "swr";
-import { fetcher, fetch_games } from "../components/utils/requests";
+import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
+import { fetch_games } from "../components/utils/requests";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { GamesByStateType, GameType } from "../types/game";
 import { game_batch, game_state } from "../components/utils/game";
@@ -31,7 +31,6 @@ const Icon = dynamic(() => import("../components/icon"));
 const GamesList = dynamic(() => import("../components/game/games-list"));
 
 const Home: NextPage = () => {
-  const { data: idl } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const [pdas, setPdas] = useState<PDATypes | null>(null);
   const [openGames, setOpenGames] = useState<GameType[]>([]);
@@ -88,7 +87,7 @@ const Home: NextPage = () => {
   };
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!connection || solanaProgram || !idl || pdas) return;
+    if (!connection || solanaProgram || pdas) return;
     (async () => {
       setPdas(
         await flashError(fetch_pdas, [
@@ -98,14 +97,10 @@ const Home: NextPage = () => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(
-          JSON.parse(idl),
-          connection,
-          new PhantomWalletAdapter()
-        )
+        await initSolanaProgram(IDL, connection, new PhantomWalletAdapter())
       );
     })();
-  }, [connection, idl, solanaProgram, authority, pdas]);
+  }, [connection, solanaProgram, authority, pdas]);
 
   // STEP 2 - Fetch Configs
   useEffect(() => {

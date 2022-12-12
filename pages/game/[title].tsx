@@ -28,7 +28,6 @@ import {
 import { PublicKey, Connection } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { Fragment, ReactNode, useEffect, useState } from "react";
-import fs from "fs";
 import {
   GameType,
   OptionType,
@@ -37,6 +36,7 @@ import {
   GameTermsType,
   WarningMsgType,
 } from "../../types/game";
+import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
 import { flashError, flashMsg } from "../../components/utils/helpers";
 import { fetch_games, fetch_terms } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
@@ -220,13 +220,13 @@ const GamePage: NextPage = ({ data, path }: any) => {
       );
       setSolanaProgram(
         await initSolanaProgram(
-          data.idl,
+          IDL,
           connection,
           wallet ? wallet.adapter : new PhantomWalletAdapter()
         )
       );
     })();
-  }, [wallet, connection, data, solanaProgram, authority]);
+  }, [wallet, connection, solanaProgram, authority]);
 
   // STEP 2 - Fetch Game
   useEffect(() => {
@@ -283,20 +283,20 @@ const GamePage: NextPage = ({ data, path }: any) => {
   // Wallet connected/Disconnected
   useEffect(() => {
     // Reset Mybets, playerBets, pdas when disconnected
-    if (!wallet || !publicKey || !connection || !data.idl) {
+    if (!wallet || !publicKey || !connection) {
       if (myBets) setMyBets([]);
       if (playerBets) setPlayerBets(null);
       return;
     }
     (async () => {
       setSolanaProgram(
-        await initSolanaProgram(data.idl, connection, wallet.adapter)
+        await initSolanaProgram(IDL, connection, wallet.adapter)
       );
       if (game) {
         refreshBets(game);
       }
     })();
-  }, [publicKey, wallet, connection, data.idl]);
+  }, [publicKey, wallet, connection]);
 
   return (
     <>
@@ -412,13 +412,6 @@ const GamePage: NextPage = ({ data, path }: any) => {
 
 export async function getServerSideProps(context: any) {
   const path = context.resolvedUrl;
-  const idl = JSON.parse(
-    fs
-      .readFileSync(
-        "node_modules/@cubist-collective/cubist-games-lib/lib/idl.json"
-      )
-      .toString()
-  );
   const authority = new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string);
   const connection = new Connection(
     process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string
@@ -429,7 +422,7 @@ export async function getServerSideProps(context: any) {
     AnchorProvider.defaultOptions()
   );
   setProvider(provider);
-  const program = new Program<CubistGames>(idl, PROGRAM_ID, provider);
+  const program = new Program<CubistGames>(IDL as any, PROGRAM_ID, provider);
   try {
     const pdas = await fetch_pdas([
       ["config", config_pda, authority],
@@ -448,7 +441,7 @@ export async function getServerSideProps(context: any) {
       "public, s-maxage=3600, stale-while-revalidate=10800"
     );
     const data = {
-      idl: idl,
+      idl: IDL,
       gameId: game.gameId.toNumber(),
       definition: await arweave_json(game.definitionHash),
       image1: game.image1Hash ? arweave_url(game.image1Hash) : null,

@@ -29,8 +29,7 @@ import {
   GameStateOutputType,
   OptionInputType,
 } from "../../types/game-settings";
-import useSWR from "swr";
-import { fetcher, fetch_games } from "../../components/utils/requests";
+import { fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
 import { GameType } from "../../types/game";
@@ -39,6 +38,7 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 import { human_number } from "../../components/utils/number";
+import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
 import Link from "next/link";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
@@ -78,7 +78,6 @@ const showState = (state: GameStateOutputType) => {
 const MAX_GAMES = 10;
 
 const Games: NextPage = () => {
-  const { data } = useSWR("/api/idl", fetcher);
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
   const [loading, setLoading] = useState<boolean>(true);
@@ -119,8 +118,7 @@ const Games: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!is_authorized(publicKey) || !wallet || solanaProgram || !data || pdas)
-      return;
+    if (!is_authorized(publicKey) || !wallet || solanaProgram || pdas) return;
 
     if (!is_authorized(publicKey)) {
       Router.push("/unauthorized");
@@ -137,10 +135,10 @@ const Games: NextPage = () => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(JSON.parse(data), connection, wallet.adapter)
+        await initSolanaProgram(IDL, connection, wallet.adapter)
       );
     })();
-  }, [publicKey, wallet, connection, data, solanaProgram, authority, pdas]);
+  }, [publicKey, wallet, connection, solanaProgram, authority, pdas]);
 
   // STEP 2 - Fetch Configs
   useEffect(() => {

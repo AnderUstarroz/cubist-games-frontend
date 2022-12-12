@@ -1,6 +1,6 @@
+import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
 import type { NextPage } from "next";
 import Head from "next/head";
-import useSWR from "swr";
 import styles from "../../styles/AdminGame.module.scss";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { AnchorError } from "@project-serum/anchor";
@@ -58,7 +58,7 @@ import {
   inputsToRustSettings,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
-import { fetcher, multi_request } from "../../components/utils/requests";
+import { multi_request } from "../../components/utils/requests";
 import {
   flashError,
   flashMsg,
@@ -138,7 +138,6 @@ const mkEditorDefaults: any = {
 const Game: NextPage = () => {
   const router = useRouter();
   const { connection } = useConnection();
-  const { data } = useSWR("/api/idl", fetcher);
   const { publicKey, wallet, sendTransaction } = useWallet();
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
@@ -516,8 +515,7 @@ const Game: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!is_authorized(publicKey) || !wallet || !data || solanaProgram || pdas)
-      return;
+    if (!is_authorized(publicKey) || !wallet || solanaProgram || pdas) return;
 
     if (!is_authorized(publicKey)) {
       Router.push("/unauthorized");
@@ -534,10 +532,10 @@ const Game: NextPage = () => {
         ])
       );
       setSolanaProgram(
-        await initSolanaProgram(JSON.parse(data), connection, wallet.adapter)
+        await initSolanaProgram(IDL, connection, wallet.adapter)
       );
     })();
-  }, [publicKey, wallet, connection, data, solanaProgram, authority]);
+  }, [publicKey, wallet, connection, solanaProgram, authority]);
 
   // STEP 2 - Fetch Configs
   useEffect(() => {

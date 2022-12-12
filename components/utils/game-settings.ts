@@ -1,5 +1,4 @@
 import {
-  isRejected,
   OptionType,
   PDATypes,
   ProfitShareType,
@@ -8,14 +7,11 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
-import GameSettings from "../../pages/admin/global-settings";
 import {
   ConfigInputType,
-  GameStateType,
   OptionInputType,
   ProfitShareInputType,
-} from "../../pages/types/game-settings";
-import { multi_request } from "./requests";
+} from "../../types/game-settings";
 
 export function addProfitShare(
   profitSharing: ProfitShareInputType[],

@@ -13,7 +13,7 @@ import {
   put_cached_game,
   put_cached_terms,
 } from "../../components/utils/db";
-import { GamesType, GameTermsType, GameType } from "../../pages/types/game";
+import { GamesType, GameTermsType, GameType } from "../../types/game";
 import { PublicKey } from "@solana/web3.js";
 import { game_pda } from "@cubist-collective/cubist-games-lib";
 import { rustToInputsSettings } from "./game-settings";

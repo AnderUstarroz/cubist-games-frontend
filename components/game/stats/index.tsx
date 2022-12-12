@@ -2,11 +2,10 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import styles from "./DefaultStats.module.scss";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
-import { DefaultStatsPropsType, StatsPropsType, StakesType } from "./types";
-import { OptionInputType } from "../../../pages/types/game-settings";
+import { DefaultStatsPropsType, StatsPropsType } from "./types";
+import { OptionInputType } from "../../../types/game-settings";
 import { human_number } from "../../utils/number";
 import { num_format } from "@cubist-collective/cubist-games-lib";
-import Games from "../../../pages/admin/games";
 
 const Templates: any = {};
 

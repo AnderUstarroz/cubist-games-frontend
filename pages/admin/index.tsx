@@ -28,7 +28,7 @@ import {
 import { fetcher } from "../../components/utils/requests";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
-import { ConfigInputType } from "../types/game-settings";
+import { ConfigInputType } from "../../types/game-settings";
 import { fetch_configs } from "../../components/utils/game-settings";
 import { AnimatePresence, motion } from "framer-motion";
 import Spinner from "../../components/spinner";

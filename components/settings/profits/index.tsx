@@ -1,7 +1,7 @@
 import { human_number, parse_float_input } from "../../utils/number";
 import dynamic from "next/dynamic";
 import { ProfitsPropsType } from "./types";
-import { ProfitShareInputType } from "../../../pages/types/game-settings";
+import { ProfitShareInputType } from "../../../types/game-settings";
 import styles from "./Profits.module.scss";
 import {
   addProfitShare,

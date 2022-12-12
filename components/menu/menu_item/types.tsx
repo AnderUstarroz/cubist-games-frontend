@@ -3,4 +3,5 @@ export interface MenuItemType {
   className?: string;
   whileHover?: Object;
   whileTap?: Object;
+  margin?: number;
 }

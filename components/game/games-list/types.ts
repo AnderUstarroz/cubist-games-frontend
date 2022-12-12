@@ -1,4 +1,4 @@
-import { GameType } from "../../../pages/types/game";
+import { GameType } from "../../../types/game";
 
 export interface GamesListPropsType {
   games: GameType[];

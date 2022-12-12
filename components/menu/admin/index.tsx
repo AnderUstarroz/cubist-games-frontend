@@ -1,21 +1,29 @@
-import { scrollToElement } from "../../utils/navigation";
+// import { scrollToElement } from "../../utils/navigation";
+import { useWallet } from "@solana/wallet-adapter-react";
+import Twitter from "../../../public/images/twitter.svg";
+import Discord from "../../../public/images/discord.svg";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { HomeMenuType } from "./types";
 import Link from "next/link";
+import Image from "next/image";
 
 const SiteLinks = dynamic(() => import("../menu_item/site_links"));
 const Button = dynamic(() => import("../../button"));
 const MenuItem = dynamic(() => import("../menu_item"));
 const Icon = dynamic(() => import("../../icon"));
 
+const size = 20;
+
 export default function AdminMenu({ toggle }: HomeMenuType) {
-  const ScrollSection = (section: string) => {
-    if (toggle) {
-      toggle();
-    }
-    scrollToElement(section);
-  };
+  const { publicKey } = useWallet();
+
+  // const ScrollSection = (section: string) => {
+  //   if (toggle) {
+  //     toggle();
+  //   }
+  //   scrollToElement(section);
+  // };
 
   return (
     <motion.ul
@@ -31,36 +39,86 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
       <MenuItem className="leftItems" whileHover={{}} whileTap={{}}>
         <div>
           <SiteLinks toggle={toggle} />
-          <Button cType="transparent" title="Dashboard">
-            <Link href="/admin">
-              <a title="Dashboard" onClick={toggle}>
-                <Icon cType="dashboard" width={20} height={20} />
-              </a>
-            </Link>
-          </Button>
-          <Button cType="transparent">
-            <Link href="/admin/global-settings">
-              <a title="Settings" onClick={toggle}>
-                Settings
-              </a>
-            </Link>
-          </Button>
-          <Button cType="transparent">
-            <Link href="/admin/games">
-              <a title="Settings" onClick={toggle}>
-                Manage Games
-              </a>
-            </Link>
-          </Button>
-          <Button cType="transparent">
-            <Link href="/admin/game">
-              <a rel="noopener" title="Settings" onClick={toggle}>
-                New Game
-              </a>
-            </Link>
-          </Button>
+          {publicKey?.toBase58() ===
+            (process.env.NEXT_PUBLIC_AUTHORITY as string) && (
+            <>
+              <Button cType="transparent" title="Dashboard">
+                <Link href="/admin">
+                  <a title="Dashboard" onClick={toggle}>
+                    <Icon cType="dashboard" width={size} height={size} />
+                  </a>
+                </Link>
+              </Button>
+              <Button cType="transparent">
+                <Link href="/admin/global-settings">
+                  <a title="Settings" onClick={toggle}>
+                    Settings
+                  </a>
+                </Link>
+              </Button>
+              <Button cType="transparent">
+                <Link href="/admin/games">
+                  <a title="Settings" onClick={toggle}>
+                    Manage Games
+                  </a>
+                </Link>
+              </Button>
+              <Button cType="transparent">
+                <Link href="/admin/game">
+                  <a rel="noopener" title="Settings" onClick={toggle}>
+                    New Game
+                  </a>
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </MenuItem>
+      {!!process.env.NEXT_PUBLIC_DISCORD && (
+        <MenuItem margin={5}>
+          <Link href={process.env.NEXT_PUBLIC_DISCORD}>
+            <a target="_blank" onClick={toggle}>
+              <Image
+                src={Discord}
+                height={size}
+                width={size}
+                alt="Discord"
+                title="Visit Discord"
+              />
+            </a>
+          </Link>
+        </MenuItem>
+      )}
+
+      {!!process.env.NEXT_PUBLIC_TWITTER && (
+        <MenuItem margin={5}>
+          <Link href={process.env.NEXT_PUBLIC_TWITTER}>
+            <a target="_blank" title="Visit Twitter" onClick={toggle}>
+              <Image
+                src={Twitter}
+                height={size}
+                width={size}
+                alt="Twitter"
+                title="Visit Twitter"
+              />
+            </a>
+          </Link>
+        </MenuItem>
+      )}
+      {!!process.env.NEXT_PUBLIC_WEB && (
+        <MenuItem margin={5}>
+          <Link href={process.env.NEXT_PUBLIC_WEB}>
+            <a
+              title="Visit Website"
+              target="_blank"
+              onClick={toggle}
+              style={{ paddingBottom: 4 }}
+            >
+              <Icon cType="web" height={size} width={size} />
+            </a>
+          </Link>
+        </MenuItem>
+      )}
       <MenuItem whileTap={{}} whileHover={{}}>
         <Button cType="wallet" />
       </MenuItem>

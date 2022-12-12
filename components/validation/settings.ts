@@ -3,7 +3,7 @@ import {
   GameSettingsInputType,
   ProfitShareInputType,
   TermsInputsType,
-} from "../../pages/types/game-settings";
+} from "../../types/game-settings";
 import { SettingsError } from "./errors";
 import {
   isBase58,
@@ -15,7 +15,7 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { is_ascii_alphanumeric } from "./string";
 import { ordinal } from "../utils/number";
-import { DefinitionInputsType, OptionType } from "../../pages/types/game";
+import { DefinitionInputsType, OptionType } from "../../types/game";
 
 export interface AllSettingsType {
   SystemConfig: SystemConfigType;
@@ -221,7 +221,6 @@ export function optionsDefinitionValidator(options: OptionType[]) {
       );
     }
   });
-  const maxChar = 1000;
 }
 
 export function feeAndProfitSharing(allSettings: AllSettingsType) {

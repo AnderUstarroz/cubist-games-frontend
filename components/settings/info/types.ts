@@ -1,8 +1,8 @@
-import { DefinitionInputsType } from "../../../pages/types/game";
+import { DefinitionInputsType } from "../../../types/game";
 import {
   ConfigInputType,
   GameSettingsInputType,
-} from "../../../pages/types/game-settings";
+} from "../../../types/game-settings";
 
 export interface InfoPropsType {
   gameSettings: GameSettingsInputType;

@@ -3,7 +3,7 @@ import {
   GameTermsType,
   GameType,
   PrevGameType,
-} from "../../pages/types/game";
+} from "../../types/game";
 import { PublicKey, Connection } from "@solana/web3.js";
 import {
   PDATypes,

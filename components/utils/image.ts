@@ -1,5 +1,4 @@
 import {
-  FilesType,
   is_compressible,
   compress_image,
   blob_to_base64,

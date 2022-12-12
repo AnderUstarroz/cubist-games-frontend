@@ -1,5 +1,3 @@
-import { ConfigInputType } from "../../../pages/types/game-settings";
-
 export interface StakeButtonsType {
   settings: {
     minStake: number;

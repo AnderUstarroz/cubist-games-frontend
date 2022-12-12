@@ -12,10 +12,9 @@ import {
 } from "../../components/utils/bundlr";
 import { PublicKey } from "@solana/web3.js";
 import Router from "next/router";
-import { ConfigInputType, TermsInputsType } from "../types/game-settings";
+import { ConfigInputType, TermsInputsType } from "../../types/game-settings";
 import {
   Bundlr,
-  FilesType,
   initSolanaProgram,
   SolanaProgramType,
   config_pda,
@@ -145,7 +144,6 @@ const GameSettings: NextPage = () => {
     decimals: 9,
     closeModals: {},
   });
-  const [files, setFiles] = useState<FilesType>({});
   const [maxDecimals, setMaxDecimals] = useState<number>(DEFAULT_DECIMALS);
   const [bundlr, setBundlr] = useState<Bundlr | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -158,7 +156,7 @@ const GameSettings: NextPage = () => {
   const [systemConfig, setSystemConfig] = useState<SystemConfigType | null>(
     null
   );
-  const [stats, setStats] = useState<StatsType | null>(null);
+  const [_stats, setStats] = useState<StatsType | null>(null);
   const [settings, setSettings] = useState<ConfigInputType>({
     https: true, // Populated on page load using window.location.protocol
     domain: "", // Populated on page load using window.location.host

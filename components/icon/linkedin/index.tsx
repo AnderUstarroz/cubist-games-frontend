@@ -1,6 +1,5 @@
-import { NONAME } from "dns"
-import * as React from "react"
-import { IconType } from "../types"
+import * as React from "react";
+import { IconType } from "../types";
 
 function Linkedin(props: IconType) {
   return (
@@ -32,7 +31,7 @@ function Linkedin(props: IconType) {
         />
       </svg>
     </div>
-  )
+  );
 }
 
-export default Linkedin
+export default Linkedin;

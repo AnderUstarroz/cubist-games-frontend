@@ -1,5 +1,3 @@
-import { MouseEventHandler } from "react";
-
 export interface RechargeArweaveType {
   display: boolean;
   value: number;

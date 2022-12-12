@@ -13,7 +13,7 @@ import {
   solana_to_usd,
 } from "@cubist-collective/cubist-games-lib";
 import { AnimatePresence } from "framer-motion";
-import { calculate_stakes, MyBetType } from "../../utils/bet";
+import { calculate_stakes } from "../../utils/bet";
 
 const MyBets = dynamic(() => import("../my-bets"));
 const Button = dynamic(() => import("../../button"));

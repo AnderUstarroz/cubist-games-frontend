@@ -10,7 +10,7 @@ import {
   sol_to_lamports,
   SystemConfigType,
 } from "@cubist-collective/cubist-games-lib";
-import { GameType } from "../../pages/types/game";
+import { GameType } from "../../types/game";
 import { flashMsg } from "./helpers";
 import {
   PublicKey,
@@ -18,7 +18,7 @@ import {
   SignaturesForAddressOptions,
 } from "@solana/web3.js";
 import { human_number } from "./number";
-import { OptionInputType } from "../../pages/types/game-settings";
+import { OptionInputType } from "../../types/game-settings";
 
 export const place_bet = async (
   solanaProgram: SolanaProgramType,

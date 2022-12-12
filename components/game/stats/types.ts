@@ -1,4 +1,4 @@
-import { GameType, PrevGameType } from "../../../pages/types/game";
+import { GameType, PrevGameType } from "../../../types/game";
 
 export interface DefaultStatsPropsType {
   game: GameType;

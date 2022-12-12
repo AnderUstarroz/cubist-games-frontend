@@ -1,5 +1,5 @@
 import { SystemConfigType } from "@cubist-collective/cubist-games-lib";
-import { GameTermsType, GameType } from "../../../pages/types/game";
+import { GameTermsType, GameType } from "../../../types/game";
 
 export interface DefaultDefinitionPropsType {
   game: GameType;

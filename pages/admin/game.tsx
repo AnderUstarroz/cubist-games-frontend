@@ -18,7 +18,7 @@ import {
   GameSettingsInputType,
   GameStateType,
   ProfitShareInputType,
-} from "../types/game-settings";
+} from "../../types/game-settings";
 import { BN } from "@project-serum/anchor";
 import { addHours } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -44,7 +44,6 @@ import {
   arweave_image,
   blob_to_base64,
   PDATypes,
-  ProfitShareType,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
@@ -72,7 +71,7 @@ import {
   DefinitionInputsType,
   OptionType,
   WarningMsgInputsType,
-} from "../types/game";
+} from "../../types/game";
 import { MDEditorProps } from "@uiw/react-md-editor";
 import {
   bold,

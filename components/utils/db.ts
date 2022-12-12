@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { CachedGameType, GameTermsType } from "../../pages/types/game";
+import { CachedGameType, GameTermsType } from "../../types/game";
 
 const DB_NAME = `CubistGamesDB_${(
   process.env.NEXT_PUBLIC_AUTHORITY as string

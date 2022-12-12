@@ -1,9 +1,9 @@
-import { PrevGameType } from "../../pages/types/game";
+import { PrevGameType } from "../../types/game";
 import {
   GameSettingsInputType,
   OptionInputType,
   GameStateOutputType,
-} from "../../pages/types/game-settings";
+} from "../../types/game-settings";
 
 export const game_batch = (maxGameId: number, max = 10): number[] => {
   // Returns a list with the Game ids in descendent order

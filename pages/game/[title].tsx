@@ -36,7 +36,7 @@ import {
   CustomStakeType,
   GameTermsType,
   WarningMsgType,
-} from "../types/game";
+} from "../../types/game";
 import { flashError, flashMsg } from "../../components/utils/helpers";
 import { fetch_games, fetch_terms } from "../../components/utils/requests";
 import dynamic from "next/dynamic";

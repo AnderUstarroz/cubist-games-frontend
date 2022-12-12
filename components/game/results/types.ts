@@ -1,4 +1,4 @@
-import { GameType } from "../../../pages/types/game";
+import { GameType } from "../../../types/game";
 import { MyBetType } from "../../utils/bet";
 export interface DefaultResultsPropsType {
   game: GameType;

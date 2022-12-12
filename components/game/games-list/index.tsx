@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
-import { GameType } from "../../../pages/types/game";
+import { GameType } from "../../../types/game";
 import styles from "./GamesList.module.scss";
 import { GamesListPropsType } from "./types";
 import dynamic from "next/dynamic";
 import slugify from "slugify";
-import { OptionInputType } from "../../../pages/types/game-settings";
+import { OptionInputType } from "../../../types/game-settings";
 
 const Button = dynamic(() => import("../../button"));
 const ImageBlob = dynamic(() => import("../../image-blob"));

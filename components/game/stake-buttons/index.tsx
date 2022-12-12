@@ -2,7 +2,7 @@ import styles from "./DefaultStakeButtons.module.scss";
 import dynamic from "next/dynamic";
 import { StakeButtonsPropsType, DefaultStakeButtonsPropsType } from "./types";
 import React from "react";
-import { OptionType } from "../../../pages/types/game";
+import { OptionType } from "../../../types/game";
 import { flashMsg } from "../../utils/helpers";
 import { place_bet } from "../../utils/bet";
 import { sol_to_lamports } from "@cubist-collective/cubist-games-lib";

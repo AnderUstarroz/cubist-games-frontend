@@ -1,5 +1,5 @@
 import { SystemConfigType } from "@cubist-collective/cubist-games-lib";
-import { ProfitShareInputType } from "../../../pages/types/game-settings";
+import { ProfitShareInputType } from "../../../types/game-settings";
 
 export interface ProfitsPropsType {
   systemConfig: SystemConfigType | null;

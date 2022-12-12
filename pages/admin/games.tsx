@@ -28,12 +28,12 @@ import {
   ConfigInputType,
   GameStateOutputType,
   OptionInputType,
-} from "../types/game-settings";
+} from "../../types/game-settings";
 import useSWR from "swr";
 import { fetcher, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
-import { GameType } from "../types/game";
+import { GameType } from "../../types/game";
 import { game_batch, game_state } from "../../components/utils/game";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";

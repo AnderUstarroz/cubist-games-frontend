@@ -1,4 +1,4 @@
-import { CustomStakeType, GameType } from "../../../pages/types/game";
+import { CustomStakeType, GameType } from "../../../types/game";
 import { PublicKey, Connection } from "@solana/web3.js";
 import {
   PDATypes,

@@ -1,6 +1,6 @@
 import { MyBetType } from "../../utils/bet";
 import { PlayerBetsType } from "@cubist-collective/cubist-games-lib";
-import { GameType, PrevGameType } from "../../../pages/types/game";
+import { GameType, PrevGameType } from "../../../types/game";
 import { PublicKey } from "@solana/web3.js";
 
 export interface CTAPropsType {

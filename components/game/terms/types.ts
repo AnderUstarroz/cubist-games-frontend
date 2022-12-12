@@ -1,4 +1,4 @@
-import { GameTermsType } from "../../../pages/types/game";
+import { GameTermsType } from "../../../types/game";
 
 export interface TermsPropsType {
   display: boolean;

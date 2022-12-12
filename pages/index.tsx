@@ -17,12 +17,12 @@ import {
   system_config_pda,
   TermsType,
 } from "@cubist-collective/cubist-games-lib";
-import { ConfigInputType } from "./types/game-settings";
+import { ConfigInputType } from "../types/game-settings";
 import { PublicKey } from "@solana/web3.js";
 import useSWR from "swr";
 import { fetcher, fetch_games } from "../components/utils/requests";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { GamesByStateType, GameType } from "./types/game";
+import { GamesByStateType, GameType } from "../types/game";
 import { game_batch, game_state } from "../components/utils/game";
 import { fetch_configs } from "../components/utils/game-settings";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";

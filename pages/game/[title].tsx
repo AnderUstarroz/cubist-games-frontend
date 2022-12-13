@@ -13,6 +13,7 @@ import {
   fetch_pdas,
   game_pda,
   initSolanaProgram,
+  num_format,
   PDATypes,
   PlayerBetsType,
   player_bets_pda,
@@ -204,6 +205,25 @@ const GamePage: NextPage = ({ data, path }: any) => {
       const data = await r.json();
       setWarningMsg({ ...data, show: true });
     }
+  };
+  const handleShare = () => {
+    if (!game || !game.cached.definition) return;
+    window.open(
+      `http://twitter.com/share?text=${
+        game.cached.definition.title
+      }%0A${game.cached.definition.options
+        .map(
+          (option, index) =>
+            `%0A🔹${option.title}:%20${num_format(
+              (game.data.options[index].totalStake /
+                game.data.options.reduce((a, o) => a + o.totalStake, 0)) *
+                100,
+              2
+            )}%25`
+        )
+        .join("")}%0A%0A💰Place your bet:&url=${window.location.href}`,
+      "_blank"
+    );
   };
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
@@ -397,6 +417,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
               playerBets={playerBets}
               handleClaim={handleClaim}
               solFiatPrice={solFiatPrice}
+              handleShare={handleShare}
             />
           ) : (
             <Spinner />

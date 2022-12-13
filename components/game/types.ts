@@ -35,6 +35,7 @@ export interface GamePropsType {
   playerBets: PlayerBetsType | null;
   handleClaim: Function;
   solFiatPrice: number | null;
+  handleShare: Function;
 }
 
 export interface DefaultGamePropsType extends GamePropsType {}

@@ -7,6 +7,7 @@ export interface DefaultDefinitionPropsType {
   setTerms: Function;
   setMainModal: Function;
   systemConfig: SystemConfigType;
+  handleShare: Function;
 }
 
 export interface DefinitionPropsType extends DefaultDefinitionPropsType {

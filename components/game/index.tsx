@@ -27,7 +27,7 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         <li
           className={["Settled", "Voided"].includes(gameState) ? "active" : ""}
         >
-          {gameState}
+          {gameState === "Voided" ? gameState : "Settled"}
           <time>{format_time(props.game.data.settleTime)}</time>
         </li>
       </motion.ul>
@@ -38,6 +38,7 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         setTerms={props.setTerms}
         setMainModal={props.setMainModal}
         systemConfig={props.systemConfig}
+        handleShare={props.handleShare}
       />
       <Stats
         template={template}

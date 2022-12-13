@@ -23,6 +23,7 @@ function DefaultDefinition({
   setTerms,
   setMainModal,
   systemConfig,
+  handleShare,
 }: DefaultDefinitionPropsType) {
   return (
     <motion.div {...DEFAULT_ANIMATION}>
@@ -79,7 +80,11 @@ function DefaultDefinition({
         >
           Fees <Icon cType="info" className="icon1" />
         </Button>
-        <Button className="vAligned gap5" cType="transparent">
+        <Button
+          className="vAligned gap5"
+          cType="transparent"
+          onClick={() => handleShare()}
+        >
           Share <Icon cType="share" className="icon1" />{" "}
         </Button>
       </div>

@@ -58,7 +58,7 @@ function DefaultResults({ game, myBets }: DefaultResultsPropsType) {
                     : game.data.result === bet.optionId
                     ? "Not claimed"
                     : gameState === "Voided"
-                    ? "Not refunded"
+                    ? "Refund not claimed"
                     : `-${bet.stake} SOL`}
                 </td>
                 <td>
@@ -67,7 +67,9 @@ function DefaultResults({ game, myBets }: DefaultResultsPropsType) {
                       href={tx_link(bet.paySignature)}
                       target="_blank"
                       rel="noreferrer"
+                      className="vAligned gap5"
                     >
+                      <Icon cType="eye" width={15} />
                       {short_key(bet.paySignature)}
                     </a>
                   ) : (

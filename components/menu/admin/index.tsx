@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { HomeMenuType } from "./types";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const SiteLinks = dynamic(() => import("../menu_item/site_links"));
 const Button = dynamic(() => import("../../button"));
@@ -16,6 +17,7 @@ const Icon = dynamic(() => import("../../icon"));
 const size = 20;
 
 export default function AdminMenu({ toggle }: HomeMenuType) {
+  const [showAdmin, setShowAdmin] = useState<boolean>(false);
   const { publicKey } = useWallet();
 
   // const ScrollSection = (section: string) => {
@@ -24,6 +26,12 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
   //   }
   //   scrollToElement(section);
   // };
+
+  useEffect(() => {
+    setShowAdmin(
+      publicKey?.toBase58() === (process.env.NEXT_PUBLIC_AUTHORITY as string)
+    );
+  }, [publicKey]);
 
   return (
     <motion.ul
@@ -39,8 +47,7 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
       <MenuItem className="leftItems" whileHover={{}} whileTap={{}}>
         <div>
           <SiteLinks toggle={toggle} />
-          {publicKey?.toBase58() ===
-            (process.env.NEXT_PUBLIC_AUTHORITY as string) && (
+          {showAdmin && (
             <>
               <Button cType="transparent" title="Dashboard">
                 <Link href="/admin">
@@ -89,7 +96,6 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
           </Link>
         </MenuItem>
       )}
-
       {!!process.env.NEXT_PUBLIC_TWITTER && (
         <MenuItem margin={5}>
           <Link href={process.env.NEXT_PUBLIC_TWITTER}>

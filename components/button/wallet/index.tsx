@@ -1,8 +1,14 @@
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import styles from "./Wallet.module.scss";
 import React, { FC } from "react";
 import { motion } from "framer-motion";
 import { DisconnectButtonType } from "./types";
+import dynamic from "next/dynamic";
+
+const WalletMultiButton = dynamic(
+  async () =>
+    (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
+  { ssr: false }
+);
 
 export const DisconnectButton = ({ onClick }: DisconnectButtonType) => {
   return (

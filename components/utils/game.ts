@@ -22,7 +22,7 @@ export const game_state = (
 ): GameStateOutputType => {
   const now = new Date();
   if (game.settledAt) {
-    return game.state.hasOwnProperty("Voided") ? "Voided" : "Settled";
+    return game.state.hasOwnProperty("voided") ? "Voided" : "Settled";
   }
   if (now < game.openTime) {
     return "Pending";

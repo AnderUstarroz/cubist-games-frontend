@@ -4,7 +4,7 @@ import styles from "./CTA.module.scss";
 import CountUp from "react-countup";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   calculate_payment,
   lamports_to_sol,
@@ -47,27 +47,8 @@ export default function CTA({
   setModals,
 }: CTAPropsType) {
   const [showMyBets, setShowMyBets] = useState<boolean>(false);
+  const [showButton, setShowButton] = useState<ShowCTA>(ShowCTA.None);
   const gameState = game_state(game.data);
-  const handleShowButton = (): ShowCTA => {
-    if (!publickey) return ShowCTA.Wallet;
-    if (game.data.settledAt) {
-      if (!playerBets) return ShowCTA.None;
-      // Voided: Claim refund
-      if (game.data.state.hasOwnProperty("voided")) {
-        return playerBets.bets.length ? ShowCTA.Refund : ShowCTA.None;
-      }
-      // Settled: Claim payment (only if has winner bets)
-      for (const bet of playerBets.bets) {
-        if (!bet.paid && bet.optionId === game.data.result) {
-          return ShowCTA.Pay;
-        }
-      }
-      // Show Bet button if Game is open and active
-    } else if (gameState === "Open" && game.data.isActive) {
-      return ShowCTA.Bet;
-    }
-    return ShowCTA.None;
-  };
 
   const totalPrize = (): number => {
     if (!playerBets || !playerBets.bets.length) return 0;
@@ -98,7 +79,29 @@ export default function CTA({
         );
   };
 
-  const showButton = handleShowButton();
+  useEffect(() => {
+    const handleShowButton = (): ShowCTA => {
+      if (!publickey) return ShowCTA.Wallet;
+      if (game.data.settledAt) {
+        if (!playerBets) return ShowCTA.None;
+        // Settled or Voided: Claim payment (only if has winner bets)
+        for (const bet of playerBets.bets) {
+          if (
+            !bet.paid &&
+            (bet.optionId === game.data.result || gameState === "Voided")
+          ) {
+            return gameState === "Voided" ? ShowCTA.Refund : ShowCTA.Pay;
+          }
+        }
+        // Show Bet button if Game is open and active
+      } else if (gameState === "Open" && game.data.isActive) {
+        return ShowCTA.Bet;
+      }
+      return ShowCTA.None;
+    };
+    setShowButton(handleShowButton());
+  });
+
   const totalPot = get_pot(game.data);
   const [pot, prevPot, potUnit] = formatPot(totalPot, prevGame.pot);
   return (
@@ -160,11 +163,13 @@ export default function CTA({
                 </div>
               </Flame>
             )}
-            <CountdownTimer
-              openTime={game.data.openTime}
-              closeTime={game.data.closeTime}
-              size="extra-small"
-            />
+            {gameState === "Open" && (
+              <CountdownTimer
+                openTime={game.data.openTime}
+                closeTime={game.data.closeTime}
+                size="extra-small"
+              />
+            )}
           </div>
           <div className={styles.rightCTA}>
             <AnimatePresence>
@@ -199,7 +204,7 @@ export default function CTA({
               )}
               {[ShowCTA.Pay, ShowCTA.Refund].includes(showButton) && (
                 <Button
-                  title="Claim prize"
+                  title={`Claim ${gameState === "Voided" ? "refund" : "prize"}`}
                   className={styles.claimBtn}
                   key="btn-claim"
                   onClick={() => handleClaim(showButton, playerBets)}
@@ -209,7 +214,9 @@ export default function CTA({
                     <i>WINNER</i>
                   </span>
                   <span>
-                    <strong>Claim Prize</strong>
+                    <strong>
+                      Claim {gameState === "Voided" ? "refund" : "prize"}
+                    </strong>
                     <span>+{num_format(totalPrize(), 4)} SOL</span>
                   </span>
                 </Button>

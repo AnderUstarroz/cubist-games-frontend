@@ -48,7 +48,7 @@ const ImageBlob = dynamic(() => import("../../components/image-blob"));
 const Spinner = dynamic(() => import("../../components/spinner"));
 const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 
-const showState = (state: GameStateOutputType) => {
+const showState = (cashedAt: Date | null, state: GameStateOutputType) => {
   switch (state) {
     case "Pending":
       return (
@@ -61,17 +61,15 @@ const showState = (state: GameStateOutputType) => {
     case "Closed":
       return <span className={styles.closed}>Closed</span>;
     case "Settled":
-      return (
-        <span className="vAligned gap5">
+      return cashedAt ? (
+        <span className="vAligned gap5" title="Cashed">
           <Icon cType="coins" width={12} height={12} /> Settled
         </span>
+      ) : (
+        <span>Settled</span>
       );
     case "Voided":
-      return (
-        <span className="vAligned gap5">
-          <Icon cType="coins" width={12} height={12} /> Voided
-        </span>
-      );
+      return <span>Voided</span>;
   }
 };
 
@@ -206,7 +204,7 @@ const Games: NextPage = () => {
                       <tr>
                         <th>Game</th>
                         <th>Pot</th>
-                        <th className="hiddenMobile">Prices claimed</th>
+                        <th className="hiddenMobile">Claimed</th>
                         <th className="textCenter">State</th>
                       </tr>
                     </thead>
@@ -265,13 +263,24 @@ const Games: NextPage = () => {
                                 />
                               </td>
                               <td className="hiddenMobile">
-                                {g.data.result
-                                  ? `${g.data.totalBetsClaimed}}/${
-                                      g.data.options[g.data.result].totalBets
+                                {g.data.settledAt
+                                  ? `${g.data.totalBetsClaimed}/${
+                                      g.data.result
+                                        ? g.data.options[g.data.result]
+                                            .totalBets
+                                        : g.data.options.reduce(
+                                            (
+                                              acc: number,
+                                              opt: OptionInputType
+                                            ) => acc + opt.totalBets,
+                                            0
+                                          )
                                     }`
                                   : "-"}
                               </td>
-                              <td>{showState(game_state(g.data))}</td>
+                              <td>
+                                {showState(g.data.cashedAt, game_state(g.data))}
+                              </td>
                             </motion.tr>
                           );
                         })}

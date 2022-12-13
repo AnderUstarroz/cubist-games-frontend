@@ -336,7 +336,7 @@ button {
 }
 
 .gameFooter {
-  padding: 20px 20px 100px 20px !important;
+  padding-bottom: 100px !important;
 }
 
 @media (max-width: 768px) {
@@ -353,5 +353,8 @@ button {
   .fullCol {
     flex: unset;
     width: 100%;
+  }
+  .gameFooter {
+    padding-bottom: 120px !important;
   }
 }

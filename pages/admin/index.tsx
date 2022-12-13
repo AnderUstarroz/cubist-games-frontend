@@ -157,7 +157,10 @@ const AdminHome: NextPage = () => {
                             )} USD`
                           }
                         >
-                          {human_number(stats.totalSolProfits.toNumber(), 2)}{" "}
+                          {human_number(
+                            lamports_to_sol(stats.totalSolProfits.toNumber()),
+                            2
+                          )}{" "}
                           SOL
                           <Icon cType="info" className="icon1" />
                         </span>

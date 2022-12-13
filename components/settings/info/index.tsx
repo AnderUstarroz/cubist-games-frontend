@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
 import { format_time } from "../../utils/date";
 import styles from "./Info.module.scss";
+import { OptionInputType } from "../../../types/game-settings";
+import { lamports_to_sol } from "@cubist-collective/cubist-games-lib";
 
 export default function Info({
   gameSettings,
@@ -14,6 +16,7 @@ export default function Info({
   const gameLink = `http${config.https ? "s" : ""}://${
     config.domain
   }/game/${slugify(definition.title.toLowerCase())}?id=${gameSettings.gameId}`;
+  const gameState = game_state(gameSettings);
   return (
     <AnimatePresence>
       <motion.section {...DEFAULT_ANIMATION}>
@@ -22,7 +25,7 @@ export default function Info({
           <div>
             <div className={styles.title}>
               <label>STATE: </label>
-              <span>{game_state(gameSettings)}</span>
+              <span>{gameState}</span>
             </div>
             <div>
               <label>Game link: </label>
@@ -39,7 +42,11 @@ export default function Info({
               <span>
                 {gameSettings.result === null ||
                 definition.options.length < gameSettings.result + 1 ? (
-                  "-"
+                  gameState === "Voided" ? (
+                    "Voided"
+                  ) : (
+                    ""
+                  )
                 ) : (
                   <span className={`optColor${gameSettings.result}`}>
                     {definition.options[gameSettings.result].title}
@@ -61,13 +68,25 @@ export default function Info({
                 <span>
                   {gameSettings.solProfits === null
                     ? "-"
-                    : `${gameSettings.solProfits} SOL`}
+                    : `${lamports_to_sol(gameSettings.solProfits)} SOL`}
                 </span>
               </div>
             )}
             <div>
-              <label>Total bets paid:</label>
-              <span>{gameSettings.totalBetsClaimed}</span>
+              <label>
+                {gameState === "Voided" ? "Refunded" : "Paid"} bets:
+              </label>
+              <span>
+                {gameSettings.totalBetsClaimed}/
+                {gameSettings.options.reduce(
+                  (acc: number, opt: OptionInputType) =>
+                    acc +
+                    (gameState === "Voided" || opt.id === gameSettings.result
+                      ? opt.totalBets
+                      : 0),
+                  0
+                )}
+              </span>
             </div>
           </div>
           <div>

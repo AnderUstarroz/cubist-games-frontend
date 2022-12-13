@@ -88,7 +88,7 @@ import {
 } from "@uiw/react-md-editor/lib/commands";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
-import { DEFAULT_SELECT_STYLES } from "../../components/utils/game";
+import { DEFAULT_SELECT_STYLES, game_state } from "../../components/utils/game";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Input = dynamic(() => import("../../components/input"));
@@ -344,19 +344,21 @@ const Game: NextPage = () => {
     try {
       setLoading(true);
       const tx = new Transaction(await connection.getLatestBlockhash());
-      gameSettings.profitSharing.map(async (share: ProfitShareInputType) => {
-        tx.add(
-          await (solanaProgram as SolanaProgramType).methods
-            .collectSolProfits()
-            .accounts({
-              authority: authority,
-              game: pdas?.game.pda,
-              stats: pdas?.stats.pda,
-              treasury: new PublicKey(share.treasury),
-            })
-            .instruction()
-        );
-      });
+      await Promise.all(
+        gameSettings.profitSharing.map(async (share: ProfitShareInputType) => {
+          tx.add(
+            await (solanaProgram as SolanaProgramType).methods
+              .collectSolProfits()
+              .accounts({
+                authority: authority,
+                game: pdas?.game.pda,
+                stats: pdas?.stats.pda,
+                treasury: new PublicKey(share.treasury),
+              })
+              .instruction()
+          );
+        })
+      );
       const signature = await sendTransaction(tx, connection);
       const latestBlockHash = await connection.getLatestBlockhash();
       await connection.confirmTransaction({
@@ -367,7 +369,7 @@ const Game: NextPage = () => {
       flashMsg("Game cashed!", "success");
       router.reload();
     } catch (error) {
-      flashMsg("Cash out failed", "success");
+      flashMsg("Cash out failed!");
       console.error(error);
       setLoading(false);
     }
@@ -992,6 +994,7 @@ const Game: NextPage = () => {
                 </fieldset>
               </section>
               {gameSettings.createdAt &&
+                !gameSettings.cashedAt &&
                 gameSettings.isActive &&
                 !gameSettings.totalBetsClaimed && (
                   <section>
@@ -1118,11 +1121,13 @@ const Game: NextPage = () => {
                   </section>
                 )}
               <div className="vAligned centered mb-big">
-                {gameSettings.settledAt && !gameSettings.cashedAt && (
-                  <Button className="button2" onClick={() => handleCashOut()}>
-                    Cash out
-                  </Button>
-                )}
+                {gameSettings.settledAt &&
+                  !gameSettings.cashedAt &&
+                  game_state(gameSettings) === "Settled" && (
+                    <Button className="button2" onClick={() => handleCashOut()}>
+                      Cash out
+                    </Button>
+                  )}
                 {!gameSettings.hasBets && (
                   <Button
                     onClick={() => handleSave()}

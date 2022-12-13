@@ -9,6 +9,7 @@ export default function Coins(props: IconType) {
       id="Capa_1"
       width={props.width ? props.width : 25}
       height={props.height ? props.height : 25}
+      className={props.className ? props.className : undefined}
       x="0px"
       y="0px"
       viewBox="0 0 60 60"

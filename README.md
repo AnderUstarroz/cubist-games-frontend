@@ -19,14 +19,15 @@ To create your own gaming site in few minutes follow these steps:
 
 ## Vercel Setup
 
-- [Create a Vercel account](https://vercel.com/signup) (if you don´t have one already) using your previously created github account to login.
-- Go to [Vercel's Dashboard](https://vercel.com/dashboard).
-- Click on `Create New Project`.
-- Click on `Import from Git` and in the popup select `Only select repositories` and choose the previously forked: `cubist-games-frontend`.
-- Click on `Install`.
-- Enter the following repository URL: `https://github.com/AnderUstarroz/cubist-games-frontend`
-- Click on `Import cubist-games-frontend repository`.
-- Click on the `Environment Variables` tab and add the following variables:
+1. [Create a Vercel account](https://vercel.com/signup) (if you don´t have one already) using your previously created github account to login.
+2. If you didn't have a Vercel account, you'll be asked to install Vercel into Github. Choose your account and skip to step 5 below in this case.
+3. Go to [Vercel's Dashboard](https://vercel.com/dashboard).
+4. Click on `Create New Project`.
+5. Click on `Import from Git` and in the popup select `Only select repositories` and choose the previously forked: `cubist-games-frontend`.
+6. Click on `Install`.
+7. Enter the repository URL if asked: `https://github.com/AnderUstarroz/cubist-games-frontend`
+8. Click on `Import cubist-games-frontend repository`.
+9. Click on the `Environment Variables` tab and add the following variables:
 
   - `VERCEL_ENV`: `development`
   - `NEXT_PUBLIC_ENV`: development
@@ -40,14 +41,14 @@ To create your own gaming site in few minutes follow these steps:
   - `NEXT_PUBLIC_TWITTER` (optional): HERE_YOUR_TWITTER_URL
   - `NEXT_PUBLIC_WEB` (optional): HERE_YOUR_WEBSITES_URL
     ```
-    Note: For uploading and editting images you can use https://imgur.com and https://www.photopea.com respectively.
+    Note: For uploading and editing images you can use https://imgur.com and https://www.photopea.com respectively.
     ```
 
-- Click on `Deploy` (wait for about 2min)
-- Your app should be up and running now, nonetheless we recommend you to change the domain for something more readable.
-- Go back to [Vercel's Dashboard](https://vercel.com/dashboard)
-- Click on your newly created project.
-- Go to `Settings` tab, then click on `Domains` and edit the default domain using something like `YOURNEWDOMAIN.vercel.app` (replace only the `YOURNEWDOMAIN` part).
+10. Click on `Deploy` (wait for about 5min)
+11. Your app should be up and running now, nonetheless we recommend you to change the domain for something more readable.
+12. Go back to [Vercel's Dashboard](https://vercel.com/dashboard)
+13. Click on your newly created project.
+14. Go to `Settings` tab, then click on `Domains` and edit the default domain using something like `YOURNEWDOMAIN.vercel.app` (replace only the `YOURNEWDOMAIN` part).
 
 ## Custom Domain name
 

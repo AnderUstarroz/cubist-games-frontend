@@ -28,7 +28,6 @@ To create your own gaming site in few minutes follow these steps:
 - Click on `Import cubist-games-frontend repository`.
 - Click on the `Environment Variables` tab and add the following variables:
 
-  - `VERCEL_ENV`: `development`
   - `NEXT_PUBLIC_ENV`: development
   - `NEXT_PUBLIC_SOLANA_RPC_HOST`: https://api.devnet.solana.com
   - `NEXT_PUBLIC_SOLANA_NETWORK`: devnet

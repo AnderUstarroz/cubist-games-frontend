@@ -29,6 +29,7 @@ export interface ConfigInputType
     StakeButtonsInputType {
   designTemplatesHash: null | string;
   categoriesHash: null | string;
+  tokensHash: null | string;
   profitSharing: ProfitShareInputType[];
   terms: TermsType[];
 }

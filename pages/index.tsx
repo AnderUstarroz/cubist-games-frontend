@@ -27,6 +27,7 @@ import { game_batch, game_state } from "../components/utils/game";
 import { fetch_configs } from "../components/utils/game-settings";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { motion } from "framer-motion";
+import Link from "next/link";
 const Icon = dynamic(() => import("../components/icon"));
 const GamesList = dynamic(() => import("../components/game/games-list"));
 
@@ -117,7 +118,18 @@ const Home: NextPage = () => {
           9
         ))
       ) {
-        flashMsg("The site is not configured yet");
+        flashMsg(
+          <>
+            <span className="vAligned gap5">
+              Site is not configured, please update
+              <Link href="/admin/global-settings">
+                <a className="link" title="Update global settings">
+                  Global Settings
+                </a>
+              </Link>
+            </span>
+          </>
+        );
       }
     })();
   }, [solanaProgram, pdas]);

@@ -166,6 +166,7 @@ const GameSettings: NextPage = () => {
     stakeButtons: [0.5, 1],
     designTemplatesHash: null,
     categoriesHash: null,
+    tokensHash: null,
     profitSharing: [],
     terms: [],
   });
@@ -280,6 +281,7 @@ const GameSettings: NextPage = () => {
           throw error;
         }
         flashMsg(`${error.error.errorMessage}`);
+        console.error(error);
       }
     })();
   };

@@ -25,7 +25,6 @@ const MenuItem = ({
   whileHover,
   whileTap,
   children,
-  margin,
 }: MenuItemType) => {
   return (
     <motion.li
@@ -33,7 +32,6 @@ const MenuItem = ({
       whileHover={whileHover ? whileHover : { scale: 1.1 }}
       whileTap={whileTap ? whileTap : { scale: 0.95 }}
       className={className ? styles[className] : undefined}
-      style={margin ? { marginLeft: margin } : { marginLeft: 32 }}
     >
       {children}
     </motion.li>

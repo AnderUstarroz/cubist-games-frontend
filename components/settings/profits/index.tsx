@@ -113,7 +113,14 @@ export default function Profits({
                               onClick={() =>
                                 showModal(
                                   <div>
-                                    <h4>Service fee</h4>
+                                    <span className="infoIco">
+                                      <Icon
+                                        cType="info"
+                                        width={26}
+                                        height={26}
+                                      />
+                                    </span>
+                                    <h4 className="textCenter">Service fee</h4>
                                     <p>
                                       The program keeps the{" "}
                                       {human_number(
@@ -243,7 +250,10 @@ export default function Profits({
                     onClick={() =>
                       showModal(
                         <div>
-                          <h4>Fee</h4>
+                          <span className="infoIco">
+                            <Icon cType="info" width={26} height={26} />
+                          </span>
+                          <h4 className="textCenter">Fee</h4>
                           <p>
                             Defines the percentage of benefits collected. This
                             fee will be extracted from all placed bets (total

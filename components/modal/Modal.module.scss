@@ -9,6 +9,18 @@
   border-radius: 8px;
   overflow: auto;
   outline: none;
+  & :global {
+    .infoIco {
+      width: fit-content;
+      margin: 0 auto 15px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      padding: 16px;
+      background-color: var(--iconFill1);
+    }
+  }
 }
 .modHead {
   padding: 20px 20px 0 0;

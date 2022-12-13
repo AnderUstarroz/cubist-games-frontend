@@ -38,7 +38,10 @@ export default function GeneralSettings({
                 onClick={() =>
                   showModal(
                     <div>
-                      <h4>Show pot</h4>
+                      <span className="infoIco">
+                        <Icon cType="info" width={26} height={26} />
+                      </span>
+                      <h4 className="textCenter">Show pot</h4>
                       <p>
                         Displays the sum of all stakes within the game page.
                       </p>
@@ -63,7 +66,10 @@ export default function GeneralSettings({
                 onClick={() =>
                   showModal(
                     <div>
-                      <h4>Allow referral</h4>
+                      <span className="infoIco">
+                        <Icon cType="info" width={26} height={26} />
+                      </span>
+                      <h4 className="textCenter">Allow referral</h4>
                       <p>
                         A referral code is just a unique game URL which contains
                         a referral ID. All the bets placed using these game
@@ -101,7 +107,10 @@ export default function GeneralSettings({
                 onClick={() =>
                   showModal(
                     <div>
-                      <h4>Fire threshold</h4>
+                      <span className="infoIco">
+                        <Icon cType="info" width={26} height={26} />
+                      </span>
+                      <h4 className="textCenter">Fire threshold</h4>
                       <p>
                         The fire threshold is just a flame animation which is
                         displayed when the pot (sum of all bet stakes) has

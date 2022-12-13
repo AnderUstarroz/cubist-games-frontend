@@ -14,6 +14,7 @@ import {
 } from "@cubist-collective/cubist-games-lib";
 import { AnimatePresence } from "framer-motion";
 import { calculate_stakes } from "../../utils/bet";
+import { flashMsg } from "../../utils/helpers";
 
 const MyBets = dynamic(() => import("../my-bets"));
 const Button = dynamic(() => import("../../button"));
@@ -45,6 +46,7 @@ export default function CTA({
   solFiatPrice,
   modals,
   setModals,
+  termsAgreed,
 }: CTAPropsType) {
   const [showMyBets, setShowMyBets] = useState<boolean>(false);
   const [showButton, setShowButton] = useState<ShowCTA>(ShowCTA.None);
@@ -189,7 +191,11 @@ export default function CTA({
                 <Button
                   key="btn-bet"
                   className="vAligned gap5 rounded"
-                  onClick={() => setModals({ ...modals, bet: true })}
+                  onClick={() =>
+                    termsAgreed
+                      ? setModals({ ...modals, bet: true })
+                      : flashMsg("You must accept the Terms & Conditions")
+                  }
                 >
                   <span className={styles.sol}>
                     <Icon

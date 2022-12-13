@@ -13,9 +13,12 @@ export default function Info({
   definition,
   config,
 }: InfoPropsType) {
+  const gamePath = `/game/${slugify(definition.title.toLowerCase())}?id=${
+    gameSettings.gameId
+  }`;
   const gameLink = `http${config.https ? "s" : ""}://${
     config.domain
-  }/game/${slugify(definition.title.toLowerCase())}?id=${gameSettings.gameId}`;
+  }${gamePath}`;
   const gameState = game_state(gameSettings);
   return (
     <AnimatePresence>
@@ -30,7 +33,7 @@ export default function Info({
             <div>
               <label>Game link: </label>
               <span>
-                <a href={gameLink} target="_blank" rel="noreferrer">
+                <a href={gamePath} target="_blank" rel="noreferrer">
                   {gameLink.length > 20
                     ? `${gameLink.substring(0, 20)}...`
                     : gameLink}

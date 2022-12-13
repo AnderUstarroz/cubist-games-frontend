@@ -45,7 +45,10 @@ export default function StakeButtons({
                 onClick={() =>
                   showModal(
                     <div>
-                      <h4>Allow custom stake</h4>
+                      <span className="infoIco">
+                        <Icon cType="info" width={26} height={26} />
+                      </span>
+                      <h4 className="textCenter">Allow custom stake</h4>
                       <p>
                         Displays the stake input, so users can freely type the
                         amount to bet.
@@ -78,7 +81,10 @@ export default function StakeButtons({
                   onClick={() =>
                     showModal(
                       <div>
-                        <h4>Minimum stake</h4>
+                        <span className="infoIco">
+                          <Icon cType="info" width={26} height={26} />
+                        </span>
+                        <h4 className="textCenter">Minimum stake</h4>
                         <p>The minimum amount allowed to place a bet.</p>
                       </div>
                     )
@@ -107,7 +113,10 @@ export default function StakeButtons({
                   onClick={() =>
                     showModal(
                       <div>
-                        <h4>Min step</h4>
+                        <span className="infoIco">
+                          <Icon cType="info" width={26} height={26} />
+                        </span>
+                        <h4 className="textCenter">Min step</h4>
                         <p>
                           The minimum amount in which a bet can be
                           increased/decreased.
@@ -127,7 +136,10 @@ export default function StakeButtons({
               onClick={() =>
                 showModal(
                   <div>
-                    <h4>Default stake buttons</h4>
+                    <span className="infoIco">
+                      <Icon cType="info" width={26} height={26} />
+                    </span>
+                    <h4 className="textCenter">Default stake buttons</h4>
                     <p>
                       Shows buttons with predefined amounts for each game
                       option. This allows users to place bets quicker.

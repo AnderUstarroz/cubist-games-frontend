@@ -41,7 +41,10 @@ export default function DatesSettings({
                   onClick={() =>
                     showModal(
                       <div>
-                        <h4>Open time</h4>
+                        <span className="infoIco">
+                          <Icon cType="info" width={26} height={26} />
+                        </span>
+                        <h4 className="textCenter">Open time</h4>
                         <p>
                           Defines the time at which the game will start being
                           displayed and accepting bets.
@@ -72,7 +75,10 @@ export default function DatesSettings({
                   onClick={() =>
                     showModal(
                       <div>
-                        <h4>Close time</h4>
+                        <span className="infoIco">
+                          <Icon cType="info" width={26} height={26} />
+                        </span>
+                        <h4 className="textCenter">Close time</h4>
                         <p>
                           Defines the time at which the game will stop accepting
                           bets.
@@ -103,7 +109,10 @@ export default function DatesSettings({
                   onClick={() =>
                     showModal(
                       <div>
-                        <h4>Settle time</h4>
+                        <span className="infoIco">
+                          <Icon cType="info" width={26} height={26} />
+                        </span>
+                        <h4 className="textCenter">Settle time</h4>
                         <p>
                           Defines the approximated time at which the game should
                           be settled.{" "}

@@ -51,7 +51,10 @@ function DefaultDefinition({
           onClick={() =>
             setMainModal(
               <div>
-                <h4>Fees</h4>
+                <span className="infoIco">
+                  <Icon cType="info" width={26} height={26} />
+                </span>
+                <h4 className="textCenter">Fees</h4>
                 <ul className="sqList">
                   <li>
                     <strong>{num_format(game.data.fee, 2)}% Game fee:</strong>{" "}

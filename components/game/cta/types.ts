@@ -14,6 +14,7 @@ export interface CTAPropsType {
   solFiatPrice: number | null;
   modals: { [key: string]: boolean };
   setModals: Function;
+  termsAgreed: boolean;
 }
 
 export enum ShowCTA {

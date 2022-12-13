@@ -81,48 +81,47 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
           )}
         </div>
       </MenuItem>
-      {!!process.env.NEXT_PUBLIC_DISCORD && (
-        <MenuItem margin={5}>
-          <Link href={process.env.NEXT_PUBLIC_DISCORD}>
-            <a target="_blank" onClick={toggle}>
-              <Image
-                src={Discord}
-                height={size}
-                width={size}
-                alt="Discord"
-                title="Visit Discord"
-              />
-            </a>
-          </Link>
-        </MenuItem>
-      )}
-      {!!process.env.NEXT_PUBLIC_TWITTER && (
-        <MenuItem margin={5}>
-          <Link href={process.env.NEXT_PUBLIC_TWITTER}>
-            <a target="_blank" title="Visit Twitter" onClick={toggle}>
-              <Image
-                src={Twitter}
-                height={size}
-                width={size}
-                alt="Twitter"
-                title="Visit Twitter"
-              />
-            </a>
-          </Link>
-        </MenuItem>
-      )}
       {!!process.env.NEXT_PUBLIC_WEB && (
-        <MenuItem margin={5}>
-          <Link href={process.env.NEXT_PUBLIC_WEB}>
-            <a
-              title="Visit Website"
-              target="_blank"
-              onClick={toggle}
-              style={{ paddingBottom: 4 }}
-            >
-              <Icon cType="web" height={size} width={size} />
-            </a>
-          </Link>
+        <MenuItem whileTap={{}} whileHover={{}}>
+          <div className="vAligned gap5">
+            {!!process.env.NEXT_PUBLIC_DISCORD && (
+              <Button cType="transparent">
+                <Link href={process.env.NEXT_PUBLIC_DISCORD}>
+                  <a target="_blank" onClick={toggle}>
+                    <Image
+                      src={Discord}
+                      height={size}
+                      width={size}
+                      alt="Discord"
+                      title="Visit Discord"
+                    />
+                  </a>
+                </Link>
+              </Button>
+            )}
+            {!!process.env.NEXT_PUBLIC_TWITTER && (
+              <Button cType="transparent">
+                <Link href={process.env.NEXT_PUBLIC_TWITTER}>
+                  <a target="_blank" title="Visit Twitter" onClick={toggle}>
+                    <Image
+                      src={Twitter}
+                      height={size}
+                      width={size}
+                      alt="Twitter"
+                      title="Visit Twitter"
+                    />
+                  </a>
+                </Link>
+              </Button>
+            )}
+            <Button cType="transparent" style={{ paddingBottom: 4 }}>
+              <Link href={process.env.NEXT_PUBLIC_WEB}>
+                <a title="Visit Website" target="_blank" onClick={toggle}>
+                  <Icon cType="web" height={size} width={size} />
+                </a>
+              </Link>
+            </Button>
+          </div>
         </MenuItem>
       )}
       <MenuItem whileTap={{}} whileHover={{}}>

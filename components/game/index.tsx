@@ -84,6 +84,7 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         solFiatPrice={props.solFiatPrice}
         modals={props.modals}
         setModals={props.setModals}
+        termsAgreed={props.terms.agreed}
       />
     </>
   );

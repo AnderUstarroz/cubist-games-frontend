@@ -732,7 +732,12 @@ const Game: NextPage = () => {
                             onClick={() =>
                               showModal(
                                 <div>
-                                  <h4>Activate/Deactivate games</h4>
+                                  <span className="infoIco">
+                                    <Icon cType="info" width={26} height={26} />
+                                  </span>
+                                  <h4 className="textCenter">
+                                    Activate/Deactivate games
+                                  </h4>
                                   <p>
                                     Deactivated games won&apos;t be displayed in
                                     the games list. Only active games can accept
@@ -856,7 +861,10 @@ const Game: NextPage = () => {
                       onClick={() =>
                         showModal(
                           <div>
-                            <h4>Game image</h4>
+                            <span className="infoIco">
+                              <Icon cType="info" width={26} height={26} />
+                            </span>
+                            <h4 className="textCenter">Game image</h4>
                             <p>
                               Upload and image to enrich the game interface.
                             </p>

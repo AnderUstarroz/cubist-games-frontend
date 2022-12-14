@@ -174,7 +174,14 @@ const Home: NextPage = () => {
       </Head>
 
       <div className={styles.content}>
-        <h1 className={styles.title}>
+        <h1
+          className={styles.title}
+          style={{
+            backgroundImage: process.env.NEXT_PUBLIC_HOME_IMAGE_URL
+              ? `url(${process.env.NEXT_PUBLIC_HOME_IMAGE_URL})`
+              : "var(--homeImg)",
+          }}
+        >
           {process.env.NEXT_PUBLIC_LOGO ? (
             <motion.img
               src={process.env.NEXT_PUBLIC_LOGO}

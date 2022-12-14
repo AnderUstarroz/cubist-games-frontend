@@ -16,7 +16,6 @@
   font-size: 50px;
   padding: 65px;
   border-radius: 16px;
-  background-image: var(--homeImg);
   background-size: cover;
   background-position: center;
   display: flex;
@@ -54,7 +53,6 @@
 @media (max-width: 768px) {
   .title {
     font-size: var(--h1Size);
-    background-image: var(--homeImgMobile);
     padding: 25px;
     margin: 0 8px 25px 8px;
   }

@@ -29,25 +29,26 @@ To create your own gaming site in few minutes follow these steps:
 8. Click on `Import cubist-games-frontend repository`.
 9. Click on the `Environment Variables` tab and add the following variables:
 
-  - `NEXT_PUBLIC_ENV`: development
-  - `NEXT_PUBLIC_SOLANA_RPC_HOST`: https://api.devnet.solana.com
-  - `NEXT_PUBLIC_SOLANA_NETWORK`: devnet
-  - `NEXT_PUBLIC_AUTHORITY`: HERE_YOUR_PUBLIC_WALLETS_ADDRESS
-  - `NEXT_PUBLIC_SITE_NAME`: HERE_YOUR_SITE_NAME
-  - `NEXT_PUBLIC_LOGO` (optional): HERE_THE_URL_OF_YOUR_LOGO (recommended size 300x300)
-  - `NEXT_PUBLIC_FAVICON` (optional): HERE_THE_URL_OF_YOUR_FAVICON (recommended size 96x96)
-  - `NEXT_PUBLIC_DISCORD` (optional): HERE_YOUR_DISCORD_URL
-  - `NEXT_PUBLIC_TWITTER` (optional): HERE_YOUR_TWITTER_URL
-  - `NEXT_PUBLIC_WEB` (optional): HERE_YOUR_WEBSITES_URL
-    ```
-    Note: For uploading and editing images you can use https://imgur.com and https://www.photopea.com respectively.
-    ```
+- `NEXT_PUBLIC_ENV`: development
+- `NEXT_PUBLIC_SOLANA_RPC_HOST`: https://api.devnet.solana.com
+- `NEXT_PUBLIC_SOLANA_NETWORK`: devnet
+- `NEXT_PUBLIC_AUTHORITY`: HERE_YOUR_PUBLIC_WALLETS_ADDRESS
+- `NEXT_PUBLIC_SITE_NAME`: HERE_YOUR_SITE_NAME
+- `NEXT_PUBLIC_LOGO` (optional): HERE_THE_URL_OF_YOUR_LOGO (recommended size 300x300)
+- `NEXT_PUBLIC_HOME_IMAGE_URL` (optional): HERE_THE_URL_OF_YOUR_HOME_IMAGE_URL (recommended size 930 × 230)
+- `NEXT_PUBLIC_FAVICON` (optional): HERE_THE_URL_OF_YOUR_FAVICON (recommended size 96x96)
+- `NEXT_PUBLIC_DISCORD` (optional): HERE_YOUR_DISCORD_URL
+- `NEXT_PUBLIC_TWITTER` (optional): HERE_YOUR_TWITTER_URL
+- `NEXT_PUBLIC_WEB` (optional): HERE_YOUR_WEBSITES_URL
+  ```
+  Note: For uploading and editing images you can use https://imgur.com and https://www.photopea.com respectively.
+  ```
 
-10. Click on `Deploy` (wait for about 5min)
-11. Your app should be up and running now, nonetheless we recommend you to change the domain for something more readable.
-12. Go back to [Vercel's Dashboard](https://vercel.com/dashboard)
-13. Click on your newly created project.
-14. Go to `Settings` tab, then click on `Domains` and edit the default domain using something like `YOURNEWDOMAIN.vercel.app` (replace only the `YOURNEWDOMAIN` part).
+1.  Click on `Deploy` (wait for about 5min)
+2.  Your app should be up and running now, nonetheless we recommend you to change the domain for something more readable.
+3.  Go back to [Vercel's Dashboard](https://vercel.com/dashboard)
+4.  Click on your newly created project.
+5.  Go to `Settings` tab, then click on `Domains` and edit the default domain using something like `YOURNEWDOMAIN.vercel.app` (replace only the `YOURNEWDOMAIN` part).
 
 ## Custom Domain name
 

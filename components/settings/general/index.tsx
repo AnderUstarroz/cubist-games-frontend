@@ -91,6 +91,7 @@ export default function GeneralSettings({
                   errors.hasOwnProperty("fireThreshold") ? " error" : ""
                 }`}
                 value={settings.fireThreshold}
+                onFocus={(e: any) => e.target.select()}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   handleUpdateSettings(
                     "fireThreshold",

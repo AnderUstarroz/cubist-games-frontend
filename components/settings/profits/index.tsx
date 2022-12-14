@@ -155,6 +155,7 @@ export default function Profits({
                                   type="number"
                                   name={`ps-share${k}`}
                                   value={item.share}
+                                  onFocus={(e: any) => e.target.select()}
                                   onChange={(
                                     e: React.ChangeEvent<HTMLInputElement>
                                   ) =>
@@ -233,6 +234,7 @@ export default function Profits({
                     style={{ width: 260 }}
                     className={errors.hasOwnProperty("fee") ? "error" : null}
                     value={settings.fee}
+                    onFocus={(e: any) => e.target.select()}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleUpdateSettings(
                         "fee",

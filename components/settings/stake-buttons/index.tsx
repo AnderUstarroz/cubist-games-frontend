@@ -63,6 +63,7 @@ export default function StakeButtons({
                 <Input
                   name="minStake"
                   type="number"
+                  onFocus={(e: any) => e.target.select()}
                   className={errors.hasOwnProperty("minStake") ? "error" : null}
                   value={settings.minStake}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -95,6 +96,7 @@ export default function StakeButtons({
                 <Input
                   name="minStep"
                   type="number"
+                  onFocus={(e: any) => e.target.select()}
                   className={errors.hasOwnProperty("minStep") ? "error" : null}
                   value={settings.minStep}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -168,6 +170,7 @@ export default function StakeButtons({
                 <Input
                   type="number"
                   value={v}
+                  onFocus={(e: any) => e.target.select()}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleUpdateSettings(
                       "stakeButtons",

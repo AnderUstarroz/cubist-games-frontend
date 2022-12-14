@@ -7,7 +7,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  &:focus {
+    outline: none;
+  }
 }
+
 html,
 body {
   height: 100%;
@@ -260,6 +264,9 @@ button {
   &[disabled] {
     background-color: var(--disabledBtnBg);
     color: var(--color13);
+    &:hover {
+      background-color: var(--btnBgHover1);
+    }
   }
   &:hover {
     background-color: var(--btnBgHover0);

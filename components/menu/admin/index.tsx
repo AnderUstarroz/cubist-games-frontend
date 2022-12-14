@@ -8,6 +8,7 @@ import { HomeMenuType } from "./types";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const SiteLinks = dynamic(() => import("../menu_item/site_links"));
 const Button = dynamic(() => import("../../button"));
@@ -19,6 +20,7 @@ const size = 20;
 export default function AdminMenu({ toggle }: HomeMenuType) {
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
   const { publicKey } = useWallet();
+  const router = useRouter();
 
   // const ScrollSection = (section: string) => {
   //   if (toggle) {
@@ -70,13 +72,16 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
                   </a>
                 </Link>
               </Button>
-              <Button cType="transparent">
-                <Link href="/admin/game">
-                  <a rel="noopener" title="Settings" onClick={toggle}>
-                    New Game
-                  </a>
-                </Link>
-              </Button>
+              {/* To avoid the issue of not being able to create a new game when alreaddy editting one */}
+              {router.pathname !== "/admin/game" && (
+                <Button cType="transparent">
+                  <Link href="/admin/game">
+                    <a rel="noopener" title="Settings" onClick={toggle}>
+                      New Game
+                    </a>
+                  </Link>
+                </Button>
+              )}
             </>
           )}
         </div>

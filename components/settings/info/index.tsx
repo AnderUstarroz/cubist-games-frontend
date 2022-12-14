@@ -77,18 +77,21 @@ export default function Info({
             )}
             <div>
               <label>
-                {gameState === "Voided" ? "Refunded" : "Paid"} bets:
+                {gameState === "Voided" ? "Refunded" : "Claimed"} bets:
               </label>
               <span>
-                {gameSettings.totalBetsClaimed}/
-                {gameSettings.options.reduce(
-                  (acc: number, opt: OptionInputType) =>
-                    acc +
-                    (gameState === "Voided" || opt.id === gameSettings.result
-                      ? opt.totalBets
-                      : 0),
-                  0
-                )}
+                {gameSettings.settledAt
+                  ? `${gameSettings.totalBetsClaimed} /
+                    ${gameSettings.options.reduce(
+                      (acc: number, opt: OptionInputType) =>
+                        acc +
+                        (gameState === "Voided" ||
+                        opt.id === gameSettings.result
+                          ? opt.totalBets
+                          : 0),
+                      0
+                    )}`
+                  : "-"}
               </span>
             </div>
           </div>

@@ -265,16 +265,16 @@ const Games: NextPage = () => {
                               <td className="hiddenMobile">
                                 {g.data.settledAt
                                   ? `${g.data.totalBetsClaimed}/${
-                                      g.data.result
-                                        ? g.data.options[g.data.result]
-                                            .totalBets
-                                        : g.data.options.reduce(
+                                      g.data.result === null
+                                        ? g.data.options.reduce(
                                             (
                                               acc: number,
                                               opt: OptionInputType
                                             ) => acc + opt.totalBets,
                                             0
                                           )
+                                        : g.data.options[g.data.result]
+                                            .totalBets
                                     }`
                                   : "-"}
                               </td>

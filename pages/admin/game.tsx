@@ -690,7 +690,7 @@ const Game: NextPage = () => {
           .rpc();
         flashMsg("Game settled", "success");
       }
-      Router.push("/admin");
+      router.reload();
     } catch (error) {
       flashMsg(`${error}`);
     }
@@ -1040,6 +1040,15 @@ const Game: NextPage = () => {
                         }
                         styles={{
                           ...DEFAULT_SELECT_STYLES,
+                          singleValue: (baseStyles: any, state: any) => {
+                            return {
+                              ...baseStyles,
+                              color:
+                                gameSettings.result !== null
+                                  ? `var(--opt${gameSettings.result})`
+                                  : "",
+                            };
+                          },
                           option: (baseStyles: any, state: any) => {
                             return {
                               ...baseStyles,
@@ -1101,7 +1110,7 @@ const Game: NextPage = () => {
                               </div>
                               <p>
                                 <strong>
-                                  Are you completly sure this is the correct
+                                  Are you completely sure this is the correct
                                   outcome of the game?{" "}
                                 </strong>
                               </p>
@@ -1132,7 +1141,11 @@ const Game: NextPage = () => {
                 {gameSettings.settledAt &&
                   !gameSettings.cashedAt &&
                   game_state(gameSettings) === "Settled" && (
-                    <Button className="button2" onClick={() => handleCashOut()}>
+                    <Button
+                      className="button2 vAligned gap5"
+                      onClick={() => handleCashOut()}
+                    >
+                      <Icon cType="coins" width={12} height={12} />
                       Cash out
                     </Button>
                   )}

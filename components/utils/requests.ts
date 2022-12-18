@@ -134,7 +134,7 @@ export const fetch_games = async (
   // Sort by Newest -> Oldest
   return Object.keys(games)
     .map((gameId: string) => parseInt(gameId))
-    .sort()
+    .sort((a: number, b: number) => a - b)
     .reverse()
     .map((gameId: number) => games[gameId]);
 };

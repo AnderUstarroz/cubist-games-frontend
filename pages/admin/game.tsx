@@ -210,8 +210,8 @@ const Game: NextPage = () => {
     title: "",
     description: "",
     options: [
-      { title: "", description: "" },
-      { title: "", description: "" },
+      { title: "Type option", description: "" },
+      { title: "Type option", description: "" },
     ],
   });
   const [definitionErrors, setDefinitionErrors] = useState<{
@@ -542,6 +542,7 @@ const Game: NextPage = () => {
   // STEP 2 - Fetch Configs
   useEffect(() => {
     if (!solanaProgram || !pdas || systemConfig) return;
+
     (async () => {
       if (
         !(await fetch_configs(
@@ -1225,7 +1226,7 @@ const Game: NextPage = () => {
                           options: [
                             ...definition.options,
                             {
-                              title: ``,
+                              title: `Type option`,
                               description: "",
                             },
                           ],
@@ -1253,6 +1254,7 @@ const Game: NextPage = () => {
                             maxLength={32}
                             placeholder="Type option.."
                             value={o.title}
+                            onFocus={(e: any) => e.target.select()}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
                             ) => handleUpdateOption("title", k, e.target.value)}

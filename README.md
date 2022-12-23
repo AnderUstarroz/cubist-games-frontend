@@ -52,4 +52,4 @@ To create your own gaming site in few minutes follow these steps:
 
 ## Custom Domain name
 
-If you want to use your Custom domain instead of the current Vercel subdomain (`X.vercel.ap`) just follow [these steps](https://vercel.com/docs/concepts/projects/domains/add-a-domain).
+If you want to use your Custom domain instead of the current Vercel subdomain (`YOURNEWDOMAIN.vercel.app`) just follow [these steps](https://vercel.com/docs/concepts/projects/domains/add-a-domain).

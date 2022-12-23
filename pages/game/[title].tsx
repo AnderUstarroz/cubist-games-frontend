@@ -208,6 +208,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
   };
   const handleShare = () => {
     if (!game || !game.cached.definition) return;
+    const totalStake = game.data.options.reduce((a, o) => a + o.totalStake, 0);
     window.open(
       `http://twitter.com/share?text=${
         game.cached.definition.title
@@ -215,9 +216,9 @@ const GamePage: NextPage = ({ data, path }: any) => {
         .map(
           (option, index) =>
             `%0A🔹${option.title}:%20${num_format(
-              (game.data.options[index].totalStake /
-                game.data.options.reduce((a, o) => a + o.totalStake, 0)) *
-                100,
+              totalStake
+                ? (game.data.options[index].totalStake / totalStake) * 100
+                : 0,
               2
             )}%25`
         )
@@ -263,7 +264,15 @@ const GamePage: NextPage = ({ data, path }: any) => {
       setSystemConfig(
         await solanaProgram.account.systemConfig.fetch(pdas.systemConfig.pda)
       );
-      if (fetchedGame.data.infoHash) {
+      // Display Warning when Game is disabled or when info message is defined
+      if (!fetchedGame.data.isActive) {
+        setWarningMsg({
+          show: true,
+          title: "Game is disabled",
+          description:
+            "The game has been temporarily disabled, we apologize for the inconvenience.",
+        });
+      } else if (fetchedGame.data.infoHash) {
         fetchInfo(fetchedGame.data.infoHash);
       }
       setTerms({

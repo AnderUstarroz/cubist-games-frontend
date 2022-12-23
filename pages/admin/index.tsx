@@ -6,6 +6,7 @@ import {
   flashError,
   flashMsg,
   is_authorized,
+  update_available,
 } from "../../components/utils/helpers";
 import { useEffect, useState } from "react";
 import Router from "next/router";
@@ -33,6 +34,7 @@ import Spinner from "../../components/spinner";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 import { human_number } from "../../components/utils/number";
 import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
+import { async_cached } from "../../components/utils/requests";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Button = dynamic(() => import("../../components/button"));
@@ -65,7 +67,7 @@ const AdminHome: NextPage = () => {
       return;
     }
     (async () => {
-      setSolFiatPrice(await solana_fiat_price());
+      setSolFiatPrice(await async_cached(solana_fiat_price, [], 21600)); // Cache for 6h
       setPdas(
         await flashError(fetch_pdas, [
           ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
@@ -76,6 +78,7 @@ const AdminHome: NextPage = () => {
       setSolanaProgram(
         await initSolanaProgram(IDL, connection, wallet.adapter)
       );
+      async_cached(update_available, [], 21600); // Cached for 6h
     })();
   }, [publicKey, wallet, connection, solanaProgram, authority, pdas]);
 

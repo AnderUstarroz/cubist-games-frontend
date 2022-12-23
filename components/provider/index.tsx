@@ -37,14 +37,15 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const onError = useCallback(
     (error: WalletError) =>
-      toast.custom(
+      toast.custom((t) => (
         <Notification
+          visible={t.visible}
           message={
             error.message ? `${error.name}: ${error.message}` : error.name
           }
           variant="error"
         />
-      ),
+      )),
     []
   );
 

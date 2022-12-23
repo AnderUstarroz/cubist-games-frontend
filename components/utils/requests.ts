@@ -17,6 +17,7 @@ import { GamesType, GameTermsType, GameType } from "../../types/game";
 import { PublicKey } from "@solana/web3.js";
 import { game_pda } from "@cubist-collective/cubist-games-lib";
 import { rustToInputsSettings } from "./game-settings";
+import { Exception } from "sass";
 export type MultiRequestType = [Function, any[]];
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -168,4 +169,62 @@ export const fetch_terms = async (
     }
   }
   return terms;
+};
+
+const cache_key = (callback: Function, args: any[]) => {
+  return `${callback.name}-${args.map((arg: any) => `${arg}`).join("-")}`;
+};
+
+const fetch_cached = (cacheKey: string, expires: number | null) => {
+  try {
+    let cached = JSON.parse(sessionStorage.getItem(cacheKey) as string);
+    if (cached) {
+      if (
+        !expires ||
+        !cached.expires ||
+        cached.expires < new Date().getTime() ||
+        cached.data === undefined
+      ) {
+        return null;
+      }
+      return cached.data;
+    }
+  } catch (e) {}
+  return null;
+};
+
+const cache_item = (cacheKey: string, expires: number | null, result: any) => {
+  if (!result) {
+    return null;
+  }
+  sessionStorage.setItem(
+    cacheKey,
+    JSON.stringify({
+      expires: expires ? new Date().getTime() + expires * 1000 : null,
+      data: result,
+    })
+  );
+  return result;
+};
+
+export const cached = (
+  callback: Function,
+  args: any[],
+  expires: number | null = null // Expiration time in seconds
+): any => {
+  const cacheKey = cache_key(callback, args);
+  let cached = fetch_cached(cacheKey, expires);
+  return cached ? cached : cache_item(cacheKey, expires, callback(...args));
+};
+
+export const async_cached = async (
+  callback: Function,
+  args: any[],
+  expires: number | null = null // Expiration time in seconds
+): Promise<any> => {
+  const cacheKey = cache_key(callback, args);
+  let cached = fetch_cached(cacheKey, expires);
+  return cached
+    ? cached
+    : cache_item(cacheKey, expires, await callback(...args));
 };

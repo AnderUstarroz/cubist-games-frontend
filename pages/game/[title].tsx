@@ -39,7 +39,11 @@ import {
 } from "../../types/game";
 import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
 import { flashError, flashMsg } from "../../components/utils/helpers";
-import { fetch_games, fetch_terms } from "../../components/utils/requests";
+import {
+  fetch_games,
+  fetch_terms,
+  async_cached,
+} from "../../components/utils/requests";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
@@ -231,7 +235,7 @@ const GamePage: NextPage = ({ data, path }: any) => {
     if (!data || solanaProgram || pdas) return;
     (async () => {
       // Init
-      setSolFiatPrice(await solana_fiat_price());
+      setSolFiatPrice(await async_cached(solana_fiat_price, [], 43200)); // Cache for 12h
       setPdas(
         await flashError(fetch_pdas, [
           ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],

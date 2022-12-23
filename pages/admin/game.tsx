@@ -58,11 +58,12 @@ import {
   inputsToRustSettings,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
-import { multi_request } from "../../components/utils/requests";
+import { async_cached, multi_request } from "../../components/utils/requests";
 import {
   flashError,
   flashMsg,
   is_authorized,
+  update_available,
 } from "../../components/utils/helpers";
 import { RechargeArweaveType } from "../../components/recharge-arweave/types";
 import Link from "next/link";
@@ -524,7 +525,7 @@ const Game: NextPage = () => {
       return;
     }
     (async () => {
-      setSolFiatPrice(await solana_fiat_price());
+      setSolFiatPrice(await async_cached(solana_fiat_price, [], 21600)); // Cache for 6h
       setMaxDecimals(DEFAULT_DECIMALS);
       setPdas(
         await flashError(fetch_pdas, [
@@ -536,6 +537,7 @@ const Game: NextPage = () => {
       setSolanaProgram(
         await initSolanaProgram(IDL, connection, wallet.adapter)
       );
+      async_cached(update_available, [], 21600); // Cached for 6h
     })();
   }, [publicKey, wallet, connection, solanaProgram, authority]);
 

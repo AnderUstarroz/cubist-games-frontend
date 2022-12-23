@@ -6,6 +6,7 @@ import {
   flashError,
   flashMsg,
   is_authorized,
+  update_available,
 } from "../../components/utils/helpers";
 import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
@@ -29,7 +30,7 @@ import {
   GameStateOutputType,
   OptionInputType,
 } from "../../types/game-settings";
-import { fetch_games } from "../../components/utils/requests";
+import { async_cached, fetch_games } from "../../components/utils/requests";
 import { fetch_configs } from "../../components/utils/game-settings";
 import Router from "next/router";
 import { GameType } from "../../types/game";
@@ -124,7 +125,7 @@ const Games: NextPage = () => {
     }
 
     (async () => {
-      setSolFiatPrice(await solana_fiat_price());
+      setSolFiatPrice(await async_cached(solana_fiat_price, [], 21600)); // Cache for 6h
       setPdas(
         await flashError(fetch_pdas, [
           ["systemConfig", system_config_pda, SYSTEM_AUTHORITY],
@@ -135,6 +136,7 @@ const Games: NextPage = () => {
       setSolanaProgram(
         await initSolanaProgram(IDL, connection, wallet.adapter)
       );
+      async_cached(update_available, [], 21600); // Cached for 6h
     })();
   }, [publicKey, wallet, connection, solanaProgram, authority, pdas]);
 

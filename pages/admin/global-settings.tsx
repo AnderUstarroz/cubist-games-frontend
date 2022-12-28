@@ -611,6 +611,10 @@ const GameSettings: NextPage = () => {
                                             />
                                           </em>
                                         </label>
+                                        <ReactTooltip
+                                          id="termsTooltip"
+                                          globalEventOff="click"
+                                        />
                                       </div>
                                       <div className="mb-med">
                                         <label className="overlap">
@@ -716,7 +720,6 @@ const GameSettings: NextPage = () => {
       <Modal modalId={"main"} modals={modals} setIsOpen={setModals}>
         {mainModalContent}
       </Modal>
-      <ReactTooltip id="termsTooltip" globalEventOff="click" />
     </>
   );
 };

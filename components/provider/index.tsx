@@ -43,6 +43,8 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
           message={
             error.message ? `${error.name}: ${error.message}` : error.name
           }
+          height={t.height}
+          position={t.position}
           variant="error"
         />
       )),

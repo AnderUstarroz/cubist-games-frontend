@@ -24,7 +24,15 @@ export function flashMsg(
   duration: number = 5000
 ) {
   toast.custom(
-    (t) => <Notification visible={t.visible} message={msg} variant={variant} />,
+    (t) => (
+      <Notification
+        visible={t.visible}
+        message={msg}
+        variant={variant}
+        height={t.height}
+        position={t.position}
+      />
+    ),
     {
       duration: duration,
     }

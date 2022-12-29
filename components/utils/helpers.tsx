@@ -101,7 +101,7 @@ export const update_available = async () => {
         </ol>
       </div>,
       "error",
-      2500000
+      25000
     );
     return undefined;
   }

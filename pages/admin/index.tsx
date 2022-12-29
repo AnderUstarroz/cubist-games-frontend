@@ -27,24 +27,31 @@ import {
   system_config_pda,
 } from "@cubist-collective/cubist-games-lib";
 import dynamic from "next/dynamic";
-import { ConfigInputType } from "../../types/game-settings";
+import { ConfigInputType, GameStatsDataType } from "../../types/game-settings";
 import { fetch_configs } from "../../components/utils/game-settings";
 import { AnimatePresence, motion } from "framer-motion";
 import Spinner from "../../components/spinner";
 import { DEFAULT_ANIMATION } from "../../components/utils/animation";
 import { human_number } from "../../components/utils/number";
 import IDL from "@cubist-collective/cubist-games-lib/lib/idl.json";
-import { async_cached } from "../../components/utils/requests";
+import { async_cached, fetch_games } from "../../components/utils/requests";
+import { game_batch } from "../../components/utils/game";
+import { addDays, format, subDays } from "date-fns";
+import { GameType } from "../../types/game";
 
 const AdminWelcome = dynamic(() => import("../../components/admin-welcome"));
 const Button = dynamic(() => import("../../components/button"));
 const Icon = dynamic(() => import("../../components/icon"));
 const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
+const LineAriaChart = dynamic(() => import("../../components/chart/line-aria"));
 
 const AdminHome: NextPage = () => {
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
   const [pdas, setPdas] = useState<PDATypes | null>(null);
+  const [gameStatsData, setGameStatsData] = useState<GameStatsDataType | null>(
+    null
+  );
   const [solFiatPrice, setSolFiatPrice] = useState<number | null>(null);
   const [systemConfig, setSystemConfig] = useState<SystemConfigType | null>(
     null
@@ -58,10 +65,61 @@ const AdminHome: NextPage = () => {
     null
   );
 
+  // Fetches game stats (profits & created games)
+  const fetchGamesStatsData = async (
+    lastGameId: number,
+    statsData: GameStatsDataType | null = null
+  ): Promise<GameStatsDataType> => {
+    // Define default game stats (last 7 days)
+    if (!statsData) {
+      statsData = [...Array(7).keys()].reduce(
+        (obj, days: number) => ({
+          ...obj,
+          [format(subDays(new Date(), 6 - days), "d MMM")]: {
+            profits: 0,
+            games: 0,
+          },
+        }),
+        {}
+      ) as GameStatsDataType;
+    }
+    if (lastGameId <= 0) {
+      return statsData;
+    }
+    const games = await fetch_games(
+      solanaProgram as SolanaProgramType,
+      authority,
+      game_batch(lastGameId)
+    );
+    let finished = true;
+    games.map((g: GameType) => {
+      const created = format(g.data.createdAt as Date, "d MMM");
+      const cashed = g.data.cashedAt ? format(g.data.cashedAt, "d MMM") : null;
+      if (
+        cashed && //@ts-ignore
+        statsData.hasOwnProperty(cashed)
+      ) {
+        //@ts-ignore
+        statsData[cashed].profits += g.data.solProfits ? g.data.solProfits : 0;
+        finished = false;
+      } //@ts-ignore
+      if (statsData.hasOwnProperty(created)) {
+        //@ts-ignore
+        statsData[created].games++;
+        finished = false;
+      }
+    });
+    return finished
+      ? statsData
+      : await fetchGamesStatsData(
+          games.length ? games[games.length - 1].data.gameId : 0,
+          statsData
+        );
+  };
+
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!is_authorized(publicKey) || !wallet || solanaProgram || pdas) return;
-
+    if (!publicKey || !wallet || solanaProgram || pdas) return;
     if (!is_authorized(publicKey)) {
       Router.push("/unauthorized");
       return;
@@ -102,6 +160,23 @@ const AdminHome: NextPage = () => {
       }
     })();
   }, [solanaProgram, pdas, config, systemConfig]);
+
+  // STEP 3 - Fetch Games Stats
+  useEffect(() => {
+    if (!solanaProgram || !pdas || !stats || gameStatsData) return;
+    (async () => {
+      let tomorrow = addDays(new Date(), 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      setGameStatsData(
+        await async_cached(
+          fetchGamesStatsData,
+          [stats.totalGames.toNumber()],
+          Math.ceil((tomorrow.getTime() - new Date().getTime()) / 1000),
+          "GAMES_STATS_DATA"
+        )
+      );
+    })();
+  }, [solanaProgram, pdas, systemConfig]);
 
   return (
     <>
@@ -168,6 +243,24 @@ const AdminHome: NextPage = () => {
                           <Icon cType="info" className="icon1" />
                         </span>
                       </h3>
+                      <p>Profits</p>
+                      <AnimatePresence>
+                        {!!gameStatsData && (
+                          <motion.div {...DEFAULT_ANIMATION}>
+                            <LineAriaChart
+                              width={250}
+                              height={200}
+                              legend={"Collected SOL (last 7 days)"}
+                              tooltipUnit="SOL"
+                              data={Object.entries(gameStatsData).map(
+                                ([date, obj]: any) => {
+                                  return { name: date, Profits: obj.profits };
+                                }
+                              )}
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                       <ReactTooltip
                         id="profitsTooltip"
                         globalEventOff="click"
@@ -177,6 +270,24 @@ const AdminHome: NextPage = () => {
                       <h3>
                         Total games: <span>{stats.totalGames.toNumber()}</span>
                       </h3>
+                      <p>Games</p>
+                      <AnimatePresence>
+                        {!!gameStatsData && (
+                          <motion.div {...DEFAULT_ANIMATION}>
+                            <LineAriaChart
+                              width={250}
+                              height={200}
+                              legend={"Created games (last 7 days)"}
+                              colors={{ Games: "var(--errorBg)" }}
+                              data={Object.entries(gameStatsData).map(
+                                ([date, obj]: any) => {
+                                  return { name: date, Games: obj.games };
+                                }
+                              )}
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </motion.div>
                 </AnimatePresence>

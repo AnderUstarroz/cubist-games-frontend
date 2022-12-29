@@ -1,0 +1,9 @@
+.lineAria {
+  font-size: var(--fontSizeXS);
+  & :global {
+    .recharts-legend-wrapper {
+      color: var(--inputColor0);
+      text-align: center;
+    }
+  }
+}

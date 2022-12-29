@@ -28,6 +28,7 @@ import { fetch_configs } from "../components/utils/game-settings";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { motion } from "framer-motion";
 import Link from "next/link";
+
 const Icon = dynamic(() => import("../components/icon"));
 const GamesList = dynamic(() => import("../components/game/games-list"));
 

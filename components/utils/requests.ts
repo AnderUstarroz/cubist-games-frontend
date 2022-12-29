@@ -17,7 +17,6 @@ import { GamesType, GameTermsType, GameType } from "../../types/game";
 import { PublicKey } from "@solana/web3.js";
 import { game_pda } from "@cubist-collective/cubist-games-lib";
 import { rustToInputsSettings } from "./game-settings";
-import { Exception } from "sass";
 export type MultiRequestType = [Function, any[]];
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -147,7 +146,6 @@ export const fetch_terms = async (
 ): Promise<GameTermsType> => {
   let terms = await get_cached_terms(termsId);
   if (!terms || terms.hash != termsHash) {
-    console.log("entra a buscar terms");
     try {
       const [termsPda, _] = await terms_pda(
         new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string),
@@ -165,7 +163,7 @@ export const fetch_terms = async (
       put_cached_terms(terms);
     } catch (error) {
       flashMsg("Failed to fetch Terms & Conditions");
-      console.log(error);
+      console.error(error);
     }
   }
   return terms;
@@ -210,9 +208,12 @@ const cache_item = (cacheKey: string, expires: number | null, result: any) => {
 export const cached = (
   callback: Function,
   args: any[],
-  expires: number | null = null // Expiration time in seconds
+  expires: number | null = null, // Expiration time in seconds
+  cacheKey: string | null = null // Fixed Cache key (ignore to use function name + params)
 ): any => {
-  const cacheKey = cache_key(callback, args);
+  if (!cacheKey) {
+    cacheKey = cache_key(callback, args);
+  }
   let cached = fetch_cached(cacheKey, expires);
   return cached ? cached : cache_item(cacheKey, expires, callback(...args));
 };
@@ -220,11 +221,22 @@ export const cached = (
 export const async_cached = async (
   callback: Function,
   args: any[],
-  expires: number | null = null // Expiration time in seconds
+  expires: number | null = null, // Expiration time in seconds
+  cacheKey: string | null = null // Fixed Cache key (ignore to use function name + params)
 ): Promise<any> => {
-  const cacheKey = cache_key(callback, args);
+  if (!cacheKey) {
+    cacheKey = cache_key(callback, args);
+  }
   let cached = fetch_cached(cacheKey, expires);
   return cached
     ? cached
     : cache_item(cacheKey, expires, await callback(...args));
+};
+
+export const delete_cached = (callback: Function, args: any[]) => {
+  sessionStorage.removeItem(cache_key(callback, args));
+};
+
+export const delete_cached_key = (cacheKey: string) => {
+  sessionStorage.removeItem(cacheKey);
 };

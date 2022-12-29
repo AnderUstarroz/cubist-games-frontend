@@ -31,7 +31,7 @@ function DefaultStats({ game, prevGame, setMainModal }: DefaultStatsPropsType) {
                   onClick={() =>
                     game.cached.definition?.options[opt.id].description
                       ? setMainModal(
-                          <div>
+                          <div className="textCenter">
                             <h4 className={`optColor${opt.id}`}>
                               {game.cached.definition.options[opt.id].title}
                             </h4>

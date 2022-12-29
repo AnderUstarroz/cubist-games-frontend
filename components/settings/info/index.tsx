@@ -6,7 +6,6 @@ import { DEFAULT_ANIMATION } from "../../utils/animation";
 import { format_time } from "../../utils/date";
 import styles from "./Info.module.scss";
 import { OptionInputType } from "../../../types/game-settings";
-import { lamports_to_sol } from "@cubist-collective/cubist-games-lib";
 
 export default function Info({
   gameSettings,
@@ -71,7 +70,7 @@ export default function Info({
                 <span>
                   {gameSettings.solProfits === null
                     ? "-"
-                    : `${lamports_to_sol(gameSettings.solProfits)} SOL`}
+                    : `${gameSettings.solProfits} SOL`}
                 </span>
               </div>
             )}

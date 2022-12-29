@@ -50,7 +50,7 @@ export const place_bet = async (
     return flashMsg("You must accept the Terms & Conditions");
   }
 
-  const [tx, msg] = await bet_tx(
+  const [tx, _msg] = await bet_tx(
     solanaProgram,
     connection,
     lamports,
@@ -112,7 +112,6 @@ export const place_bet = async (
     clearTimeout(timer);
     return;
   }
-  console.log("BET:", msg);
   //Finish
   if (modals.bet) {
     setModals({ ...modals, bet: false });

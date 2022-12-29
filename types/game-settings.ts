@@ -91,3 +91,7 @@ export type GameStateOutputType =
   | "Closed"
   | "Settled"
   | "Voided";
+
+export interface GameStatsDataType {
+  [key: string]: { profits: number; games: number };
+}

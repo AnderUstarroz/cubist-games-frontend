@@ -58,7 +58,11 @@ import {
   inputsToRustSettings,
 } from "../../components/utils/game-settings";
 import { ReactNode } from "react";
-import { async_cached, multi_request } from "../../components/utils/requests";
+import {
+  async_cached,
+  delete_cached_key,
+  multi_request,
+} from "../../components/utils/requests";
 import {
   flashError,
   flashMsg,
@@ -307,28 +311,31 @@ const Game: NextPage = () => {
       }
       try {
         setLoading(true);
-        !gameSettings.createdAt
-          ? // Create new Game
-            await solanaProgram?.methods
-              .createGame(inputsToRustSettings(params, maxDecimals))
-              .accounts({
-                authority: authority,
-                systemConfig: pdas.systemConfig.pda,
-                config: pdas.config.pda,
-                stats: pdas.stats.pda,
-                game: pdas.game.pda,
-              })
-              .rpc()
-          : // Update existing Game
-            await solanaProgram?.methods
-              .updateGame(inputsToRustSettings(params, maxDecimals))
-              .accounts({
-                authority: authority,
-                systemConfig: pdas.systemConfig.pda,
-                config: pdas.config.pda,
-                game: pdas.game.pda,
-              })
-              .rpc();
+        // Create new Game
+        if (!gameSettings.createdAt) {
+          delete_cached_key("GAMES_STATS_DATA");
+          await solanaProgram?.methods
+            .createGame(inputsToRustSettings(params, maxDecimals))
+            .accounts({
+              authority: authority,
+              systemConfig: pdas.systemConfig.pda,
+              config: pdas.config.pda,
+              stats: pdas.stats.pda,
+              game: pdas.game.pda,
+            })
+            .rpc();
+          // Update existing Game
+        } else {
+          await solanaProgram?.methods
+            .updateGame(inputsToRustSettings(params, maxDecimals))
+            .accounts({
+              authority: authority,
+              systemConfig: pdas.systemConfig.pda,
+              config: pdas.config.pda,
+              game: pdas.game.pda,
+            })
+            .rpc();
+        }
 
         flashMsg("Game saved!", "success");
         Router.push("/admin");
@@ -367,6 +374,7 @@ const Game: NextPage = () => {
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
         signature: signature,
       });
+      delete_cached_key("GAMES_STATS_DATA");
       flashMsg("Game cashed!", "success");
       router.reload();
     } catch (error) {
@@ -518,8 +526,7 @@ const Game: NextPage = () => {
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
-    if (!is_authorized(publicKey) || !wallet || solanaProgram || pdas) return;
-
+    if (!publicKey || !wallet || solanaProgram || pdas) return;
     if (!is_authorized(publicKey)) {
       Router.push("/unauthorized");
       return;
@@ -1007,7 +1014,8 @@ const Game: NextPage = () => {
               {gameSettings.createdAt &&
                 !gameSettings.cashedAt &&
                 gameSettings.isActive &&
-                !gameSettings.totalBetsClaimed && (
+                !gameSettings.totalBetsClaimed &&
+                !!definition.title && (
                   <section>
                     <h2>Game result</h2>
                     <fieldset>

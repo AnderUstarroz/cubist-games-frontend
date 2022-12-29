@@ -6,11 +6,13 @@ import { GamesListPropsType } from "./types";
 import dynamic from "next/dynamic";
 import slugify from "slugify";
 import { OptionInputType } from "../../../types/game-settings";
+import Link from "next/link";
 
 const Button = dynamic(() => import("../../button"));
 const ImageBlob = dynamic(() => import("../../image-blob"));
 const Icon = dynamic(() => import("../../icon"));
 const Fire = dynamic(() => import("../../fire"));
+const CountdownTimer = dynamic(() => import("../../countdown_timer"));
 
 export default function GamesList({
   games,
@@ -49,34 +51,45 @@ export default function GamesList({
                         {...DEFAULT_ANIMATION}
                       >
                         <td>
-                          <a
-                            title="See game"
+                          <Link
                             href={`/game/${slugify(
                               g.cached.definition?.title as string,
                               { lower: true }
                             )}?id=${g.data.gameId}`}
                           >
-                            <div className="gameCard">
-                              <div className="img">
-                                <ImageBlob blob={g.cached.thumb1} />
-                                {!!g.data.fireThreshold &&
-                                  g.data.fireThreshold <= pot && (
-                                    <Fire partSize={40} />
-                                  )}
+                            <a
+                              title="See game"
+                              className="vAligned separated gap5"
+                            >
+                              <div className="gameCard">
+                                <div className="img">
+                                  <ImageBlob blob={g.cached.thumb1} />
+                                  {!!g.data.fireThreshold &&
+                                    g.data.fireThreshold <= pot && (
+                                      <Fire partSize={40} />
+                                    )}
+                                </div>
+                                <div className="terms">
+                                  <strong>GAME {g.data.gameId}</strong>
+                                  <span
+                                    className={`optBg${
+                                      termsIds[g.data.termsId] % 25
+                                    }`}
+                                  >
+                                    {g.data.termsId}
+                                  </span>
+                                </div>
+                                <h4>{g.cached.definition?.title}</h4>
                               </div>
-                              <div className="terms">
-                                <strong>GAME {g.data.gameId}</strong>
-                                <span
-                                  className={`optBg${
-                                    termsIds[g.data.termsId] % 25
-                                  }`}
-                                >
-                                  {g.data.termsId}
-                                </span>
-                              </div>
-                              <h4>{g.cached.definition?.title}</h4>
-                            </div>
-                          </a>
+                              {state === "Open" && (
+                                <CountdownTimer
+                                  openTime={g.data.openTime}
+                                  closeTime={g.data.closeTime}
+                                  size="extra-small"
+                                />
+                              )}
+                            </a>
+                          </Link>
                         </td>
                       </motion.tr>
                     );

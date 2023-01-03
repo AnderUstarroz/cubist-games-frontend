@@ -1,5 +1,5 @@
 import { CustomStakeType, GameType } from "../../../types/game";
-import { PublicKey, Connection } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import {
   PDATypes,
   PlayerBetsType,
@@ -9,7 +9,6 @@ import {
 
 export interface DefaultStakeButtonsPropsType {
   solanaProgram: SolanaProgramType;
-  connection: Connection;
   systemConfig: SystemConfigType;
   game: GameType;
   pdas: PDATypes;

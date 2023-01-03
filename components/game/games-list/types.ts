@@ -6,6 +6,7 @@ export interface GamesListPropsType {
   title?: string;
   showButton?: boolean;
   fetchMoreGames?: Function;
+  setLoading: Function;
   termsIds: {
     [key: string]: number;
   };

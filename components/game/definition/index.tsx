@@ -37,7 +37,9 @@ function DefaultDefinition({
           </div>
         )}
         <div className={styles.descText}>
-          <Markdown>{game.cached.definition?.description as string}</Markdown>
+          <Markdown className={`sqList`}>
+            {game.cached.definition?.description as string}
+          </Markdown>
         </div>
       </div>
       <div className={styles.info}>

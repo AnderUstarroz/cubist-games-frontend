@@ -40,10 +40,20 @@
     margin-right: 0;
   }
   .logo {
-    margin: 0 0 0 40px;
+    margin: 0 0 0 30px;
+    > span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 20px;
+    }
     > * {
       width: 50px;
       height: 50px;
+    }
+    svg {
+      width: 25px;
+      height: 25px;
     }
   }
 }

@@ -44,6 +44,7 @@ import {
   arweave_image,
   blob_to_base64,
   PDATypes,
+  short_key,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
@@ -313,7 +314,9 @@ const Game: NextPage = () => {
         setLoading(true);
         // Create new Game
         if (!gameSettings.createdAt) {
-          delete_cached_key("GAMES_STATS_DATA");
+          delete_cached_key(
+            `GAMES_STATS_DATA_${short_key(publicKey as PublicKey)}`
+          );
           await solanaProgram?.methods
             .createGame(inputsToRustSettings(params, maxDecimals))
             .accounts({
@@ -374,7 +377,9 @@ const Game: NextPage = () => {
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
         signature: signature,
       });
-      delete_cached_key("GAMES_STATS_DATA");
+      delete_cached_key(
+        `GAMES_STATS_DATA_${short_key(publicKey as PublicKey)}`
+      );
       flashMsg("Game cashed!", "success");
       router.reload();
     } catch (error) {
@@ -969,7 +974,7 @@ const Game: NextPage = () => {
                     <span>Game title</span>
                   </div>
                   <div className="overlap mb-big">
-                    <Markdown>
+                    <Markdown className={`sqList ${styles.defDesc}`}>
                       {definition.description
                         ? definition.description
                         : "Define a game description.."}

@@ -27,7 +27,7 @@ export default function Terms({
         className="vAligned gap5"
         onClick={() =>
           setMainModal(
-            <div className={styles.termsModal}>
+            <div className="sqList">
               <h4>{terms.title}</h4>
               <ReactMarkdown>{terms.description as string}</ReactMarkdown>
               {display && (

@@ -4,7 +4,7 @@ import {
   GameType,
   PrevGameType,
 } from "../../types/game";
-import { PublicKey, Connection } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import {
   PDATypes,
   PlayerBetsType,
@@ -16,7 +16,6 @@ import { MyBetType } from "../utils/bet";
 export interface GamePropsType {
   template: string | null;
   solanaProgram: SolanaProgramType;
-  connection: Connection;
   systemConfig: SystemConfigType;
   game: GameType;
   pdas: PDATypes;

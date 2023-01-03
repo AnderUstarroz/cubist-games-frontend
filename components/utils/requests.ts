@@ -170,7 +170,8 @@ export const fetch_terms = async (
 };
 
 const cache_key = (callback: Function, args: any[]) => {
-  return `${callback.name}-${args.map((arg: any) => `${arg}`).join("-")}`;
+  const params = args.map((arg: any) => `${arg}`).join("-");
+  return `${callback.name}${params ? `-${params}` : ""}`;
 };
 
 const fetch_cached = (cacheKey: string, expires: number | null) => {

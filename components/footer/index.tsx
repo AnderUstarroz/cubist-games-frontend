@@ -65,6 +65,7 @@ export default function Footer({ className }: FooterPropsType) {
               href={process.env.NEXT_PUBLIC_WEB}
               title="Visit Website"
               target="_blank"
+              style={{ paddingBottom: 2 }}
               {...animation}
             >
               <Icon cType="web" height={size} width={size} />

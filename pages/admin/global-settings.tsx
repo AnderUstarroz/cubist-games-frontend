@@ -578,15 +578,15 @@ const GameSettings: NextPage = () => {
                                   ) : (
                                     <div>
                                       <div className="mb-med">
-                                        <label className="overlap">
+                                        <label className="overlap fullWidth">
                                           <Input
                                             type="text"
                                             placeholder="E.g. NBA"
-                                            className={
+                                            className={`fullWidth${
                                               termsErrors.hasOwnProperty("id")
-                                                ? "error"
-                                                : null
-                                            }
+                                                ? " error"
+                                                : ""
+                                            }`}
                                             name={`id`}
                                             maxLength={4}
                                             value={terms.id}
@@ -617,16 +617,16 @@ const GameSettings: NextPage = () => {
                                         />
                                       </div>
                                       <div className="mb-med">
-                                        <label className="overlap">
+                                        <label className="overlap fullWidth">
                                           <Input
                                             type="text"
-                                            className={
+                                            className={`fullWidth${
                                               termsErrors.hasOwnProperty(
                                                 "title"
                                               )
-                                                ? "error"
-                                                : null
-                                            }
+                                                ? " error"
+                                                : ""
+                                            }`}
                                             name={`title`}
                                             maxLength={64}
                                             value={terms.title}
@@ -643,7 +643,7 @@ const GameSettings: NextPage = () => {
                                         </label>
                                       </div>
                                       <div className="mb-med">
-                                        <div className={"overlap"}>
+                                        <div className="overlap fullWidth">
                                           <MDEditor
                                             name={`description`}
                                             value={terms.description}
@@ -657,7 +657,7 @@ const GameSettings: NextPage = () => {
                                             onChange={(text: any) =>
                                               handleUpdateTerms(
                                                 "description",
-                                                text.slice(0, 1000)
+                                                text
                                               )
                                             }
                                             {...mkEditorDefaults}

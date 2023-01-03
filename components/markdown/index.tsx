@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 export default function Markdown({ children, ...props }: any) {
   return (
     <ReactMarkdown
+      className={props.className ? props.className : undefined}
       linkTarget={"_blank"}
       components={{
         a: ({ node, children, ...props }) => {

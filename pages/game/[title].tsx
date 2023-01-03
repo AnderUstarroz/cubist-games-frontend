@@ -411,7 +411,6 @@ const GamePage: NextPage = ({ data, path }: any) => {
             <Game
               template={game.data.designTemplate}
               solanaProgram={solanaProgram}
-              connection={connection}
               systemConfig={systemConfig}
               game={game}
               pdas={pdas}

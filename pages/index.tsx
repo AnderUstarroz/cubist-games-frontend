@@ -31,6 +31,7 @@ import Link from "next/link";
 
 const Icon = dynamic(() => import("../components/icon"));
 const GamesList = dynamic(() => import("../components/game/games-list"));
+const Spinner = dynamic(() => import("../components/spinner"));
 
 const Home: NextPage = () => {
   const { connection } = useConnection();
@@ -39,6 +40,7 @@ const Home: NextPage = () => {
   const [closedGames, setClosedGames] = useState<GameType[]>([]);
   const [settledGames, setSettledGames] = useState<GameType[]>([]);
   const [nextGameId, setNextGameId] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [authority, _setAuthority] = useState<PublicKey>(
     new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string)
   );
@@ -175,55 +177,68 @@ const Home: NextPage = () => {
       </Head>
 
       <div className={styles.content}>
-        <h1
-          className={styles.title}
-          style={{
-            backgroundImage: process.env.NEXT_PUBLIC_HOME_IMAGE_URL
-              ? `url(${process.env.NEXT_PUBLIC_HOME_IMAGE_URL})`
-              : "var(--homeImg)",
-          }}
-        >
-          {process.env.NEXT_PUBLIC_LOGO ? (
-            <motion.img
-              src={process.env.NEXT_PUBLIC_LOGO}
-              alt="Discord"
-              title="Homepage"
+        {loading ? (
+          <Spinner />
+        ) : (
+          <>
+            <h1
+              className={styles.title}
+              style={{
+                backgroundImage: process.env.NEXT_PUBLIC_HOME_IMAGE_URL
+                  ? `url(${process.env.NEXT_PUBLIC_HOME_IMAGE_URL})`
+                  : "var(--homeImg)",
+              }}
+            >
+              {process.env.NEXT_PUBLIC_LOGO ? (
+                <motion.img
+                  src={process.env.NEXT_PUBLIC_LOGO}
+                  alt="Discord"
+                  title="Homepage"
+                />
+              ) : (
+                <i>
+                  <Icon cType="sol" width={35} height={35} color="#4076bb" />
+                </i>
+              )}
+              <span>{process.env.NEXT_PUBLIC_SITE_NAME}</span>
+            </h1>
+            <GamesList
+              games={openGames}
+              state="Open"
+              title="Games"
+              termsIds={termsIds}
+              setLoading={setLoading}
             />
-          ) : (
-            <i>
-              <Icon cType="sol" width={35} height={35} color="#4076bb" />
-            </i>
-          )}
-          <span>{process.env.NEXT_PUBLIC_SITE_NAME}</span>
-        </h1>
-        <GamesList
-          games={openGames}
-          state="Open"
-          title="Games"
-          termsIds={termsIds}
-        />
-        <div className={styles.flexCols}>
-          <GamesList games={closedGames} state="Closed" termsIds={termsIds} />
-          <GamesList
-            games={settledGames}
-            state="Settled"
-            termsIds={termsIds}
-            fetchMoreGames={
-              !!nextGameId
-                ? () =>
-                    fetchMoreGames(
-                      {
-                        Open: openGames,
-                        Closed: closedGames,
-                        Settled: settledGames,
-                      },
-                      10,
-                      nextGameId
-                    )
-                : undefined
-            }
-          />
-        </div>
+            <div className={styles.flexCols}>
+              <GamesList
+                games={closedGames}
+                state="Closed"
+                termsIds={termsIds}
+                setLoading={setLoading}
+              />
+              <GamesList
+                games={settledGames}
+                state="Settled"
+                termsIds={termsIds}
+                setLoading={setLoading}
+                fetchMoreGames={
+                  !!nextGameId
+                    ? () =>
+                        fetchMoreGames(
+                          {
+                            Open: openGames,
+                            Closed: closedGames,
+                            Settled: settledGames,
+                          },
+                          10,
+                          nextGameId
+                        )
+                    : undefined
+                }
+              />
+            </div>
+          </>
+        )}
       </div>
     </>
   );

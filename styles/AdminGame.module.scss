@@ -26,7 +26,7 @@
     }
   }
 
-  ul {
+  > ul {
     margin-top: 15px;
     li {
       margin: 0 0 10px 0;
@@ -71,6 +71,9 @@
       }
     }
   }
+}
+.defDesc {
+  color: var(--color12);
 }
 .opDesc {
   margin: 3px 0;

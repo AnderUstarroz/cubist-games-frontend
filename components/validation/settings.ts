@@ -175,15 +175,6 @@ export function titleTermsValidator(value: string) {
     throw new SettingsError("title", `Terms title cannot be ${error}`);
   }
 }
-export function descriptionTermsValidator(value: string) {
-  if (!value || value.length > 1000) {
-    let error = !value ? "empty" : "longer than 1000 characters";
-    throw new SettingsError(
-      "description",
-      `Terms description cannot be ${error}`
-    );
-  }
-}
 
 export function titleDefinitionValidator(value: string) {
   const maxChar = 64;
@@ -329,7 +320,6 @@ export const VALIDATORS: { [key: string]: any } = {
   fireThresholdValidator,
   idTermsValidator,
   titleTermsValidator,
-  descriptionTermsValidator,
   titleDefinitionValidator,
   descriptionDefinitionValidator,
   optionsDefinitionValidator,

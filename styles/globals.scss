@@ -65,15 +65,18 @@ ul {
 .sqList {
   li {
     position: relative;
-    padding: 0 0 15px 15px;
+    padding: 0 0 5px 25px;
     &::before {
       content: "";
       position: absolute;
       top: 6px;
-      left: 0;
+      left: 10px;
       width: 4px;
       height: 4px;
       background-color: var(--color2);
+    }
+    &:last-of-type {
+      margin-bottom: 15px;
     }
   }
 }

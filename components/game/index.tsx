@@ -50,7 +50,6 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         <StakeButtons
           template={template}
           solanaProgram={props.solanaProgram}
-          connection={props.connection}
           systemConfig={props.systemConfig}
           game={props.game}
           pdas={props.pdas}

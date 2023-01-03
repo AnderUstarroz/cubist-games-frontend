@@ -6,7 +6,7 @@ import { GamesListPropsType } from "./types";
 import dynamic from "next/dynamic";
 import slugify from "slugify";
 import { OptionInputType } from "../../../types/game-settings";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 const Button = dynamic(() => import("../../button"));
 const ImageBlob = dynamic(() => import("../../image-blob"));
@@ -20,7 +20,10 @@ export default function GamesList({
   title,
   fetchMoreGames,
   termsIds,
+  setLoading,
 }: GamesListPropsType) {
+  const router = useRouter();
+
   return (
     <AnimatePresence>
       <motion.section>
@@ -51,45 +54,47 @@ export default function GamesList({
                         {...DEFAULT_ANIMATION}
                       >
                         <td>
-                          <Link
-                            href={`/game/${slugify(
-                              g.cached.definition?.title as string,
-                              { lower: true }
-                            )}?id=${g.data.gameId}`}
+                          <div
+                            className="vAligned separated gap5"
+                            title="See game"
+                            onClick={() => {
+                              setLoading(true);
+                              router.push(
+                                `/game/${slugify(
+                                  g.cached.definition?.title as string,
+                                  { lower: true }
+                                )}?id=${g.data.gameId}`
+                              );
+                            }}
                           >
-                            <a
-                              title="See game"
-                              className="vAligned separated gap5"
-                            >
-                              <div className="gameCard">
-                                <div className="img">
-                                  <ImageBlob blob={g.cached.thumb1} />
-                                  {!!g.data.fireThreshold &&
-                                    g.data.fireThreshold <= pot && (
-                                      <Fire partSize={40} />
-                                    )}
-                                </div>
-                                <div className="terms">
-                                  <strong>GAME {g.data.gameId}</strong>
-                                  <span
-                                    className={`optBg${
-                                      termsIds[g.data.termsId] % 25
-                                    }`}
-                                  >
-                                    {g.data.termsId}
-                                  </span>
-                                </div>
-                                <h4>{g.cached.definition?.title}</h4>
+                            <div className="gameCard">
+                              <div className="img">
+                                <ImageBlob blob={g.cached.thumb1} />
+                                {!!g.data.fireThreshold &&
+                                  g.data.fireThreshold <= pot && (
+                                    <Fire partSize={40} />
+                                  )}
                               </div>
-                              {state === "Open" && (
-                                <CountdownTimer
-                                  openTime={g.data.openTime}
-                                  closeTime={g.data.closeTime}
-                                  size="extra-small"
-                                />
-                              )}
-                            </a>
-                          </Link>
+                              <div className="terms">
+                                <strong>GAME {g.data.gameId}</strong>
+                                <span
+                                  className={`optBg${
+                                    termsIds[g.data.termsId] % 25
+                                  }`}
+                                >
+                                  {g.data.termsId}
+                                </span>
+                              </div>
+                              <h4>{g.cached.definition?.title}</h4>
+                            </div>
+                            {state === "Open" && (
+                              <CountdownTimer
+                                openTime={g.data.openTime}
+                                closeTime={g.data.closeTime}
+                                size="extra-small"
+                              />
+                            )}
+                          </div>
                         </td>
                       </motion.tr>
                     );

@@ -17,6 +17,7 @@ import {
   initSolanaProgram,
   lamports_to_sol,
   PDATypes,
+  short_key,
   SolanaProgramType,
   solana_fiat_price,
   solana_to_usd,
@@ -45,6 +46,61 @@ const Icon = dynamic(() => import("../../components/icon"));
 const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 const LineAriaChart = dynamic(() => import("../../components/chart/line-aria"));
 
+// Fetches game stats (profits & created games)
+const fetchGamesStatsData = async (
+  solanaProgram: SolanaProgramType,
+  authority: PublicKey,
+  lastGameId: number,
+  statsData: GameStatsDataType | null = null
+): Promise<GameStatsDataType> => {
+  // Define default game stats (last 7 days)
+  if (!statsData) {
+    statsData = [...Array(7).keys()].reduce(
+      (obj, days: number) => ({
+        ...obj,
+        [format(subDays(new Date(), 6 - days), "d MMM")]: {
+          profits: 0,
+          games: 0,
+        },
+      }),
+      {}
+    ) as GameStatsDataType;
+  }
+  if (lastGameId <= 0) {
+    return statsData;
+  }
+  const games = await fetch_games(
+    solanaProgram,
+    authority,
+    game_batch(lastGameId)
+  );
+  let finished = true;
+  games.map((g: GameType) => {
+    const createdAt = format(g.data.createdAt as Date, "d MMM");
+    const cashedAt = g.data.cashedAt ? format(g.data.cashedAt, "d MMM") : null;
+    if (
+      cashedAt && //@ts-ignore
+      statsData.hasOwnProperty(cashedAt)
+    ) {
+      //@ts-ignore
+      statsData[cashedAt].profits += g.data.solProfits ? g.data.solProfits : 0;
+      finished = false;
+    } //@ts-ignore
+    if (statsData.hasOwnProperty(createdAt)) {
+      //@ts-ignore
+      statsData[createdAt].games++;
+      finished = false;
+    }
+  });
+  return finished
+    ? statsData
+    : await fetchGamesStatsData(
+        solanaProgram,
+        authority,
+        games.length ? games[games.length - 1].data.gameId - 1 : 0,
+        statsData
+      );
+};
 const AdminHome: NextPage = () => {
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
@@ -64,58 +120,6 @@ const AdminHome: NextPage = () => {
   const [solanaProgram, setSolanaProgram] = useState<SolanaProgramType | null>(
     null
   );
-
-  // Fetches game stats (profits & created games)
-  const fetchGamesStatsData = async (
-    lastGameId: number,
-    statsData: GameStatsDataType | null = null
-  ): Promise<GameStatsDataType> => {
-    // Define default game stats (last 7 days)
-    if (!statsData) {
-      statsData = [...Array(7).keys()].reduce(
-        (obj, days: number) => ({
-          ...obj,
-          [format(subDays(new Date(), 6 - days), "d MMM")]: {
-            profits: 0,
-            games: 0,
-          },
-        }),
-        {}
-      ) as GameStatsDataType;
-    }
-    if (lastGameId <= 0) {
-      return statsData;
-    }
-    const games = await fetch_games(
-      solanaProgram as SolanaProgramType,
-      authority,
-      game_batch(lastGameId)
-    );
-    let finished = true;
-    games.map((g: GameType) => {
-      const created = format(g.data.createdAt as Date, "d MMM");
-      const cashed = g.data.cashedAt ? format(g.data.cashedAt, "d MMM") : null;
-      if (
-        cashed && //@ts-ignore
-        statsData.hasOwnProperty(cashed)
-      ) {
-        //@ts-ignore
-        statsData[cashed].profits += g.data.solProfits ? g.data.solProfits : 0;
-        finished = false;
-      } //@ts-ignore
-      if (statsData.hasOwnProperty(created)) {
-        //@ts-ignore
-        statsData[created].games++;
-        finished = false;
-      }
-    });
-    return finished
-      ? statsData
-      : await fetchGamesStatsData(
-          games.length ? games[games.length - 1].data.gameId : 0,
-          statsData
-        );
-  };
 
   // STEP 1 - Init Program and PDAs
   useEffect(() => {
@@ -142,7 +146,7 @@ const AdminHome: NextPage = () => {
 
   // STEP 2 - Fetch Configs
   useEffect(() => {
-    if (!solanaProgram || !pdas || systemConfig) return;
+    if (!publicKey || !solanaProgram || !pdas || systemConfig) return;
     (async () => {
       if (
         !(await fetch_configs(
@@ -159,24 +163,34 @@ const AdminHome: NextPage = () => {
         Router.push("/admin/global-settings");
       }
     })();
-  }, [solanaProgram, pdas, config, systemConfig]);
+  }, [publicKey, solanaProgram, pdas, config, systemConfig]);
 
   // STEP 3 - Fetch Games Stats
   useEffect(() => {
-    if (!solanaProgram || !pdas || !stats || gameStatsData) return;
+    if (!publicKey || !solanaProgram || !pdas || !stats || gameStatsData)
+      return;
+
     (async () => {
       let tomorrow = addDays(new Date(), 1);
       tomorrow.setHours(0, 0, 0, 0);
       setGameStatsData(
         await async_cached(
           fetchGamesStatsData,
-          [stats.totalGames.toNumber()],
+          [solanaProgram, authority, stats.totalGames.toNumber()],
           Math.ceil((tomorrow.getTime() - new Date().getTime()) / 1000),
-          "GAMES_STATS_DATA"
+          `GAMES_STATS_DATA_${short_key(publicKey)}`
         )
       );
     })();
-  }, [solanaProgram, pdas, systemConfig]);
+  }, [
+    publicKey,
+    solanaProgram,
+    pdas,
+    systemConfig,
+    gameStatsData,
+    stats,
+    authority,
+  ]);
 
   return (
     <>

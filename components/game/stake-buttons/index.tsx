@@ -1,13 +1,14 @@
 import styles from "./DefaultStakeButtons.module.scss";
 import dynamic from "next/dynamic";
 import { StakeButtonsPropsType, DefaultStakeButtonsPropsType } from "./types";
-import React from "react";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { sol_to_lamports } from "@cubist-collective/cubist-games-lib";
 import { OptionType } from "../../../types/game";
 import { flashMsg } from "../../utils/helpers";
 import { place_bet } from "../../utils/bet";
-import { sol_to_lamports } from "@cubist-collective/cubist-games-lib";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper";
+import React from "react";
 
 const Button = dynamic(() => import("../../button"));
 const Input = dynamic(() => import("../../input"));
@@ -19,7 +20,6 @@ const Templates: any = {};
 
 function DefaultStakeButtons({
   solanaProgram,
-  connection,
   systemConfig,
   game,
   pdas,
@@ -33,6 +33,7 @@ function DefaultStakeButtons({
   publickey,
   playerBets,
 }: DefaultStakeButtonsPropsType) {
+  const { connection } = useConnection();
   const handlePlaceCustomStake = (optionId: number) => {
     const solAmount = parseFloat(customStake.stake);
     let error = false;

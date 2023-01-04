@@ -557,7 +557,7 @@ const GameSettings: NextPage = () => {
                             setIsOpen={setModals}
                           >
                             <AnimatePresence>
-                              {rechargeArweave.display ? (
+                              {rechargeArweave.display && (
                                 <RechargeArweave
                                   {...rechargeArweave}
                                   handleUpdate={(value: string) =>
@@ -567,8 +567,11 @@ const GameSettings: NextPage = () => {
                                     handleRechargeArweave()
                                   }
                                 />
-                              ) : (
-                                <motion.div key={"tc-modal"}>
+                              )}
+                            </AnimatePresence>
+                            <AnimatePresence>
+                              {!rechargeArweave.display && (
+                                <motion.div {...DEFAULT_ANIMATION}>
                                   <h4>
                                     {terms.bump ? "Edit" : "New"} Terms &
                                     Conditions

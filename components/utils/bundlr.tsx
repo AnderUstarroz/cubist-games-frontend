@@ -1,7 +1,6 @@
 import {
   Bundlr,
   BundlrError,
-  ENVIRONMENT,
   lamports_to_sol,
   solana_to_usd,
 } from "@cubist-collective/cubist-games-lib";
@@ -17,11 +16,7 @@ export async function BundlrWrapper(
 ): Promise<Bundlr> {
   try {
     return new Proxy(
-      await new Bundlr(
-        process.env.NEXT_PUBLIC_ENV as unknown as ENVIRONMENT,
-        connection,
-        adapter
-      ),
+      await new Bundlr(process.env.NEXT_PUBLIC_ENV as any, connection, adapter),
       {
         get: function (target: any, prop, receiver) {
           if (prop in target && typeof target[prop] === "function") {

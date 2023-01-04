@@ -273,10 +273,10 @@
     eventemitter3 "^4.0.7"
     uuid "^8.3.2"
 
-"@cubist-collective/cubist-games-lib@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@cubist-collective/cubist-games-lib/-/cubist-games-lib-0.0.1.tgz#d9d22f1fbff3e8ef1ffc3eb1ea3eecfb19d705d9"
-  integrity sha512-JK4SKvNAYv6wvKpZIsCejeRkhzjZUXvVk4I/6znQq8CEPpr6dQVtEmQ2D6EMuCkLZci/+C8rG7AEvwLn8zI5Ww==
+"@cubist-collective/cubist-games-lib@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@cubist-collective/cubist-games-lib/-/cubist-games-lib-0.0.2.tgz#95e336aca9da0f6690a064f2e0289d1f2960c5dc"
+  integrity sha512-zRdOrL6HCJo5BHyq1qpxjT3HJC/Tz+BJzV1nIgsokjrfejzFObczQ7qQKIja42DhhUjy0Ur4NcartHNFvnN5Jg==
   dependencies:
     "@bundlr-network/client" "^0.8.8"
     "@project-serum/anchor" "^0.25.0"

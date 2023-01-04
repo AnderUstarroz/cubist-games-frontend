@@ -24,7 +24,7 @@ export default function RechargeArweave({
   ...props
 }: RechargeArweavePropsType) {
   return (
-    <motion.div className={styles.default} {...props} key="arweave-mod">
+    <motion.div className={styles.default} {...props}>
       <h4>Not enought balance in Arweave</h4>
       <p>
         Game data and images are stored permanently in the blockchain using{" "}
@@ -48,7 +48,7 @@ export default function RechargeArweave({
         <li>
           Required balance:{" "}
           <span className="icon1">
-            {human_number(requiredSol, decimals)} SOL{" "}
+            {human_number(requiredSol + solBalance, decimals)} SOL{" "}
           </span>
         </li>
       </ul>
@@ -73,9 +73,10 @@ export default function RechargeArweave({
             <label className="overlap">
               <Input
                 type="number"
+                autoComplete="off"
                 name="rechargeArweave"
                 className={error ? "error" : null}
-                value={human_number(value, decimals)}
+                value={value}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   handleUpdate(e.target.value)
                 }

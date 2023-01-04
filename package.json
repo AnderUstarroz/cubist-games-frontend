@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cubist-collective/cubist-games-lib": "^0.0.1",
+    "@cubist-collective/cubist-games-lib": "^0.0.2",
     "@rumess/react-flip-countdown": "^1.2.6",
     "@uiw/react-md-editor": "^3.19.0",
     "date-fns": "^2.29.3",

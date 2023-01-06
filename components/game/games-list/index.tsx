@@ -62,7 +62,7 @@ export default function GamesList({
                               router.push(
                                 `/game/${slugify(
                                   g.cached.definition?.title as string,
-                                  { lower: true }
+                                  { lower: true, strict: true }
                                 )}?id=${g.data.gameId}`
                               );
                             }}

@@ -12,9 +12,10 @@ export default function Info({
   definition,
   config,
 }: InfoPropsType) {
-  const gamePath = `/game/${slugify(definition.title.toLowerCase())}?id=${
-    gameSettings.gameId
-  }`;
+  const gamePath = `/game/${slugify(definition.title, {
+    lower: true,
+    strict: true,
+  })}?id=${gameSettings.gameId}`;
   const gameLink = `http${config.https ? "s" : ""}://${
     config.domain
   }${gamePath}`;

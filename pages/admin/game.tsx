@@ -446,7 +446,10 @@ const Game: NextPage = () => {
           return { id: k, totalStake: 0, totalBets: 0 };
         }),
       });
-      flashMsg("Uploaded game definition to Arweave", "success");
+      flashMsg(
+        "Game definition uploaded to Arweave, you still need to save the game.",
+        "info"
+      );
       setModals({ ...modals, definition: false });
     }
     setDefinition({ ...definition, loading: false });
@@ -858,7 +861,7 @@ const Game: NextPage = () => {
                       <div className="errorMsg">
                         You need to{" "}
                         <Link href="/admin/global-settings">
-                          <a title="Settings">
+                          <a className="link" title="Settings">
                             <strong>create Terms & Conditions</strong>
                           </a>
                         </Link>{" "}

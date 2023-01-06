@@ -58,6 +58,11 @@ function DefaultDefinition({
                   <Icon cType="info" width={26} height={26} />
                 </span>
                 <h4 className="textCenter">Fees</h4>
+                <p>
+                  The games follow the Pari-Mutuel (also known as
+                  &quot;Tote&quot;) model. This means odds are not fixed, but
+                  change depending on the final bets placed.
+                </p>
                 <ul className="sqList">
                   <li>
                     <strong>{num_format(game.data.fee, 2)}% Game fee:</strong>{" "}

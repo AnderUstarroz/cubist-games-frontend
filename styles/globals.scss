@@ -280,6 +280,12 @@ button {
   }
 }
 
+button.pulsar0 {
+  animation: radial-pulse0 1.5s ease infinite;
+  -moz-animation: radial-pulse0 1.5s ease infinite;
+  -webkit-animation: radial-pulse0 1.5s ease infinite;
+}
+
 .button1 {
   background-color: var(--btnBg1);
   &:hover {

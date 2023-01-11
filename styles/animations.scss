@@ -18,3 +18,12 @@
     opacity: 0;
   }
 }
+
+@keyframes radial-pulse0 {
+  0% {
+    box-shadow: 0 0 0 0em var(--btnRGBA0);
+  }
+  100% {
+    box-shadow: 0 0 0 1.5em rgba(255, 100, 100, 0);
+  }
+}

@@ -190,7 +190,7 @@ export default function CTA({
               {showButton === ShowCTA.Bet && (
                 <Button
                   key="btn-bet"
-                  className="vAligned gap5 rounded"
+                  className={`vAligned gap5 rounded pulsar0`}
                   onClick={() =>
                     termsAgreed
                       ? setModals({ ...modals, bet: true })
@@ -211,7 +211,7 @@ export default function CTA({
               {[ShowCTA.Pay, ShowCTA.Refund].includes(showButton) && (
                 <Button
                   title={`Claim ${gameState === "Voided" ? "refund" : "prize"}`}
-                  className={styles.claimBtn}
+                  className={`${styles.claimBtn} pulsar0`}
                   key="btn-claim"
                   onClick={() => handleClaim(showButton, playerBets)}
                 >

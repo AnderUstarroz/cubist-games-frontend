@@ -160,7 +160,7 @@ const GameSettings: NextPage = () => {
   const [settings, setSettings] = useState<ConfigInputType>({
     https: true, // Populated on page load using window.location.protocol
     domain: "", // Populated on page load using window.location.host
-    fee: 7,
+    fee: 10,
     showPot: true,
     useCategories: false,
     allowReferral: true,

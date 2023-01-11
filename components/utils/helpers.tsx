@@ -26,6 +26,7 @@ export function flashMsg(
   toast.custom(
     (t) => (
       <Notification
+        id={t.id}
         visible={t.visible}
         message={msg}
         variant={variant}
@@ -97,7 +98,9 @@ export async function update_available() {
             &quot;Your repositories&quot; from the drop-down menu.
           </li>
           <li>Click on your &quot;cubist-games-frontend&quot; repository.</li>
-          <li>Click on &quot;Sync fork&quot;.</li>
+          <li>
+            Click on &quot;Sync fork&quot; -&gt; &quot;Update branch&quot;.
+          </li>
         </ol>
       </div>,
       "error",

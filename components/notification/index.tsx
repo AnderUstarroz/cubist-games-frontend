@@ -1,7 +1,11 @@
 import React, { FC, ReactNode } from "react";
 import styles from "./Notification.module.scss";
-import { ToastPosition } from "react-hot-toast";
+import { toast, ToastPosition } from "react-hot-toast";
 import { keyframes } from "goober";
+import dynamic from "next/dynamic";
+
+const Icon = dynamic(() => import("../../components/icon"));
+const Button = dynamic(() => import("../../components/button"));
 
 const enterAnimation = (factor: number) => `
 0% {transform: translate3d(0,${factor * -200}%,0) scale(.6); opacity:.5;}
@@ -48,6 +52,7 @@ const getAnimationStyle = (
 };
 
 export interface NotificationProps {
+  id: string;
   visible: boolean;
   message: string | ReactNode;
   height?: number;
@@ -56,6 +61,7 @@ export interface NotificationProps {
 }
 
 export const Notification: FC<NotificationProps> = ({
+  id,
   visible,
   message,
   height,
@@ -75,6 +81,13 @@ export const Notification: FC<NotificationProps> = ({
         ...animationStyle,
       }}
     >
+      <Button
+        cType="transparent"
+        className={styles.close}
+        onClick={() => toast.dismiss(id)}
+      >
+        <Icon cType="close" />
+      </Button>
       {message}
     </div>
   );

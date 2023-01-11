@@ -39,6 +39,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     (error: WalletError) =>
       toast.custom((t) => (
         <Notification
+          id={t.id}
           visible={t.visible}
           message={
             error.message ? `${error.name}: ${error.message}` : error.name

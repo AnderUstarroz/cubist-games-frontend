@@ -66,7 +66,7 @@ export function useInterval(callback: any, delay: number) {
   }, [delay]);
 }
 
-export const update_available = async () => {
+export async function update_available() {
   const result = await fetch(
     "https://raw.githubusercontent.com/AnderUstarroz/cubist-games-frontend/main/package.json"
   );
@@ -106,4 +106,4 @@ export const update_available = async () => {
     return undefined;
   }
   return 1;
-};
+}

@@ -151,7 +151,9 @@ export function ProfitSharingValidator(
         "profitSharing",
         `The program share for ${short_key(
           systemConfig.treasury
-        )} must be at least ${((profitFee * 100) / fee).toFixed(2)}%`
+        )} must be at least ${
+          Math.ceil(((profitFee * 100) / fee) * 100) / 100
+        }%`
       );
     }
   });

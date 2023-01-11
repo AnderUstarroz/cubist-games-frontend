@@ -130,7 +130,11 @@ export default function Profits({
                                       % of the total pot as a service fee, which
                                       corresponds to a{" "}
                                       {human_number(
-                                        systemConfig.profitFee / settings.fee,
+                                        Math.ceil(
+                                          (systemConfig.profitFee /
+                                            settings.fee) *
+                                            100
+                                        ) / 100,
                                         2
                                       )}
                                       % share of the current game fee:{" "}

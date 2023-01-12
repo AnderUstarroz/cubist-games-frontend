@@ -69,7 +69,7 @@ function DefaultDefinition({
                     The fee defined by the game host. Will be collected at the
                     end of the game and deducted from the final pot.
                   </li>
-                  {systemConfig.betFee.toNumber() && (
+                  {!!systemConfig.betFee.toNumber() && (
                     <li>
                       <strong>
                         {lamports_to_sol(systemConfig.betFee.toNumber())} SOL

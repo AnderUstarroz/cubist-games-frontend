@@ -447,7 +447,10 @@ export async function getServerSideProps(context: any) {
   const path = context.resolvedUrl;
   const authority = new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string);
   const connection = new Connection(
-    process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string
+    //process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string
+    (process.env.NEXT_PUBLIC_ENV as string) === "production"
+      ? "https://solana-mainnet.g.alchemy.com/v2/IYsd9uxVwJzwCbBrHICw-1qN73_e5erQ/"
+      : "https://api.devnet.solana.com"
   );
   const provider = new AnchorProvider(
     connection,
@@ -471,7 +474,7 @@ export async function getServerSideProps(context: any) {
       .map((i: any) => i.value);
     context.res.setHeader(
       "Cache-Control",
-      "public, s-maxage=3600, stale-while-revalidate=10800"
+      "public, s-maxage=86400, stale-while-revalidate=172800" //Cached 24H
     );
     const data = {
       idl: IDL,

@@ -1,6 +1,6 @@
 {
   "name": "@cubist-collective/cubist-games-frontend",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": false,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cubist-collective/cubist-games-lib": "^0.0.2",
+    "@cubist-collective/cubist-games-lib": "^0.0.3",
     "@rumess/react-flip-countdown": "^1.2.6",
     "@uiw/react-md-editor": "^3.19.0",
     "date-fns": "^2.29.3",

@@ -45,6 +45,8 @@ import {
   blob_to_base64,
   PDATypes,
   short_key,
+  MEMO_PROGRAM_ID,
+  ActionType,
 } from "@cubist-collective/cubist-games-lib";
 import { DEFAULT_DECIMALS } from "../../components/utils/number";
 import {
@@ -370,6 +372,18 @@ const Game: NextPage = () => {
           );
         })
       );
+      tx.add({
+        programId: MEMO_PROGRAM_ID,
+        keys: [],
+        data: Buffer.from(
+          JSON.stringify({
+            siteId: (process.env.NEXT_PUBLIC_AUTHORITY as string).slice(0, 7),
+            gameId: gameSettings.gameId,
+            type: ActionType.Collect,
+          }),
+          "utf8"
+        ),
+      });
       const signature = await sendTransaction(tx, connection);
       const latestBlockHash = await connection.getLatestBlockhash();
       await connection.confirmTransaction({

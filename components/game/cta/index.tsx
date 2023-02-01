@@ -175,22 +175,24 @@ export default function CTA({
           </div>
           <div className={styles.rightCTA}>
             <AnimatePresence>
-              <Button
-                key="btn-mybets"
-                className={`vAligned rounded button1 ${styles.myBetsBtn} ${
-                  showMyBets ? "showBets" : ""
-                }`}
-                onClick={() => setShowMyBets(!showMyBets)}
-              >
-                My Bets ({myBets.length}) <Icon cType="chevron" />
-              </Button>
+              {!!publickey && (
+                <Button
+                  key="btn-mybets"
+                  className={`btnRadius2 vAligned button1 ${styles.myBetsBtn} ${
+                    showMyBets ? "showBets" : ""
+                  }`}
+                  onClick={() => setShowMyBets(!showMyBets)}
+                >
+                  My Bets ({myBets.length}) <Icon cType="chevron" />
+                </Button>
+              )}
               {showButton === ShowCTA.Wallet && (
                 <Button key="btn-connWallet" cType="wallet" />
               )}
               {showButton === ShowCTA.Bet && (
                 <Button
                   key="btn-bet"
-                  className={`vAligned gap5 rounded pulsar0`}
+                  className={`btnRadius2 vAligned gap5 pulsar0`}
                   onClick={() =>
                     termsAgreed
                       ? setModals({ ...modals, bet: true })

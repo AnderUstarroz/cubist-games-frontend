@@ -8,7 +8,7 @@
     align-items: center;
     flex: 1;
     &:last-of-type {
-      background-color: var(--boxBg0);
+      background-color: var(--boxBg2);
     }
     > div {
       min-height: 250px;
@@ -16,6 +16,7 @@
         li {
           display: flex;
           align-items: center;
+          gap: 10px;
           margin: 0 0 15px 0;
           p {
             font-size: var(--fontSizeSmall);
@@ -34,8 +35,7 @@
 
   button {
     text-align: center;
-    border-radius: 100px;
-    width: 145px;
+    width: 170px;
     a {
       margin: auto;
     }

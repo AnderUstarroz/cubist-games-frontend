@@ -5,10 +5,11 @@
     margin: 12px 16px;
   }
   fieldset {
+    padding: 0;
+
     > p {
       padding: 12px 15px;
     }
-    padding: 0;
   }
 }
 
@@ -16,11 +17,13 @@
   font-size: 50px;
   padding: 65px;
   border-radius: 16px;
+  border: 1px solid var(--inputBorder0);
   background-size: cover;
   background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
+  text-shadow: none;
   gap: 20px;
   img {
     border-radius: 50%;
@@ -35,15 +38,10 @@
     border-radius: 50%;
     width: 70px;
     height: 70px;
-    background: linear-gradient(
-      180deg,
-      #7ebbf4 0%,
-      #94d0fd 44.27%,
-      #c6e5ff 100%
-    );
+    background: var(--homeTitleBg);
   }
   span {
-    background: -webkit-linear-gradient(#7ebbf4, #94d0fd, #c6e5ff);
+    background: var(--homeTitleBg);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

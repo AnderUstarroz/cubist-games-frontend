@@ -1,0 +1,128 @@
+@import "./badlands-fonts.scss";
+
+html {
+  --fontFamily: "Poppins", sans-serif;
+  --fontFamily2: "Bowlby One SC", cursive;
+
+  --bodyImage: url(../public/images/badlands/bg.webp);
+  --footerBg: #403b39 url(../public/images/badlands/footer-bg.webp) repeat top
+    left;
+  --navBg: #403b39 url(../public/images/badlands/nav-bg.webp) repeat top left;
+  --homeImg: url(../public/images/badlands/home-desktop.webp);
+  --homeImgMobile: url(../public/images/badlands/home-mobile.webp);
+  --CTABg: var(--footerBg);
+
+  --color0: white;
+  --color1: #0e0d0c;
+  --color2: #e3be59;
+  --color3: #dfc270;
+  --color4: #1d635f;
+  --color5: #f3fcfb;
+  --color6: #fafafa;
+  --color7: #c4eeeb;
+  --color8: #bd2742;
+  --color9: #d8415c;
+  --color10: #fafafa;
+  --color11: #941f34;
+  --color12: #8c8494;
+  --color13: #aeaeae;
+  --color14: #7c7370;
+  --color15: #5e5755;
+  --color16: #b4b2e6;
+  --color17: #1d3344fc;
+  --color18: #3a46b0;
+  --color19: #332f37;
+
+  --siteNameColor: var(--color2);
+  --homeTitleBg: linear-gradient(#b3acae, #c1bfc1, #dbdfe1);
+  --homeTitleIcon: #363739;
+  --activeState: var(--color2);
+
+  --chartLines: #0d191e;
+  --boxBg0: rgb(64, 59, 57, 0.2);
+  --boxBg1: rgba(40, 37, 36, 0.8);
+  --boxBg2: var(--boxBg1);
+  --boxBg0Hover: var(--boxBg1);
+  --tableRow: rgb(144, 135, 135, 0.2);
+  --tableRowHover: rgb(137, 137, 137, 0.6);
+  --errorBg: var(--color8);
+  --gameBgColor: none;
+  --gameBorder: 0;
+  --gameRadius: 0;
+  --gameColor: #282524;
+  --gameBgImage: url(../public/images/badlands/corner_1.webp),
+    url(../public/images/badlands/corner_2.webp),
+    url(../public/images/badlands/corner_3.webp),
+    url(../public/images/badlands/corner_4.webp),
+    url(../public/images/badlands/line_1.webp),
+    url(../public/images/badlands/line_2.webp),
+    url(../public/images/badlands/line_3.webp),
+    url(../public/images/badlands/line_4.webp),
+    url(../public/images/badlands/side.webp),
+    url(../public/images/badlands/paper.webp);
+  --gameBgPosition: left top, right top, right bottom, left bottom, center top,
+    right center, center bottom, left center, right top, center;
+  --gameBgRepeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat, no-repeat, no-repeat, repeat-y, repeat;
+  --gameBgSize: auto, auto, auto, auto, calc(100% - 82px) 50px,
+    72px calc(100% - 62px), calc(100% - 82px) 50px, 50px calc(100% - 62px), auto,
+    auto;
+
+  --inputBg0: var(--color1);
+  --inputColor0: var(--color12);
+  --inputBorder0: rgba(255, 255, 255, 0.06);
+
+  --btnBg0: var(--color2);
+  --btnRGBA0: rgb(227, 190, 89, 0.8);
+  --btnBgHover0: var(--color3);
+  --btnBg1: var(--color14);
+  --btnBgHover1: var(--color15);
+  --btnBg2: var(--color8);
+  --btnBgHover2: var(--color9);
+  --btnBg3: var(--btnBg1);
+  --btnBgHover3: var(--color15);
+  --disabledBtnBg: var(--color10);
+  --btnRadius: 4px;
+  --btnRadius2: var(--btnRadius);
+  --checkbox: var(--color2);
+  --btnShadow: 0px 4px 0px rgba(0, 0, 0, 0.14),
+    inset 0px 2px 0px rgba(255, 255, 255, 0.17),
+    inset 0px 21px 0px rgba(255, 255, 255, 0.07),
+    inset 0px -3px 0px rgba(0, 0, 0, 0.17);
+  --titlesShadow: 0px 2px 0px #000000;
+
+  --iconFill0: var(--color0);
+  --iconFill1: var(--color2);
+  --iconFill2: var(--errorBg);
+  --iconFill3: var(--color12);
+
+  --opt0: #35b7af;
+  --opt1: var(--errorBg);
+  --opt2: #b7a235;
+  --opt3: #57bd27;
+  --opt4: #3579b7;
+  --opt5: #2748bd;
+  --opt6: #5735b7;
+  --opt7: #b127bd;
+  --opt8: #b73573;
+  --opt9: #b73573;
+  --opt10: #b76c35;
+  --opt11: #7cbeba;
+  --opt12: #c27c89;
+  --opt13: #b9af7a;
+  --opt14: #8dc075;
+  --opt15: #7a9dbe;
+  --opt16: #7788c1;
+  --opt17: #8876bb;
+  --opt18: #bb7bc0;
+  --opt19: #bc7195;
+  --opt20: #ba9478;
+  --opt21: #527a78;
+  --opt22: #8c404e;
+  --opt23: #857b47;
+  --opt24: #588c40;
+
+  --colorPending: var(--color2);
+  --colorOpen: var(--opt3);
+  --colorClosed: var(--color8);
+}

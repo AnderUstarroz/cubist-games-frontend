@@ -110,3 +110,12 @@ export async function update_available() {
   }
   return 1;
 }
+
+const THEMES: string[] = ["galaxy", "badlands"];
+
+export function get_theme(): string {
+  return process.env.NEXT_PUBLIC_THEME &&
+    THEMES.includes((process.env.NEXT_PUBLIC_THEME as string).toLowerCase())
+    ? process.env.NEXT_PUBLIC_THEME
+    : THEMES[0];
+}

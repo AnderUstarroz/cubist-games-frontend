@@ -209,19 +209,19 @@ const AdminHome: NextPage = () => {
               <ul>
                 <li>
                   <p>Default configuration for new games</p>
-                  <Button>
+                  <Button className="btnRadius2 button3">
                     <a href="admin/global-settings">Global settings</a>
                   </Button>
                 </li>
                 <li>
                   <p>Edit existing games</p>{" "}
-                  <Button>
+                  <Button className="btnRadius2 button3">
                     <a href="admin/games">Manage Games</a>
                   </Button>
                 </li>
                 <li>
                   <p>Create a new game</p>
-                  <Button>
+                  <Button className="btnRadius2 button3">
                     <a href="admin/game">New Game</a>
                   </Button>
                 </li>

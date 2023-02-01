@@ -68,7 +68,9 @@ export default function GamesList({
                             }}
                           >
                             <div className="gameCard">
-                              <div className="img">
+                              <div
+                                className={`img${g.cached.thumb1 ? "" : " bg"}`}
+                              >
                                 <ImageBlob blob={g.cached.thumb1} />
                                 {!!g.data.fireThreshold &&
                                   g.data.fireThreshold <= pot && (
@@ -85,7 +87,7 @@ export default function GamesList({
                                   {g.data.termsId}
                                 </span>
                               </div>
-                              <h4>{g.cached.definition?.title}</h4>
+                              <p>{g.cached.definition?.title}</p>
                             </div>
                             {state === "Open" && (
                               <CountdownTimer
@@ -105,8 +107,9 @@ export default function GamesList({
           </table>
           {!!fetchMoreGames && (
             <div className={styles.btns}>
-              <Button onClick={fetchMoreGames} className="sm">
-                <Icon cType="chevron" /> Load previous games
+              <Button onClick={fetchMoreGames} className="button3 sm">
+                <Icon cType="chevron" />
+                Previous games
               </Button>
             </div>
           )}

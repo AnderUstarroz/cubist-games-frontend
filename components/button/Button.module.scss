@@ -5,7 +5,8 @@
   font-weight: bold;
   border: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--btnRadius);
+  box-shadow: var(--btnShadow);
   display: flex;
   align-items: center;
   &:hover {

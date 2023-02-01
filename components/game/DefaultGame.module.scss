@@ -7,17 +7,23 @@
     z-index: 1;
     flex: 1;
     display: flex;
-    border-radius: 5px;
     flex-direction: column;
     gap: 2px;
     align-items: center;
     font-size: var(--fontSizeBig);
     justify-content: center;
     background-color: var(--color19);
+    h5 {
+      line-height: 20px;
+      font-size: 18px;
+    }
     time {
       font-size: var(--fontSizeXS);
     }
     &:not(&:last-of-type) {
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+
       &::before {
         z-index: -1;
         background-color: var(--color19);
@@ -32,8 +38,6 @@
       }
     }
     &:not(&:first-of-type) {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
       margin-left: 30px;
       time::before,
       time::after {
@@ -62,19 +66,22 @@
     }
     &:global {
       &.active {
-        background-color: var(--errorBg);
+        background-color: var(--activeState);
         &:not(&:last-of-type) {
           &::before {
-            background-color: var(--errorBg);
+            background-color: var(--activeState);
           }
         }
         &:not(&:first-of-type) {
           time::before {
-            border-bottom: 24px solid var(--errorBg);
+            border-bottom: 24px solid var(--activeState);
           }
           time::after {
-            border-top: 24px solid var(--errorBg);
+            border-top: 24px solid var(--activeState);
           }
+        }
+        time {
+          color: var(--gameColor);
         }
       }
     }

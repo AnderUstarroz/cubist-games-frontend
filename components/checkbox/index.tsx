@@ -35,7 +35,7 @@ export default function Checkbox(props: CheckboxType) {
     >
       <motion.path
         d="M 72 136 C 72 100.654 100.654 72 136 72 L 304 72 C 339.346 72 368 100.654 368 136 L 368 304 C 368 339.346 339.346 368 304 368 L 136 368 C 100.654 368 72 339.346 72 304 Z"
-        fill="var(--errorBg)"
+        fill="var(--checkbox)"
         strokeWidth={3}
         stroke="#FF008C"
         variants={boxVariants}

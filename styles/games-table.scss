@@ -12,7 +12,7 @@
     -moz-transition: background-color 1s ease-out;
     -o-transition: background-color 1s ease-out;
     transition: background-color 1s ease-out;
-    background-color: var(--boxBg0);
+    background-color: var(--tableRow);
     &:not(&.empty) {
       > td,
       > th {
@@ -29,8 +29,12 @@
     tr {
       &:not(&.empty) {
         &:hover {
-          background-color: var(--boxBg0Hover);
+          background-color: var(--tableRowHover);
         }
+      }
+      p {
+        margin: 0;
+        color: var(--color0);
       }
     }
   }
@@ -53,7 +57,13 @@
     border-radius: 8px;
     width: 48px;
     height: 48px;
-    background-color: var(--color14);
+    &.bg {
+      background-color: var(--color14);
+      box-shadow: inset 0px 2px 0px rgb(255 255 255 / 12%),
+        inset 0px 30px 5px rgb(255 255 255 / 5%),
+        inset 0px -3px 0px rgb(0 0 0 / 17%);
+    }
+
     img {
       position: absolute;
       top: 0;

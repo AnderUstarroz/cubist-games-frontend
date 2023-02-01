@@ -1,8 +1,5 @@
 .results {
   margin: 0 0 100px 0;
-  h2 {
-    margin-left: 32px;
-  }
   h4 {
     margin: 12px 16px;
     font-size: var(--fontSizeBig);
@@ -34,4 +31,9 @@
 }
 
 @media (max-width: 768px) {
+  .results {
+    h2 {
+      margin-left: 32px;
+    }
+  }
 }

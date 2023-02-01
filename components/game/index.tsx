@@ -19,15 +19,17 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
     <>
       <motion.ul className={styles.states}>
         <li className={gameState === "Open" ? "active" : ""}>
-          Open<time>{format_time(props.game.data.openTime)}</time>
+          <h5>Open</h5>
+          <time>{format_time(props.game.data.openTime)}</time>
         </li>
         <li className={gameState === "Closed" ? "active" : ""}>
-          Closed<time>{format_time(props.game.data.closeTime)}</time>
+          <h5>Closed</h5>
+          <time>{format_time(props.game.data.closeTime)}</time>
         </li>
         <li
           className={["Settled", "Voided"].includes(gameState) ? "active" : ""}
         >
-          {gameState === "Voided" ? gameState : "Settled"}
+          <h5>{gameState === "Voided" ? gameState : "Settled"}</h5>
           <time>{format_time(props.game.data.settleTime)}</time>
         </li>
       </motion.ul>

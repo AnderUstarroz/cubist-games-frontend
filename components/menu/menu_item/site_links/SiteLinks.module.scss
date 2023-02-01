@@ -5,11 +5,12 @@
   margin-right: 25px;
   a {
     font-size: var(--fontSizeMedium);
+    text-shadow: none;
   }
 }
 .siteName {
   text-transform: uppercase;
-  background-color: #f3ec78;
+  background-color: var(--color2);
   background-image: var(--siteNameColor);
   background-size: 100%;
   background-clip: text;

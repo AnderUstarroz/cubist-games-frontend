@@ -130,7 +130,7 @@ export default function AdminMenu({ toggle }: HomeMenuType) {
         </MenuItem>
       )}
       <MenuItem whileTap={{}} whileHover={{}}>
-        <Button cType="wallet" />
+        <Button cType="wallet" className="btnRadius2" />
       </MenuItem>
     </motion.ul>
   );

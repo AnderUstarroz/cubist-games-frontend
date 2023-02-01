@@ -197,7 +197,12 @@ const Home: NextPage = () => {
                 />
               ) : (
                 <i>
-                  <Icon cType="sol" width={35} height={35} color="#4076bb" />
+                  <Icon
+                    cType="sol"
+                    width={35}
+                    height={35}
+                    color="var(--homeTitleIcon)"
+                  />
                 </i>
               )}
               <span>{process.env.NEXT_PUBLIC_SITE_NAME}</span>

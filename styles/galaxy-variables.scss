@@ -1,0 +1,111 @@
+@import "./galaxy-fonts.scss";
+
+html {
+  --fontFamily: "Rubik", sans-serif;
+  --fontFamily2: var(--fontFamily);
+
+  --bodyImage: url(../public/images/galaxy/bg.webp);
+  --footerBg: linear-gradient(180deg, #0e1a25 0%, #10222f 100%);
+  --navBg: linear-gradient(180deg, #0d191e 0%, #152a3d 100%);
+  --homeImg: url(../public/images/galaxy/home-desktop.webp);
+  --homeImgMobile: url(../public/images/galaxy/home-mobile.webp);
+  --CTABg: linear-gradient(180deg, #152a3d 0%, #0d191e 100%);
+
+  --color0: white;
+  --color1: #0b1b27;
+  --color2: #35b7af;
+  --color3: #288a84;
+  --color4: #1d635f;
+  --color5: #f3fcfb;
+  --color6: #fafafa;
+  --color7: #c4eeeb;
+  --color8: #bd2742;
+  --color9: #d8415c;
+  --color10: #fafafa;
+  --color11: #941f34;
+  --color12: #668fa3;
+  --color13: #aeaeae;
+  --color14: #20354f;
+  --color15: #2c4666;
+  --color16: #b4b2e6;
+  --color17: #1d3344fc;
+  --color18: #3a46b0;
+  --color19: #15293a;
+
+  --siteNameColor: linear-gradient(270deg, #bd2742 0.02%, #eb5973 149.72%);
+  --homeTitleBg: linear-gradient(#7ebbf4, #94d0fd, #c6e5ff);
+  --homeTitleIcon: #4076bb;
+  --activeState: var(--color8);
+
+  --chartLines: #2f586a;
+  --boxBg0: rgba(56, 96, 136, 0.2);
+  --boxBg1: rgba(56, 96, 136, 0.3);
+  --boxBg2: var(--boxBg0);
+  --boxBg0Hover: rgba(56, 96, 136, 0.6);
+  --tableRow: var(--boxBg0);
+  --tableRowHover: var(--boxBg0Hover);
+  --errorBg: var(--color8);
+  --gameBgColor: var(--boxBg0);
+  --gameBorder: 1px solid var(--inputBorder0);
+  --gameRadius: 8px;
+  --gameColor: inherit;
+  --gameBgImage: none;
+  --gameBgPosition: none;
+  --gameBgRepeat: none;
+  --gameBgSize: none;
+
+  --inputBg0: var(--color1);
+  --inputColor0: var(--color12);
+  --inputBorder0: rgba(255, 255, 255, 0.06);
+
+  --btnBg0: var(--color2);
+  --btnRGBA0: rgb(53, 183, 175, 0.8);
+  --btnBgHover0: var(--color3);
+  --btnBg1: var(--color14);
+  --btnBgHover1: var(--color15);
+  --btnBg2: var(--color8);
+  --btnBgHover2: var(--color9);
+  --btnBg3: var(--btnBg0);
+  --btnBgHover3: var(--btnBgHover0);
+  --disabledBtnBg: var(--color10);
+  --btnRadius: 6px;
+  --btnRadius2: 50px;
+  --checkbox: var(--errorBg);
+  --btnShadow: none;
+  --titlesShadow: none;
+
+  --iconFill0: var(--color0);
+  --iconFill1: var(--color2);
+  --iconFill2: var(--errorBg);
+  --iconFill3: var(--color12);
+
+  --opt0: var(--color2);
+  --opt1: var(--errorBg);
+  --opt2: #b7a235;
+  --opt3: #57bd27;
+  --opt4: #3579b7;
+  --opt5: #2748bd;
+  --opt6: #5735b7;
+  --opt7: #b127bd;
+  --opt8: #b73573;
+  --opt9: #b73573;
+  --opt10: #b76c35;
+  --opt11: #7cbeba;
+  --opt12: #c27c89;
+  --opt13: #b9af7a;
+  --opt14: #8dc075;
+  --opt15: #7a9dbe;
+  --opt16: #7788c1;
+  --opt17: #8876bb;
+  --opt18: #bb7bc0;
+  --opt19: #bc7195;
+  --opt20: #ba9478;
+  --opt21: #527a78;
+  --opt22: #8c404e;
+  --opt23: #857b47;
+  --opt24: #588c40;
+
+  --colorPending: var(--color2);
+  --colorOpen: var(--opt3);
+  --colorClosed: var(--color8);
+}

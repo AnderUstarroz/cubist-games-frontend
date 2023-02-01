@@ -1,7 +1,7 @@
 .myBets {
   border-collapse: collapse;
   font-size: var(--fontSizeXS);
-  background-color: var(--inputBg0);
+  background-color: var(--boxBg1);
   table-layout: fixed;
   width: 100%;
 
@@ -11,13 +11,15 @@
   }
   th {
     color: var(--inputColor0);
-    background-color: var(--boxBg0);
   }
 
   th,
   td {
     border-bottom: 1px solid var(--inputBorder0);
     padding: 8px 0;
+  }
+  tbody tr {
+    background-color: var(--boxBg0);
   }
   tr {
     > * {

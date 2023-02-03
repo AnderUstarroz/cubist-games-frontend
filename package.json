@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cubist-collective/cubist-games-lib": "^0.0.4",
+    "@cubist-collective/cubist-games-lib": "^0.0.5",
     "@rumess/react-flip-countdown": "^1.2.6",
     "@uiw/react-md-editor": "^3.19.0",
     "date-fns": "^2.29.3",
     "framer-motion": "^7.3.2",
     "idb": "^7.1.0",
-    "next": "12.3.4",
+    "next": "12.2.5",
     "next-remove-imports": "^1.0.7",
     "next-transpile-modules": "^9.0.0",
     "react": "18.2.0",

@@ -8,6 +8,7 @@ export interface StakeButtonsType {
   };
   errors: { [key: string]: string };
   handleUpdateSettings: Function;
+  handleValidateSettings: Function;
   showModal: Function;
   maxDecimals: number;
 }

@@ -22,6 +22,7 @@ export default function Profits({
   settings,
   errors,
   handleUpdateSettings,
+  handleValidateSettings,
   showModal,
   modals,
   setModals,
@@ -179,6 +180,12 @@ export default function Profits({
                                       )
                                     )
                                   }
+                                  onBlur={() =>
+                                    handleValidateSettings(
+                                      "profitSharing",
+                                      settings.profitSharing
+                                    )
+                                  }
                                 />
                                 <span>Share</span>
                                 <em className="icon1">%</em>
@@ -200,7 +207,14 @@ export default function Profits({
                                         k,
                                         "treasury",
                                         e.target.value
-                                      )
+                                      ),
+                                      ["fee"]
+                                    )
+                                  }
+                                  onBlur={() =>
+                                    handleValidateSettings(
+                                      "profitSharing",
+                                      settings.profitSharing
                                     )
                                   }
                                 />
@@ -242,9 +256,14 @@ export default function Profits({
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleUpdateSettings(
                         "fee",
-                        num_format(parse_float_input(e.target.value, 0, 100), 2)
+                        num_format(
+                          parse_float_input(e.target.value, 0, 100),
+                          2
+                        ),
+                        ["profitSharing"]
                       )
                     }
+                    onBlur={() => handleValidateSettings("fee", settings.fee)}
                     min={0}
                     max={100}
                     step={0.01}

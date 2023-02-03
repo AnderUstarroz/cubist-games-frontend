@@ -218,8 +218,8 @@ const Game: NextPage = () => {
     title: "",
     description: "",
     options: [
-      { title: "Type option", description: "" },
-      { title: "Type option", description: "" },
+      { title: "", description: "" },
+      { title: "", description: "" },
     ],
   });
   const [definitionErrors, setDefinitionErrors] = useState<{
@@ -281,17 +281,28 @@ const Game: NextPage = () => {
     return false;
   };
 
-  const handleUpdateGameSettings = (key: string, value: any) => {
-    delete errors[key];
+  const handleUpdateGameSettings = (
+    key: string,
+    value: any,
+    errorFields: string[] = []
+  ) => {
+    errorFields.push(key);
+    errorFields.map((errorField) => delete errors[errorField]);
     setErrors(errors);
-    const updatedSettings = { ...gameSettings, [key]: value };
-    if (validateSettingsField(key, value, "", { Settings: updatedSettings })) {
+    setGameSettings({ ...gameSettings, [key]: value });
+  };
+
+  const handleValidateSettings = (key: string, value: any) => {
+    if (
+      validateSettingsField(key, value, "", {
+        Settings: { ...gameSettings, [key]: value },
+      })
+    ) {
       if (key in COMBINED_INPUTS) {
         COMBINED_INPUTS[key].map((input: string) => delete errors[input]);
         setErrors(errors);
       }
     }
-    setGameSettings(updatedSettings);
   };
 
   const handleSave = () => {
@@ -406,9 +417,6 @@ const Game: NextPage = () => {
     delete definitionErrors[key];
     setDefinitionErrors(definitionErrors);
     const updatedDescription = { ...definition, [key]: value };
-    validateSettingsField(key, value, "Definition", {
-      Description: updatedDescription,
-    });
     setDefinition(updatedDescription);
   };
 
@@ -798,6 +806,7 @@ const Game: NextPage = () => {
                 errors={errors}
                 showModal={showModal}
                 handleUpdateSettings={handleUpdateGameSettings}
+                handleValidateSettings={handleValidateSettings}
               />
               {!!systemConfig && (
                 <Profits
@@ -806,6 +815,7 @@ const Game: NextPage = () => {
                   errors={errors}
                   showModal={showModal}
                   handleUpdateSettings={handleUpdateGameSettings}
+                  handleValidateSettings={handleValidateSettings}
                   modals={modals}
                   setModals={setModals}
                 />
@@ -815,12 +825,14 @@ const Game: NextPage = () => {
                 errors={errors}
                 showModal={showModal}
                 handleUpdateSettings={handleUpdateGameSettings}
+                handleValidateSettings={handleValidateSettings}
               />
               <StakeButtons
                 settings={gameSettings}
                 errors={errors}
                 showModal={showModal}
                 handleUpdateSettings={handleUpdateGameSettings}
+                handleValidateSettings={handleValidateSettings}
                 maxDecimals={maxDecimals}
               />
               <div className={styles.flexCols}>
@@ -867,6 +879,12 @@ const Game: NextPage = () => {
                           onChange={(option, _actionMeta) => {
                             handleUpdateGameSettings("termsId", option?.value);
                           }}
+                          onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                            handleValidateSettings(
+                              "termsId",
+                              gameSettings.termsId
+                            )
+                          }
                         />
                         <span>Terms & Conditions</span>
                       </label>
@@ -1224,6 +1242,14 @@ const Game: NextPage = () => {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           handleUpdateDefinition("title", e.target.value)
                         }
+                        onBlur={() =>
+                          validateSettingsField(
+                            "title",
+                            definition.title,
+                            "Definition",
+                            definition
+                          )
+                        }
                       />
                       <span>Game title</span>
                     </label>
@@ -1243,6 +1269,14 @@ const Game: NextPage = () => {
                             text.slice(0, 1000)
                           )
                         }
+                        onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                          validateSettingsField(
+                            "description",
+                            definition.description,
+                            "Definition",
+                            definition
+                          )
+                        }
                         {...mkEditorDefaults}
                       />
                       <span>Description</span>
@@ -1258,7 +1292,7 @@ const Game: NextPage = () => {
                           options: [
                             ...definition.options,
                             {
-                              title: `Type option`,
+                              title: ``,
                               description: "",
                             },
                           ],
@@ -1290,6 +1324,16 @@ const Game: NextPage = () => {
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
                             ) => handleUpdateOption("title", k, e.target.value)}
+                            onBlur={() =>
+                              validateSettingsField(
+                                "options",
+                                definition.options,
+                                "Definition",
+                                {
+                                  Description: definition,
+                                }
+                              )
+                            }
                           />
                           <span>Title</span>
                         </label>

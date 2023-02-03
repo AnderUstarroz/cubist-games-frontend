@@ -11,6 +11,7 @@ export default function DatesSettings({
   settings,
   errors,
   handleUpdateSettings,
+  handleValidateSettings,
   showModal,
 }: DatesSettingsType) {
   const TZ = `Time zone: ${
@@ -32,6 +33,9 @@ export default function DatesSettings({
                   value={format(settings.openTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleUpdateSettings("openTime", new Date(e.target.value))
+                  }
+                  onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                    handleValidateSettings("openTime", settings.openTime)
                   }
                 />
                 <span>Open Time</span>
@@ -67,6 +71,9 @@ export default function DatesSettings({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleUpdateSettings("closeTime", new Date(e.target.value))
                   }
+                  onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                    handleValidateSettings("closeTime", settings.closeTime)
+                  }
                 />
                 <span>Close time</span>
                 <Icon
@@ -100,6 +107,9 @@ export default function DatesSettings({
                   value={format(settings.settleTime, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleUpdateSettings("settleTime", new Date(e.target.value))
+                  }
+                  onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                    handleValidateSettings("settleTime", settings.settleTime)
                   }
                 />
                 <span>Settle time</span>

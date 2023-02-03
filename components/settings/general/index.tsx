@@ -12,6 +12,7 @@ export default function GeneralSettings({
   settings,
   errors,
   handleUpdateSettings,
+  handleValidateSettings,
   showModal,
 }: GeneralSettingsType) {
   return (
@@ -96,6 +97,12 @@ export default function GeneralSettings({
                   handleUpdateSettings(
                     "fireThreshold",
                     parse_float_input(e.target.value, settings.fireThreshold)
+                  )
+                }
+                onBlur={() =>
+                  handleValidateSettings(
+                    "fireThreshold",
+                    settings.fireThreshold
                   )
                 }
                 min={0}

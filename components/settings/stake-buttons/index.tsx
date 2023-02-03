@@ -14,6 +14,7 @@ export default function StakeButtons({
   settings,
   errors,
   handleUpdateSettings,
+  handleValidateSettings,
   maxDecimals,
   showModal,
 }: StakeButtonsType) {
@@ -69,8 +70,12 @@ export default function StakeButtons({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleUpdateSettings(
                       "minStake",
-                      parse_float_input(e.target.value, settings.minStake)
+                      parse_float_input(e.target.value, settings.minStake),
+                      ["stakeButtons"]
                     )
+                  }
+                  onBlur={() =>
+                    handleValidateSettings("minStake", settings.minStake)
                   }
                   min={1 / Math.pow(10, maxDecimals)}
                   max={100}
@@ -102,8 +107,12 @@ export default function StakeButtons({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleUpdateSettings(
                       "minStep",
-                      parse_float_input(e.target.value, settings.minStep)
+                      parse_float_input(e.target.value, settings.minStep),
+                      ["stakeButtons"]
                     )
+                  }
+                  onBlur={() =>
+                    handleValidateSettings("minStep", settings.minStep)
                   }
                   min={1 / Math.pow(10, maxDecimals)}
                   max={100}
@@ -178,7 +187,14 @@ export default function StakeButtons({
                         k === l
                           ? parse_float_input(e.target.value, settings.minStake)
                           : v
-                      )
+                      ),
+                      ["minStake", "minStep"]
+                    )
+                  }
+                  onBlur={() =>
+                    handleValidateSettings(
+                      "stakeButtons",
+                      settings.stakeButtons
                     )
                   }
                   min={settings.minStake}

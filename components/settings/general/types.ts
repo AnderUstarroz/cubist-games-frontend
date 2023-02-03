@@ -11,5 +11,6 @@ export interface GeneralSettingsType {
   };
   errors: { [key: string]: string };
   handleUpdateSettings: Function;
+  handleValidateSettings: Function;
   showModal: Function;
 }

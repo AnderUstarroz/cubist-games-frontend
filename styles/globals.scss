@@ -281,7 +281,7 @@ button {
     background-color: var(--disabledBtnBg);
     color: var(--color13);
     &:hover {
-      background-color: var(--btnBgHover1);
+      background-color: var(--disabledBtnHoverBg);
     }
   }
   &:hover {

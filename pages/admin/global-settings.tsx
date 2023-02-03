@@ -221,22 +221,21 @@ const GameSettings: NextPage = () => {
   const handleUpdateSettings = (key: string, value: any) => {
     delete errors[key];
     setErrors(errors);
-    const updatedSettings = { ...settings, [key]: value };
-    if (validateSettingsField(key, value, "", { Settings: updatedSettings })) {
+    setSettings({ ...settings, [key]: value });
+  };
+
+  const handleValidateSettings = (key: string, value: any) => {
+    if (validateSettingsField(key, value, "", { Settings: settings })) {
       if (key in COMBINED_INPUTS) {
         COMBINED_INPUTS[key].map((input: string) => delete errors[input]);
         setErrors(errors);
       }
     }
-    setSettings(updatedSettings);
   };
-
   const handleUpdateTerms = (key: string, value: any) => {
     delete termsErrors[key];
     setTermsErrors(termsErrors);
-    const updatedTerms = { ...terms, [key]: value };
-    validateSettingsField(key, value, "Terms", { Terms: updatedTerms });
-    setTerms(updatedTerms);
+    setTerms({ ...terms, [key]: value });
   };
 
   const handleSave = () => {
@@ -484,6 +483,7 @@ const GameSettings: NextPage = () => {
                 errors={errors}
                 showModal={showModal}
                 handleUpdateSettings={handleUpdateSettings}
+                handleValidateSettings={handleValidateSettings}
                 modals={modals}
                 setModals={setModals}
               />
@@ -492,12 +492,14 @@ const GameSettings: NextPage = () => {
                 errors={errors}
                 showModal={showModal}
                 handleUpdateSettings={handleUpdateSettings}
+                handleValidateSettings={handleValidateSettings}
               />
               <StakeButtons
                 settings={settings}
                 errors={errors}
                 showModal={showModal}
                 handleUpdateSettings={handleUpdateSettings}
+                handleValidateSettings={handleValidateSettings}
                 maxDecimals={maxDecimals}
               />
               {/* <fieldset className={styles.grid}>
@@ -602,6 +604,14 @@ const GameSettings: NextPage = () => {
                                                 e.target.value
                                               )
                                             }
+                                            onBlur={() =>
+                                              validateSettingsField(
+                                                "id",
+                                                terms.id,
+                                                "Terms",
+                                                { Terms: terms }
+                                              )
+                                            }
                                           />
                                           <span>ID</span>
                                           <em
@@ -641,6 +651,14 @@ const GameSettings: NextPage = () => {
                                                 e.target.value
                                               )
                                             }
+                                            onBlur={() =>
+                                              validateSettingsField(
+                                                "title",
+                                                terms.title,
+                                                "Terms",
+                                                { Terms: terms }
+                                              )
+                                            }
                                           />
                                           <span>Title</span>
                                         </label>
@@ -661,6 +679,14 @@ const GameSettings: NextPage = () => {
                                               handleUpdateTerms(
                                                 "description",
                                                 text
+                                              )
+                                            }
+                                            onBlur={() =>
+                                              validateSettingsField(
+                                                "description",
+                                                terms.description,
+                                                "Terms",
+                                                { Terms: terms }
                                               )
                                             }
                                             {...mkEditorDefaults}

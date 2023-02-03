@@ -10,6 +10,7 @@ export interface ProfitsPropsType {
   };
   errors: { [key: string]: string };
   handleUpdateSettings: Function;
+  handleValidateSettings: Function;
   showModal: Function;
   setModals: Function;
   modals: { [key: string]: boolean };

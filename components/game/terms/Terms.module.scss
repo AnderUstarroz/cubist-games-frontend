@@ -10,3 +10,10 @@
     }
   }
 }
+.disclaimer {
+  font-size: var(--fontSizeSmall);
+  background-color: var(--tableRowHover);
+  padding: 10px;
+  border-radius: var(--btnRadius);
+  margin: 0 0 15px 0;
+}

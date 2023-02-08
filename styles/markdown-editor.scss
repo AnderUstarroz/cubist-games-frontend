@@ -21,7 +21,8 @@
   }
 }
 
-.w-md-editor-text-pre > code {
+.w-md-editor-text .w-md-editor-text-pre > code {
+  font-family: var(--fontFamily) !important;
   color: var(--inputColor0);
 }
 

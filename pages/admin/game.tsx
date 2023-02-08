@@ -611,6 +611,23 @@ const Game: NextPage = () => {
       );
       const [gamePda, bump] = await game_pda(authority, new BN(gameId));
       setPdas({ ...pdas, game: { pda: gamePda, bump: bump } }); // Add Game to the existing PDAs
+      // Throw error if there is no Terms & Conditions defined.
+      if (!config.terms.length) {
+        flashMsg(
+          <>
+            <span className="vAligned gap5">
+              Before creating games you need to create Terms & Conditions at
+              <Link href="/admin/global-settings">
+                <a className="link" title="Update global settings">
+                  Global Settings
+                </a>
+              </Link>
+            </span>
+          </>,
+          "error",
+          10000
+        );
+      }
       try {
         const existingGame = rustToInputsSettings(
           await solanaProgram.account.game.fetch(gamePda),
@@ -1188,6 +1205,25 @@ const Game: NextPage = () => {
                     </fieldset>
                   </section>
                 )}
+              <section>
+                <fieldset>
+                  <h3 className="vAligned">Note</h3>
+                  <ul className="sqList">
+                    <li>
+                      It is your responsibility to settle all games accurately
+                      and fairly.
+                    </li>
+                    <li>
+                      Please make sure any game you create is legal in your
+                      region.
+                    </li>
+                    <li>
+                      Follow your local legal regulations at all times. Game
+                      creators assume all liability.
+                    </li>
+                  </ul>
+                </fieldset>
+              </section>
               <div className="vAligned centered mb-big">
                 {gameSettings.settledAt &&
                   !gameSettings.cashedAt &&

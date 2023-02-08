@@ -30,6 +30,16 @@ export default function Terms({
             <div className="sqList">
               <h4>{terms.title}</h4>
               <ReactMarkdown>{terms.description as string}</ReactMarkdown>
+              <div className={styles.disclaimer}>
+                <p>
+                  Please make sure you trust the creator of the game to settle
+                  it accurately and fairly.
+                </p>
+                <p>
+                  Please make sure any game you participate in is legal in your
+                  region. Follow your local legal regulations at all times.
+                </p>
+              </div>
               {display && (
                 <div className={styles.terms}>
                   <label

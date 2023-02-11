@@ -6,7 +6,6 @@ import {
 } from "@solana/wallet-adapter-react";
 import {
   LedgerWalletAdapter,
-  PhantomWalletAdapter,
   SlopeWalletAdapter,
   SolflareWalletAdapter,
   SolletExtensionWalletAdapter,

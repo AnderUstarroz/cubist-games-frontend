@@ -7,7 +7,6 @@
   }
   ul {
     position: relative;
-    z-index: 2;
     flex: 1;
     li:not(:last-of-type) {
       margin: 0 0 20px 0;
@@ -16,7 +15,7 @@
 }
 .statsBox {
   display: flex;
-  gap: 25px;
+  gap: 15px;
   background-color: var(--boxBg2);
   border: 1px solid var(--inputBorder0);
   border-radius: 8px;
@@ -31,6 +30,19 @@
     }
   }
 }
+.rightStats {
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+  flex-direction: column;
+
+  > p {
+    text-align: center;
+    margin: 0;
+    color: var(--color12);
+    font-size: var(--fontSizeSmall);
+  }
+}
 
 .statsDef {
   margin: 0 0 5px 0;
@@ -39,6 +51,8 @@
     height: 2px;
   }
   span {
+    position: relative;
+    z-index: 2;
     cursor: pointer;
     font-size: var(--fontSizeXS);
     transition: color 1s ease-in-out;
@@ -88,6 +102,7 @@
     flex-direction: column;
     > label {
       font-size: 14px;
+      cursor: none;
     }
     > span {
       font-size: 18px;
@@ -100,6 +115,7 @@
     svg {
       width: 25px;
       height: 25px;
+      cursor: none;
     }
   }
 }

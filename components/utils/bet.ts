@@ -73,7 +73,7 @@ export const place_bet = async (
       tx.getEstimatedFee(connection),
     ])
   ).map((r: any) => (r.status !== "fulfilled" ? null : r.value));
-  if (!balance || !accountCost || !txFee) {
+  if (!accountCost || !txFee) {
     return flashMsg("Failed to read wallet's balance");
   }
 

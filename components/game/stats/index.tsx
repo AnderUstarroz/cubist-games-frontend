@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import styles from "./DefaultStats.module.scss";
 import { DEFAULT_ANIMATION } from "../../utils/animation";
@@ -127,46 +127,45 @@ function DefaultStats({
           </ul>
         </div>
         <div>
-          {game.data.showPot && (
-            <>
-              <Flame active={game.data.fireThreshold <= totalPot}>
-                <div
-                  className={`${styles.pot} ${
-                    game.data.fireThreshold <= totalPot ? styles.burning : ""
-                  }`}
-                >
-                  <i>
-                    <Icon
-                      cType="sol"
-                      color={
-                        game.data.fireThreshold <= totalPot
-                          ? "var(--color1)"
-                          : "var(--color0)"
-                      }
-                    />
-                  </i>
-                  <div>
-                    <label>Pot size</label>
-                    <CountUp
-                      start={prevPot}
-                      end={pot}
-                      decimals={2}
-                      decimal="."
-                      suffix={potUnit}
-                    />
+          <AnimatePresence>
+            {game.data.showPot && (
+              <motion.div className={styles.rightStats} {...DEFAULT_ANIMATION}>
+                <Flame active={game.data.fireThreshold <= totalPot}>
+                  <div
+                    className={`${styles.pot} ${
+                      game.data.fireThreshold <= totalPot ? styles.burning : ""
+                    }`}
+                  >
+                    <i>
+                      <Icon
+                        cType="sol"
+                        color={
+                          game.data.fireThreshold <= totalPot
+                            ? "var(--color1)"
+                            : "var(--color0)"
+                        }
+                      />
+                    </i>
+                    <div>
+                      <label>Pot size</label>
+                      <CountUp
+                        start={prevPot}
+                        end={pot}
+                        decimals={2}
+                        decimal="."
+                        suffix={potUnit}
+                      />
+                    </div>
                   </div>
-                </div>
-              </Flame>
-              <p>
-                {solFiatPrice
-                  ? `Pot size: ${solana_to_usd(
-                      totalPot,
-                      solFiatPrice
-                    )}${potUnit} USD`
-                  : ""}
-              </p>
-            </>
-          )}
+                </Flame>
+                <p>
+                  {solFiatPrice
+                    ? `$${solana_to_usd(totalPot, solFiatPrice)}${potUnit} USD`
+                    : ""}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>
@@ -178,11 +177,19 @@ export default function Stats({
   game,
   prevGame,
   setMainModal,
+  solFiatPrice,
 }: StatsPropsType) {
   const Stats =
     template && Templates.hasOwnProperty(template)
       ? Templates[template]
       : DefaultStats;
 
-  return <Stats game={game} prevGame={prevGame} setMainModal={setMainModal} />;
+  return (
+    <Stats
+      game={game}
+      prevGame={prevGame}
+      setMainModal={setMainModal}
+      solFiatPrice={solFiatPrice}
+    />
+  );
 }

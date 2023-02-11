@@ -18,7 +18,6 @@ const MyBets = dynamic(() => import("../my-bets"));
 const Button = dynamic(() => import("../../button"));
 const Icon = dynamic(() => import("../../icon"));
 const CountdownTimer = dynamic(() => import("../../countdown_timer"));
-const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
 
 export default function CTA({
   publickey,

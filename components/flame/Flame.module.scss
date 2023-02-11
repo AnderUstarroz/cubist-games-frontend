@@ -1,6 +1,8 @@
 .container {
   position: relative;
   display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
   // padding: 50px 0 50px 0;
   > svg {
     position: absolute;
@@ -14,15 +16,18 @@
   //   rgba(255, 193, 7, 0) 90%
   // );
   &:global {
-    &.activeBg::before {
-      content: "";
-      width: 125px;
-      height: 90px;
-      bottom: calc(50% - 45px);
-      left: -10px;
-      position: absolute;
-      border-radius: 50%;
-      background-color: #ff9800;
+    &.activeBg {
+      margin-bottom: 20px;
+      &::before {
+        content: "";
+        width: 140px;
+        height: 70px;
+        bottom: calc(50% - 35px);
+        left: calc(50% - 70px);
+        position: absolute;
+        border-radius: 50%;
+        background-color: #ff9800;
+      }
     }
   }
 }
@@ -41,14 +46,13 @@
 .flameWrapper {
   display: flex;
   position: absolute;
-  bottom: calc(50% - 30px);
+  bottom: calc(50% - 20px);
   z-index: 1;
-  left: calc(50% - 80px);
-  width: 170px;
+  left: calc(50% - 100px);
+  width: 200px;
   height: 190px;
   border-radius: 70%;
   overflow: hidden;
-
   .fire {
     filter: url(#goo);
     position: absolute;

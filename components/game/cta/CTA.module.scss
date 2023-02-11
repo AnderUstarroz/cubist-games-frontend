@@ -81,51 +81,11 @@
   }
 }
 
-.pot,
-.pot i {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.pot {
-  gap: 5px;
-  > div {
-    display: flex;
-    flex-direction: column;
-    > label {
-      font-size: var(--fontSizeXS);
-    }
-  }
-  i {
-    border: 2px solid var(--color0);
-    border-radius: 50%;
-    padding: 5px;
-  }
-}
-.burning {
-  color: var(--color1);
-  animation: fadeText 2s infinite;
-  i {
-    border-color: var(--color1);
-  }
-}
 .sol {
   display: flex;
   background-color: var(--color0);
   border-radius: 50%;
   padding: 3px;
-}
-
-@keyframes fadeText {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 1;
-  }
 }
 
 @media (max-width: 768px) {

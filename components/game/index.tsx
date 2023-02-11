@@ -47,6 +47,7 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         game={props.game}
         prevGame={props.prevGame}
         setMainModal={props.setMainModal}
+        solFiatPrice={props.solFiatPrice}
       />
       {gameState === "Open" && (
         <StakeButtons
@@ -79,11 +80,9 @@ function DefaultGame({ template, ...props }: DefaultGamePropsType) {
         publickey={props.publickey}
         template={template}
         game={props.game}
-        prevGame={props.prevGame}
         myBets={props.myBets}
         playerBets={props.playerBets}
         handleClaim={props.handleClaim}
-        solFiatPrice={props.solFiatPrice}
         modals={props.modals}
         setModals={props.setModals}
         termsAgreed={props.terms.agreed}

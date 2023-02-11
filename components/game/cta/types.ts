@@ -7,11 +7,9 @@ export interface CTAPropsType {
   publickey: PublicKey | null;
   template: string | null;
   game: GameType;
-  prevGame: PrevGameType;
   myBets: MyBetType[];
   playerBets: PlayerBetsType | null;
   handleClaim: Function;
-  solFiatPrice: number | null;
   modals: { [key: string]: boolean };
   setModals: Function;
   termsAgreed: boolean;

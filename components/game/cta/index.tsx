@@ -1,7 +1,6 @@
-import { game_state, get_pot } from "../../utils/game";
+import { game_state } from "../../utils/game";
 import { CTAPropsType, ShowCTA } from "./types";
 import styles from "./CTA.module.scss";
-import CountUp from "react-countup";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -10,7 +9,6 @@ import {
   lamports_to_sol,
   num_format,
   PlayerBetType,
-  solana_to_usd,
 } from "@cubist-collective/cubist-games-lib";
 import { AnimatePresence } from "framer-motion";
 import { calculate_stakes } from "../../utils/bet";
@@ -19,31 +17,16 @@ import { flashMsg } from "../../utils/helpers";
 const MyBets = dynamic(() => import("../my-bets"));
 const Button = dynamic(() => import("../../button"));
 const Icon = dynamic(() => import("../../icon"));
-const Flame = dynamic(() => import("../../flame"));
 const CountdownTimer = dynamic(() => import("../../countdown_timer"));
 const ReactTooltip = dynamic(() => import("react-tooltip"), { ssr: false });
-
-const formatPot = (pot: number, prevPot: number): [number, number, string] => {
-  const divPot = (n: number) => (prevPot ? prevPot / n : prevPot);
-  if (pot < 1000) {
-    return [pot, prevPot, ""]; // Thousands
-  } else if (pot < 1_000_000) {
-    return [pot / 1000, divPot(1000), "K"]; // Thousands
-  } else if (pot < 1_000_000_000) {
-    return [pot / 1_000_000, divPot(1_000_000), "M"]; // Millions
-  }
-  return [pot / 1_000_000_000, divPot(1_000_000_000), "B"]; // Billions
-};
 
 export default function CTA({
   publickey,
   game,
-  prevGame,
   template,
   myBets,
   playerBets,
   handleClaim,
-  solFiatPrice,
   modals,
   setModals,
   termsAgreed,
@@ -104,8 +87,6 @@ export default function CTA({
     setShowButton(handleShowButton());
   });
 
-  const totalPot = get_pot(game.data);
-  const [pot, prevPot, potUnit] = formatPot(totalPot, prevGame.pot);
   return (
     <>
       <div className={styles.CTA}>
@@ -124,47 +105,6 @@ export default function CTA({
             </Link>
           </Button>
           <div className={styles.centerCTA}>
-            {game.data.showPot && (
-              <Flame
-                active={game.data.fireThreshold <= totalPot}
-                data-tip={
-                  solFiatPrice
-                    ? `Pot size: ${solana_to_usd(
-                        totalPot,
-                        solFiatPrice
-                      )}${potUnit} USD`
-                    : ""
-                }
-                data-for="potTooltip"
-              >
-                <div
-                  className={`${styles.pot} ${
-                    game.data.fireThreshold <= totalPot ? styles.burning : ""
-                  }`}
-                >
-                  <i>
-                    <Icon
-                      cType="sol"
-                      color={
-                        game.data.fireThreshold <= totalPot
-                          ? "var(--color1)"
-                          : "var(--color0)"
-                      }
-                    />
-                  </i>
-                  <div>
-                    <label>Pot size</label>
-                    <CountUp
-                      start={prevPot}
-                      end={pot}
-                      decimals={2}
-                      decimal="."
-                      suffix={potUnit}
-                    />
-                  </div>
-                </div>
-              </Flame>
-            )}
             {gameState === "Open" && (
               <CountdownTimer
                 openTime={game.data.openTime}
@@ -238,7 +178,6 @@ export default function CTA({
           <MyBets template={template} myBets={myBets} />
         </div>
       </div>
-      <ReactTooltip id="potTooltip" globalEventOff="click" />
     </>
   );
 }

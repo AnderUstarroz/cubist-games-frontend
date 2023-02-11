@@ -1,20 +1,37 @@
 .stats {
   margin-bottom: 40px;
+
   h2 {
     font-size: 24px;
     margin: 0 32px 15px 0;
   }
   ul {
-    background-color: var(--boxBg2);
-    border: 1px solid var(--inputBorder0);
-    border-radius: 8px;
-    padding: 32px;
-
-    li {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    li:not(:last-of-type) {
       margin: 0 0 20px 0;
     }
   }
 }
+.statsBox {
+  display: flex;
+  gap: 25px;
+  background-color: var(--boxBg2);
+  border: 1px solid var(--inputBorder0);
+  border-radius: 8px;
+  padding: 32px;
+
+  > div {
+    flex: 1;
+    display: flex;
+    vertical-align: middle;
+    &:last-of-type {
+      justify-content: center;
+    }
+  }
+}
+
 .statsDef {
   margin: 0 0 5px 0;
   gap: 8px;
@@ -50,10 +67,62 @@
   }
 }
 
+.burning {
+  color: var(--color1);
+  animation: fadeText 2s infinite;
+  i {
+    border-color: var(--color1) !important;
+  }
+}
+
+.pot,
+.pot i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pot {
+  gap: 7px;
+  > div {
+    display: flex;
+    flex-direction: column;
+    > label {
+      font-size: 14px;
+    }
+    > span {
+      font-size: 18px;
+    }
+  }
+  i {
+    border: 2px solid var(--color0);
+    border-radius: 50%;
+    padding: 7px;
+    svg {
+      width: 25px;
+      height: 25px;
+    }
+  }
+}
+@keyframes fadeText {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .stats {
     h2 {
       margin: 0 32px 15px 32px;
     }
+  }
+  .statsBox {
+    flex-direction: column;
+    gap: 50px;
   }
 }

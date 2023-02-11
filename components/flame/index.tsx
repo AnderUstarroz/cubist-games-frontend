@@ -3,7 +3,10 @@ import { FlamePropsType } from "./types";
 
 export default function Flame({ active, children, ...props }: FlamePropsType) {
   return (
-    <div className={styles.container} {...props}>
+    <div
+      className={`${styles.container}${active ? " activeBg" : ""}`}
+      {...props}
+    >
       {active ? (
         <>
           <div className={styles.flameWrapper}>
@@ -26,7 +29,7 @@ export default function Flame({ active, children, ...props }: FlamePropsType) {
               <figure></figure>
             </div>
           </div>
-          <svg version="1.1">
+          <svg version="1.1" style={{ display: "none" }}>
             <defs>
               <filter id="goo">
                 <feGaussianBlur

@@ -4,6 +4,7 @@ export interface DefaultStatsPropsType {
   game: GameType;
   prevGame: PrevGameType;
   setMainModal: Function;
+  solFiatPrice: number | null;
 }
 
 export interface StatsPropsType extends DefaultStatsPropsType {

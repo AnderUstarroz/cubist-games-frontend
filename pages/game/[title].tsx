@@ -444,6 +444,10 @@ const GamePage: NextPage = ({ data, path }: any) => {
 };
 
 export async function getServerSideProps(context: any) {
+  context.res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=86400, stale-while-revalidate=172800" //Cached 24H
+  );
   const path = context.resolvedUrl;
   const authority = new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string);
   const connection = new Connection(
@@ -472,10 +476,6 @@ export async function getServerSideProps(context: any) {
     )
       .filter((i: any) => i.status === "fulfilled")
       .map((i: any) => i.value);
-    context.res.setHeader(
-      "Cache-Control",
-      "public, s-maxage=86400, stale-while-revalidate=172800" //Cached 24H
-    );
     const data = {
       idl: IDL,
       gameId: game.gameId.toNumber(),

@@ -453,7 +453,10 @@ export async function getServerSideProps(context: any) {
   const connection = new Connection(
     //process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string
     (process.env.NEXT_PUBLIC_ENV as string) === "production"
-      ? "https://rpc.ankr.com/solana/"
+      ? (process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string) ===
+        "https://silent-small-dust.solana-mainnet.quiknode.pro/2d3f8acf4c3d328b36e4c0705222dddaf370f4ea/"
+        ? "https://solana-mainnet.g.alchemy.com/v2/I6Q1rvRCHHzwOMWYJDL7JK2y7xfJDTNd/"
+        : (process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string)
       : "https://api.devnet.solana.com"
   );
   const provider = new AnchorProvider(

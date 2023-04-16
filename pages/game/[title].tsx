@@ -451,14 +451,15 @@ export async function getServerSideProps(context: any) {
   const path = context.resolvedUrl;
   const authority = new PublicKey(process.env.NEXT_PUBLIC_AUTHORITY as string);
   const connection = new Connection(
-    //process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string
     (process.env.NEXT_PUBLIC_ENV as string) === "production"
-      ? (process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string) ===
-        "https://silent-small-dust.solana-mainnet.quiknode.pro/2d3f8acf4c3d328b36e4c0705222dddaf370f4ea/"
+      ? (process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string).includes(
+          "2d3f8acf4c3d328b36e4c0705222dddaf370f4ea"
+        )
         ? "https://solana-mainnet.g.alchemy.com/v2/I6Q1rvRCHHzwOMWYJDL7JK2y7xfJDTNd/"
         : (process.env.NEXT_PUBLIC_SOLANA_RPC_HOST as string)
       : "https://api.devnet.solana.com"
   );
+  console.log("Connection:", connection.rpcEndpoint);
   const provider = new AnchorProvider(
     connection,
     new PhantomWalletAdapter() as any,

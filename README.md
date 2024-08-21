@@ -9,4 +9,4 @@ The frontend can be classified in two parts:
 
 # How to create your own games website
 
-Create your own prediction games in less than 5 minutes and totally free by following [this tutorial](https://cubistcollective.com/tutorial).
+Create your own prediction games in less than 5 minutes and totally free by following [this tutorial](https://cubistlabs.com/tutorial).
